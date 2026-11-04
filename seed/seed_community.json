@@ -1,0 +1,319 @@
+{
+  "_note": "Données FICTIVES de démonstration (demo=true).",
+  "reviews": [
+    {
+      "id": "demo-r1",
+      "blklot": "3609042",
+      "address": "907 Valencia St",
+      "period": "2022-2024",
+      "ratings": {
+        "repairs": 1,
+        "landlord": 2,
+        "safety": 2,
+        "noise": 2,
+        "value": 2
+      },
+      "text": "Le chauffage est tombé en panne trois hivers de suite. Il a fallu des mois et une plainte à la ville pour que quelque chose bouge. Humidité sur les murs de la chambre.",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-r2",
+      "blklot": "3609042",
+      "address": "907 Valencia St",
+      "period": "2023-2025",
+      "ratings": {
+        "repairs": 2,
+        "landlord": 1,
+        "safety": 3,
+        "noise": 1,
+        "value": 2
+      },
+      "text": "Bruit constant de la rue et du bar d'à côté jusqu'à 2h. Le gestionnaire répond rarement et les réparations sont promises sans date.",
+      "verified": false,
+      "demo": true
+    },
+    {
+      "id": "demo-r3",
+      "blklot": "3609042",
+      "address": "907 Valencia St",
+      "period": "2020-2022",
+      "ratings": {
+        "repairs": 2,
+        "landlord": 2,
+        "safety": 3,
+        "noise": 3,
+        "value": 3
+      },
+      "text": "Emplacement pratique, mais on m'a proposé un 'buyout' au bout de deux ans. Plusieurs voisins sont partis dans la même période.",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-r4",
+      "blklot": "3609042",
+      "address": "907 Valencia St",
+      "period": "2024-2025",
+      "ratings": {
+        "repairs": 1,
+        "landlord": 2,
+        "safety": 2,
+        "noise": 2,
+        "value": 1
+      },
+      "text": "Cafards récurrents, traitement de l'immeuble jamais fait en entier. Loyer élevé pour l'état du logement.",
+      "verified": false,
+      "demo": true
+    },
+    {
+      "id": "demo-r5",
+      "blklot": "0564C104",
+      "address": "2288 Broadway",
+      "period": "2019-2024",
+      "ratings": {
+        "repairs": 5,
+        "landlord": 5,
+        "safety": 5,
+        "noise": 4,
+        "value": 4
+      },
+      "text": "Immeuble très bien tenu. Les demandes de réparation sont traitées sous quelques jours et le propriétaire prévient toujours avant une visite.",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-r6",
+      "blklot": "0564C104",
+      "address": "2288 Broadway",
+      "period": "2021-2023",
+      "ratings": {
+        "repairs": 4,
+        "landlord": 5,
+        "safety": 5,
+        "noise": 4,
+        "value": 3
+      },
+      "text": "Calme, sûr, vue dégagée. Le loyer est un peu au-dessus de la moyenne mais l'entretien le justifie.",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-r7",
+      "blklot": "0564C104",
+      "address": "2288 Broadway",
+      "period": "2023-2025",
+      "ratings": {
+        "repairs": 5,
+        "landlord": 4,
+        "safety": 4,
+        "noise": 3,
+        "value": 4
+      },
+      "text": "Quelques travaux dans les parties communes, bien annoncés et rapides. Ascenseur parfois lent.",
+      "verified": false,
+      "demo": true
+    },
+    {
+      "id": "demo-r8",
+      "blklot": "5505019",
+      "address": "3033 Cesar Chavez St",
+      "period": "2021-2023",
+      "ratings": {
+        "repairs": 3,
+        "landlord": 2,
+        "safety": 3,
+        "noise": 3,
+        "value": 2
+      },
+      "text": "On a reçu un avis de départ pour 'occupation par le propriétaire'. Le logement a ensuite été remis en location plus cher.",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-r9",
+      "blklot": "5505019",
+      "address": "3033 Cesar Chavez St",
+      "period": "2022-2024",
+      "ratings": {
+        "repairs": 3,
+        "landlord": 3,
+        "safety": 3,
+        "noise": 4,
+        "value": 3
+      },
+      "text": "Rien de dramatique au quotidien, mais les communications du propriétaire sont floues et les augmentations arrivent sans explication.",
+      "verified": false,
+      "demo": true
+    },
+    {
+      "id": "demo-r10",
+      "blklot": "5505019",
+      "address": "3033 Cesar Chavez St",
+      "period": "2018-2021",
+      "ratings": {
+        "repairs": 2,
+        "landlord": 2,
+        "safety": 4,
+        "noise": 3,
+        "value": 2
+      },
+      "text": "Fuite dans la salle de bain réparée de manière provisoire. Il faut insister pour obtenir une réponse.",
+      "verified": false,
+      "demo": true
+    },
+    {
+      "id": "demo-r11",
+      "blklot": "5505019",
+      "address": "3033 Cesar Chavez St",
+      "period": "2024-2025",
+      "ratings": {
+        "repairs": 3,
+        "landlord": 3,
+        "safety": 4,
+        "noise": 3,
+        "value": 3
+      },
+      "text": "Quartier vivant, transports proches. Plusieurs voisins sont partis récemment, ambiance incertaine.",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-r12",
+      "blklot": "3609042",
+      "address": "907 Valencia St",
+      "period": "2021-2022",
+      "ratings": {
+        "repairs": 3,
+        "landlord": 3,
+        "safety": 2,
+        "noise": 2,
+        "value": 3
+      },
+      "text": "Serrure de l'entrée cassée pendant des semaines. Fin de bail correcte, dépôt de garantie rendu avec retard.",
+      "verified": false,
+      "demo": true
+    }
+  ],
+  "profiles": [
+    {
+      "id": "demo-p1",
+      "pseudo": "mission_nord",
+      "role": "current_tenant",
+      "blklot": "3609042",
+      "address": "907 Valencia St",
+      "period": "2022-",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-p2",
+      "pseudo": "valencia_vieux",
+      "role": "former_tenant",
+      "blklot": "3609042",
+      "address": "907 Valencia St",
+      "period": "2018-2022",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-p3",
+      "pseudo": "broadway_calme",
+      "role": "current_tenant",
+      "blklot": "0564C104",
+      "address": "2288 Broadway",
+      "period": "2020-",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-p4",
+      "pseudo": "colline_russe",
+      "role": "former_tenant",
+      "blklot": "0564C104",
+      "address": "2288 Broadway",
+      "period": "2016-2021",
+      "verified": false,
+      "demo": true
+    },
+    {
+      "id": "demo-p5",
+      "pseudo": "cesar_est",
+      "role": "current_tenant",
+      "blklot": "5505019",
+      "address": "3033 Cesar Chavez St",
+      "period": "2021-",
+      "verified": true,
+      "demo": true
+    },
+    {
+      "id": "demo-p6",
+      "pseudo": "bernal_local",
+      "role": "seeking_roommate",
+      "blklot": null,
+      "address": null,
+      "period": null,
+      "verified": false,
+      "demo": true,
+      "roommate": {
+        "budget_max": 1800,
+        "move_in": "2026-12-01",
+        "sleep": "tôt",
+        "cleanliness": "élevée",
+        "noise_tolerance": "faible",
+        "pets": "chat OK",
+        "smoking": "non",
+        "areas": [
+          "Mission",
+          "Bernal Heights"
+        ]
+      }
+    },
+    {
+      "id": "demo-p7",
+      "pseudo": "nuit_creative",
+      "role": "seeking_roommate",
+      "blklot": null,
+      "address": null,
+      "period": null,
+      "verified": false,
+      "demo": true,
+      "roommate": {
+        "budget_max": 2200,
+        "move_in": "2027-01-15",
+        "sleep": "tard",
+        "cleanliness": "moyenne",
+        "noise_tolerance": "élevée",
+        "pets": "pas d'animaux",
+        "smoking": "non",
+        "areas": [
+          "Mission",
+          "Castro"
+        ]
+      }
+    },
+    {
+      "id": "demo-p8",
+      "pseudo": "etudiant_sf",
+      "role": "seeking_housing",
+      "blklot": null,
+      "address": null,
+      "period": null,
+      "verified": false,
+      "demo": true,
+      "roommate": {
+        "budget_max": 1500,
+        "move_in": "2026-12-15",
+        "sleep": "moyen",
+        "cleanliness": "moyenne",
+        "noise_tolerance": "moyenne",
+        "pets": "indifférent",
+        "smoking": "non",
+        "areas": [
+          "Richmond",
+          "Sunset",
+          "Mission"
+        ]
+      }
+    }
+  ]
+}
