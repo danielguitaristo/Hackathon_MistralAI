@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Know Your Building</title>
+<meta name="description" content="City records and tenant voices for any San Francisco address.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --paper:#f6f2ea; --surface:#fffdf9; --ink:#191d22; --muted:#5a6068; --line:#d9d3c7;
+  --city:#1f4560; --city-tint:#e6edf2; --city-line:#bccbd6;
+  --voice:#5c2d7e; --voice-tint:#f1e9f6; --voice-line:#d8c6e5;
+  --green:#22693f; --green-tint:#e0f0e5; --orange:#9a5200; --orange-tint:#fbecd6; --red:#ab2319; --red-tint:#fae3e0;
+  --serif:"Fraunces",Georgia,"Songti SC","Noto Serif SC",serif;
+  --sans:"IBM Plex Sans",-apple-system,"PingFang SC","Noto Sans SC",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --wrap:1120px; --radius:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--sans)}
+h1,h2,h3,p{margin:0}
+h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1.1}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--city);outline-offset:2px;border-radius:4px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+.eyebrow{font:500 12px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 18px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:#fff;font-weight:600;cursor:pointer;text-decoration:none}
+.btn:hover{background:#343a42}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:rgba(0,0,0,.06)}
+.btn.voice{background:var(--voice);border-color:var(--voice)}
+.btn.voice:hover{background:#49216a}
+.btn[disabled]{opacity:.55;cursor:default}
+.link{background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+.mockbar{background:#191d22;color:#fff;font:500 13px/1.4 var(--mono);text-align:center;padding:7px 16px}
+.bar{position:sticky;top:0;z-index:1000;background:rgba(246,242,234,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:16px;min-height:62px;padding-top:8px;padding-bottom:8px}
+.brand{display:flex;align-items:center;gap:9px;background:none;border:0;padding:0;cursor:pointer;font:700 19px/1 var(--serif);letter-spacing:-.01em;white-space:nowrap}
+.brand svg{flex:none}
+.barsearch{flex:1;display:flex;max-width:480px;margin-left:auto}
+.barsearch input{flex:1;min-width:0;height:42px;border:1px solid var(--line);border-right:0;border-radius:999px 0 0 999px;background:var(--surface);padding:0 16px}
+.barsearch button{height:42px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:0 999px 999px 0;padding:0 16px;font-weight:600;cursor:pointer}
+.lang{margin-left:auto;height:42px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 8px}
+.barsearch + .lang{margin-left:0}
+
+/* landing */
+.hero{padding:72px 0 56px;display:grid;grid-template-columns:1.35fr .65fr;gap:48px;align-items:end}
+.hero h1{font-size:clamp(44px,7vw,84px);max-width:11em}
+.hero .lede{font-size:20px;max-width:32em;margin-top:22px;color:#3d4249}
+.bigsearch{display:flex;margin-top:32px;max-width:640px;background:var(--surface);border:2px solid var(--ink);border-radius:14px;overflow:hidden}
+.bigsearch input{flex:1;min-width:0;border:0;background:transparent;padding:18px 20px;font-size:19px}
+.bigsearch input:focus{outline:none}
+.bigsearch:focus-within{box-shadow:0 0 0 3px rgba(31,69,96,.3)}
+.bigsearch button{border:0;background:var(--ink);color:#fff;padding:0 26px;font-weight:600;font-size:17px;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}
+.chip-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font:400 13px var(--mono);cursor:pointer;min-height:36px}
+.chip-btn:hover{border-color:var(--ink)}
+.street{display:flex;align-items:flex-end;justify-content:flex-end;gap:5px;height:330px}
+.street svg{display:block}
+.threeup{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink);margin-bottom:72px}
+.threeup>div{padding:22px 24px 0 0}
+.threeup>div+div{padding-left:24px;border-left:1px solid var(--line)}
+.threeup h2{font-size:24px;margin:8px 0}
+.c-city{color:var(--city)} .c-voice{color:var(--voice)}
+
+/* states */
+.state{min-height:58vh;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:16px;padding:64px 0}
+.state h1{font-size:clamp(34px,5vw,54px);max-width:16em}
+.steps{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:9px;font-family:var(--mono);font-size:14px}
+.steps li{color:#99a0a7;display:flex;gap:10px;align-items:center}
+.steps li::before{content:"";width:10px;height:10px;border:1.5px solid currentColor;border-radius:50%}
+.steps li.on{color:var(--ink)}
+.steps li.on::before{border-right-color:transparent;animation:spin .8s linear infinite}
+.steps li.done{color:var(--green)}
+.steps li.done::before{background:currentColor}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* result header */
+.addr{padding-top:44px;padding-bottom:24px}
+.addr h1{font-size:clamp(38px,6.2vw,72px);overflow-wrap:anywhere}
+.addr .meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;color:var(--muted);font:400 14px var(--mono)}
+.subnav{position:sticky;top:62px;z-index:900;background:var(--paper);border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.subnav .wrap{display:flex;gap:24px;overflow-x:auto;scrollbar-width:none}
+.subnav a{display:block;padding:12px 0;font-weight:500;font-size:14px;text-decoration:none;white-space:nowrap}
+.subnav a:hover{text-decoration:underline}
+section[id],#block{scroll-margin-top:126px}
+.person>.btn,.person div>.btn{white-space:nowrap;flex:none}
+
+/* report */
+.report{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:44px;padding:40px 0 56px}
+.stamp{display:inline-flex;align-items:center;gap:9px;border:2px solid currentColor;border-radius:7px;padding:6px 13px;font:500 13px/1.25 var(--mono);letter-spacing:.05em;text-transform:uppercase;transform:rotate(-1.4deg)}
+.stamp svg{flex:none}
+.lv-green{color:var(--green)} .lv-orange{color:var(--orange)} .lv-red{color:var(--red)}
+.report h2.headline{font-size:clamp(30px,4vw,44px);margin:20px 0 14px}
+.summary{font-size:18px;max-width:38em}
+.ai-note{margin-top:12px;color:var(--muted);font-size:13px}
+.signals{list-style:none;margin:28px 0 0;padding:0;border-top:1px solid var(--line)}
+.signal{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:15px 0;border-bottom:1px solid var(--line)}
+.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px}
+.dot.green{background:var(--green-tint);color:var(--green)}
+.dot.orange{background:var(--orange-tint);color:var(--orange)}
+.dot.red{background:var(--red-tint);color:var(--red)}
+.signal h3{font-size:16px;font-weight:600;line-height:1.35}
+.signal p{font-size:15px;color:#3d4249;margin-top:2px}
+.tag{display:inline-flex;align-items:center;gap:5px;font:500 11.5px/1.3 var(--mono);border-radius:5px;padding:3px 7px;margin-top:6px;text-decoration:none}
+.tag.city{background:var(--city-tint);color:var(--city)}
+.tag.voice{background:var(--voice-tint);color:var(--voice)}
+.tag.fict{background:#ececec;color:#3f3f3f}
+.tag.ok{background:var(--green-tint);color:var(--green)}
+a.tag:hover{text-decoration:underline}
+.questions{margin-top:30px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.questions header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.questions h3{font:600 20px/1.2 var(--serif)}
+.questions ol{margin:12px 0 0;padding-left:22px}
+.questions li{margin:6px 0}
+.disclaimer{margin-top:18px;padding-left:12px;border-left:3px solid var(--ink);font-size:13.5px;color:#3d4249}
+.side{display:flex;flex-direction:column;gap:18px}
+#map{height:280px;border-radius:var(--radius);border:1px solid var(--city-line);background:#dfe5e7;z-index:1}
+.map-fallback{display:grid;place-items:center;height:100%;padding:16px;font:400 13px var(--mono);color:var(--muted);text-align:center}
+.pin{width:20px;height:20px;background:var(--ink);border:3px solid #fff;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,.5)}
+.profile{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:end;padding:18px;background:var(--city-tint);border:1px solid var(--city-line);border-radius:var(--radius)}
+.profile dl{margin:0;display:grid;gap:8px}
+.profile dt{font:500 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--city)}
+.profile dd{margin:1px 0 0;font-weight:600}
+.profile .eyebrow{grid-column:1/-1;color:var(--city)}
+.rentnote{grid-column:1/-1;font-size:13px;border-top:1px solid var(--city-line);padding-top:10px}
+
+/* bands */
+.band{padding:52px 0 60px}
+.band.city{background:var(--city-tint);border-top:4px solid var(--city)}
+.band.voice{background:var(--voice-tint);border-top:4px solid var(--voice)}
+.band.people{background:var(--surface);border-top:4px solid var(--ink)}
+.band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.band-head h2{font-size:clamp(30px,4.2vw,44px);margin-top:7px}
+.band-head p{max-width:38em;margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--city-line);margin-bottom:32px}
+.stat{padding:16px 16px 16px 0}
+.stat+.stat{padding-left:16px;border-left:1px solid var(--city-line)}
+.stat b{display:block;font:600 40px/1 var(--serif)}
+.stat span{font-size:13.5px;display:block;margin-top:5px}
+.stat.alert b{color:var(--red)}
+.stat em{font:500 11px var(--mono);font-style:normal;color:var(--city);display:block;margin-top:3px}
+.records{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,1fr);gap:40px}
+.tabs{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--city-line)}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 16px 9px 0;margin-right:10px;font-weight:600;cursor:pointer;min-height:44px;color:#4a5a66}
+.tabs button[aria-selected=true]{border-color:var(--city);color:var(--ink)}
+.rows{list-style:none;margin:0;padding:0}
+.rows li{display:grid;grid-template-columns:104px 1fr auto;gap:14px;padding:12px 0;border-bottom:1px solid var(--city-line);align-items:start}
+.rows time{font:400 13px/1.6 var(--mono);color:#40505c}
+.rows small{display:block;color:#4a5a66;margin-top:2px}
+.status{font:500 11.5px/1.3 var(--mono);padding:3px 7px;border-radius:5px;background:#fff;color:#40505c;white-space:nowrap}
+.status.open{background:var(--red-tint);color:var(--red)}
+.unsafe{display:inline-block;font:500 11.5px var(--mono);color:var(--red);background:var(--red-tint);padding:2px 6px;border-radius:4px;margin-top:4px}
+.empty{padding:18px 0;color:var(--muted)}
+.bars{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:11px}
+.bars label,.bars .lab{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.track{height:7px;background:rgba(31,69,96,.13);border-radius:4px;margin-top:4px}
+.fill{height:100%;background:var(--city);border-radius:4px}
+.subhead{font:600 21px/1.2 var(--serif)}
+.source{display:inline-block;margin-top:12px;font:400 12.5px var(--mono);color:var(--city)}
+.blockpanel{margin-top:42px;padding:24px;border:2px dashed var(--city);border-radius:var(--radius);background:rgba(255,255,255,.45)}
+.blockflag{display:inline-block;background:var(--city);color:#fff;font:500 12px/1.3 var(--mono);padding:5px 9px;border-radius:5px}
+.blockgrid{display:grid;grid-template-columns:1.25fr 1fr;gap:36px;margin-top:20px}
+.yearbars{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:5px;height:110px;align-items:end;margin-top:14px}
+.yb{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font:400 11px var(--mono)}
+.yb i{display:block;width:100%;background:var(--city);border-radius:3px 3px 0 0;min-height:1px}
+.yb span{margin-top:4px;color:#40505c}
+.chiplist{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chiplist span{font-size:13px;background:#fff;border-radius:5px;padding:3px 8px}
+.renttable{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
+.renttable th{font:500 11.5px var(--mono);text-transform:uppercase;text-align:left;color:var(--city);padding:0 0 6px}
+.renttable td{padding:9px 0;border-top:1px solid var(--city-line)}
+
+/* voices */
+.opinion-flag{display:inline-block;background:var(--voice);color:#fff;font:500 12px/1.3 var(--mono);padding:5px 9px;border-radius:5px}
+.voice-grid{display:grid;grid-template-columns:minmax(240px,.75fr) minmax(0,2fr);gap:40px}
+.avg .big{font:600 58px/1 var(--serif);color:var(--voice)}
+.avg .big small{font-size:20px;color:var(--muted)}
+.bars.voiced .track{background:rgba(92,45,126,.15)}
+.bars.voiced .fill{background:var(--voice)}
+.tv{padding:18px 20px;background:#fff;border-radius:var(--radius);margin-bottom:18px;border-left:4px solid var(--voice)}
+.review{padding:20px 0;border-top:1px solid var(--voice-line)}
+.review header{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.review header b{font-weight:600}
+.review .tag{margin-top:0}
+.review blockquote{margin:10px 0 8px;font:400 19px/1.45 var(--serif)}
+.pips{display:inline-flex;gap:3px;vertical-align:middle}
+.pips i{width:8px;height:8px;border-radius:50%;background:var(--voice);display:block}
+.pips i.off{background:rgba(92,45,126,.2)}
+
+/* people */
+.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px}
+.person{padding:18px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.person b{font-weight:600}
+.person p{font-size:15px;margin-top:5px}
+.person .tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.person .tag{margin-top:0}
+.score{font:600 25px/1 var(--serif)}
+.life{font-size:13px;color:var(--muted);margin-top:5px}
+.me{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:14px;margin-bottom:14px}
+
+footer{padding-top:34px;padding-bottom:52px;font-size:13.5px;color:var(--muted)}
+.leaflet-tile-pane{filter:saturate(.35) contrast(.95)}
+footer a{margin-right:12px}
+
+/* dialog */
+dialog{width:min(600px,calc(100vw - 24px));max-height:calc(100dvh - 24px);border:0;border-radius:14px;padding:0;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(20,22,26,.55)}
+.dlg{padding:26px}
+.dlg h2{font-size:30px;padding-right:44px}
+.dlg .close{position:absolute;right:14px;top:14px;width:44px;height:44px;border:0;border-radius:50%;background:none;cursor:pointer;font-size:24px}
+.field{display:block;margin-top:16px}
+.field>span,fieldset legend{display:block;font-weight:600;font-size:14px;margin-bottom:5px;padding:0}
+fieldset{border:0;padding:0;margin:0}
+.field input:not([type=checkbox]),.field select,.field textarea{width:100%;min-height:44px;border:1px solid #a7a296;border-radius:8px;background:#fff;padding:9px 11px}
+.field textarea{min-height:110px;resize:vertical}
+.hint{font-size:13px;color:var(--muted);margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.check{display:flex;align-items:flex-start;gap:9px;margin-top:14px;font-size:15px}
+.check input{margin-top:5px;width:17px;height:17px;flex:none}
+.rate{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rate legend{float:left;margin:0;font-weight:500}
+.rate .opts{display:flex;gap:5px;margin-left:auto}
+.rate label{position:relative}
+.rate input{position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer;margin:0}
+.rate span{display:grid;place-items:center;width:38px;height:38px;border:1px solid #a7a296;border-radius:8px;font:500 14px var(--mono)}
+.rate input:checked+span{background:var(--voice);border-color:var(--voice);color:#fff}
+.rate input:focus-visible+span{outline:3px solid var(--voice);outline-offset:2px}
+.privacy{margin-top:16px;padding:12px 14px;background:var(--green-tint);border-radius:8px;font-size:13.5px}
+.formerr{margin-top:14px;padding:11px 13px;background:var(--red-tint);color:var(--red);border-radius:8px;font-size:14px}
+.formactions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:3000;max-width:calc(100vw - 32px);background:var(--ink);color:#fff;border-radius:10px;padding:12px 18px;font-size:14.5px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.toast:empty{display:none}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;padding-top:44px}
+  .street{display:none}
+  .threeup{grid-template-columns:1fr;margin-bottom:44px}
+  .threeup>div,.threeup>div+div{padding:18px 0;border-left:0;border-bottom:1px solid var(--line)}
+  .report,.records,.blockgrid,.voice-grid,.people-grid{grid-template-columns:minmax(0,1fr);gap:30px}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){padding-left:0;border-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--city-line)}
+}
+@media (max-width:620px){
+  .wrap{padding:0 16px}
+  .bar .wrap{flex-wrap:wrap;gap:8px 10px;min-height:0}
+  .barsearch{order:3;flex:1 0 100%;max-width:none}
+  .lang,.barsearch + .lang{margin-left:auto}
+  .subnav{top:0;position:static}
+  section[id],#block{scroll-margin-top:118px}
+  .bigsearch{flex-direction:column}
+  .bigsearch button{padding:14px}
+  .rows li{grid-template-columns:1fr auto}
+  .rows li time{grid-column:1/-1}
+  .two{grid-template-columns:1fr}
+  .profile{grid-template-columns:1fr}
+  .profile .facade{display:none}
+  .dlg{padding:20px 16px}
+  .person{flex-direction:column}
+  .person .btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.steps li.on::before{animation:none}}
+</style>
+</head>
+<body>
+<div id="mockbar"></div>
+<header class="bar" id="bar"></header>
+<main id="app"></main>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+"use strict";
+/* =========================== i18n =========================== */
+const I18N = {
+en:{search_ph:"Enter a San Francisco address",search:"Look up",try:"Try:",hero_title:"Read the building before you sign.",hero_lede:"Type a San Francisco address. See what the city has on record, what tenants say, and who you can ask.",l1:"City records",l1t:"Complaints, violations, permits, and street-block evictions and rents, explained in plain language.",l2:"Tenant voices",l2t:"Reviews from current and former tenants, kept apart from official data, with a badge when occupancy was proven.",l3:"People you can trust",l3t:"Ask tenants who agreed to be contacted, or find a roommate by budget, dates and lifestyle.",
+loading:"Looking up",step1:"Finding the parcel",step2:"Pulling city records",step3:"Collecting tenant reviews",step4:"Mistral is writing your report",err_title:"We couldn't load this address",err_nf:"Check the street number and name, like 777 Bay St.",err_net:"The service isn't responding. Try again in a moment.",retry:"Try again",
+nav_report:"Report",nav_city:"City records",nav_block:"Street block",nav_voices:"Tenant voices",nav_people:"People",district:"District",parcel:"Parcel",green:"Few warning signs",orange:"Look closer",red:"Serious warning signs",ai_note:"AI summary by Mistral, based on the sources cited below.",no_report:"The AI report isn't available right now. The city records below are still accurate to the source data.",sig_tenant:"Tenant opinion",sig_city:"City record",questions:"Questions to ask the landlord",copy:"Copy",copied:"Questions copied",disclaimer:"This is not legal advice. Verify important details with the city or a tenant counselor.",
+profile:"Building profile",built:"Built",units:"Units",stories:"Stories",last_sale:"Last sale",unknown:"Unknown",rc_yes:"Likely rent-controlled. Indicative only: confirm with the Rent Board.",rc_no:"Probably not rent-controlled. Indicative only: confirm with the Rent Board.",rc_unknown:"Rent control status unknown.",
+city_flag:"Official data",city_title:"What the city has on record",city_sub:"Public DataSF data for this parcel, covering the last 10 years.",st_open:"Open complaints",st_c:"Complaints",st_v:"Violations",st_e:"Evictions",st_e_scope:"on the street block",tenyears:"10 years",tab_c:"Complaints",tab_v:"Violations",tab_p:"Permits",none:"No records found for this period.",unsafe:"Unsafe building",closed:"Closed",show_all:"Show all",show_less:"Show less",source:"Source: DataSF",near:"Nearby 311 requests",near_sub:"Within 150 m of the building, last 12 months",total:"total",
+block_flag:"Street-block level, not this building",block_title:"The block around it",block_sub:"The city only publishes these by street block. They don't describe this specific building.",ev_title:"Eviction notices on the block",ev_none:"No eviction notices on this block in the last 10 years.",rent_title:"Reported rents on the block",bedrooms:"Bedrooms",range:"Monthly rent",rent_none:"No rent data for this block.",
+voice_flag:"Opinions, not facts",voice_title:"What tenants say",voice_sub:"Personal experiences shared under a pseudonym. The city hasn't checked them.",write:"Share your experience",tv:"Mistral's summary of the reviews",avg:"Average rating",basedon:"{n} reviews, {v} verified",no_rev:"No reviews yet. Lived here? You can be the first.",verified:"Verified tenant",verified_tip:"This tenant proved they lived here with a document",unverified:"Not verified",fict:"Fictional example",present:"present",r_overall:"Overall",r_landlord_responsiveness:"Landlord response",r_maintenance:"Maintenance",r_noise:"Noise",r_safety:"Safety",
+ppl_title:"People you can ask",ppl_sub:"Pseudonyms only. No email or phone is shown, and contact happens through a request in the app.",ppl_tenants:"Tenants open to contact",ppl_none:"Nobody from this building has opted in yet.",ask:"Send a request",sent:"Request sent",rm_title:"Find a roommate",rm_sub:"Matched only on budget, dates, neighborhood and the lifestyle you declare.",rm_cta:"Create a profile",rm_none:"No matches yet. Check back soon.",match:"match",you:"You:",forget:"Forget this profile",rm_tenant_note:"Your profile is a tenant profile. Create a roommate profile to see matches.",
+role_current_tenant:"Current tenant",role_former_tenant:"Former tenant",role_seeking_roommate:"Looking for a room",role_has_room:"Has a room",budget:"Budget",move_in:"Move-in",sch_early:"early riser",sch_late:"night owl",sch_flexible:"flexible schedule",clean:"tidiness",g_rarely:"guests rarely",g_sometimes:"guests sometimes",g_often:"guests often",smoker:"smoker",nonsmoker:"non-smoker",pets:"has pets",nopets:"no pets",
+f_review_title:"Share your experience",f_pseudo:"Pseudonym",f_pseudo_h:"Don't use your real name.",f_start:"Moved in",f_end:"Moved out",f_still:"I still live here",f_ratings:"Rate from 1 (poor) to 5 (great)",f_text:"Your review",f_text_h:"Describe your experience. Names and contact details are removed, and harassment, threats and discriminatory language are rejected.",f_proof:"Proof you lived here (optional)",f_proof_h:"A lease or utility bill earns the Verified badge.",f_privacy:"Mistral OCR reads your document in memory. It's never stored; we keep only verified yes or no.",f_cancel:"Cancel",f_publish:"Submit review",f_checking:"Checking…",f_rate_err:"Please rate all five categories.",pub_ok:"Your review is published.",pub_ver:"Your review is published with the Verified badge.",rejected:"Your review wasn't published:",
+f_profile_title:"Create your profile",f_role:"I am…",f_nhood:"Neighborhood",f_bmin:"Budget min ($/month)",f_bmax:"Budget max ($/month)",f_bio:"Short bio",f_bio_h:"Don't include your email, phone number or full name.",f_sched:"Schedule",f_cleanl:"Tidiness (1–5)",f_guests:"Guests",f_smoke:"I smoke",f_pets:"I have pets",f_open:"Other users can send me contact requests",f_create:"Create profile",f_sched_early:"Early",f_sched_late:"Late",f_sched_flexible:"Flexible",f_g_rarely:"Rarely",f_g_sometimes:"Sometimes",f_g_often:"Often",prof_ok:"Profile created.",
+f_contact_title:"Send a request to {p}",f_msg:"Message",f_msg_h:"Don't share your email or phone number here.",f_send:"Send request",contact_first:"Create a profile first so they know who's asking.",contact_ok:"Your request was sent.",generic_err:"Something went wrong. Please try again.",mock_bar:"MOCK MODE: sample data, not real city records"},
+es:{search_ph:"Escribe una dirección de San Francisco",search:"Buscar",try:"Prueba:",hero_title:"Conoce el edificio antes de firmar.",hero_lede:"Escribe una dirección de San Francisco. Mira lo que consta en la ciudad, lo que dicen los inquilinos y a quién puedes preguntar.",l1:"Registros de la ciudad",l1t:"Quejas, infracciones, permisos, y desalojos y alquileres de la cuadra, explicados con claridad.",l2:"Voces de inquilinos",l2t:"Opiniones de inquilinos actuales y anteriores, separadas de los datos oficiales, con una insignia si probaron su residencia.",l3:"Gente de confianza",l3t:"Pregunta a inquilinos que aceptan contacto o encuentra compañero de piso por presupuesto, fechas y estilo de vida.",
+loading:"Buscando",step1:"Localizando la parcela",step2:"Obteniendo registros de la ciudad",step3:"Reuniendo opiniones de inquilinos",step4:"Mistral está escribiendo tu informe",err_title:"No pudimos cargar esta dirección",err_nf:"Revisa el número y la calle, por ejemplo 777 Bay St.",err_net:"El servicio no responde. Inténtalo de nuevo en un momento.",retry:"Reintentar",
+nav_report:"Informe",nav_city:"Registros",nav_block:"La cuadra",nav_voices:"Inquilinos",nav_people:"Personas",district:"Distrito",parcel:"Parcela",green:"Pocas señales de alerta",orange:"Mira con atención",red:"Alertas serias",ai_note:"Resumen de IA por Mistral, basado en las fuentes citadas abajo.",no_report:"El informe de IA no está disponible ahora. Los registros de la ciudad siguen abajo.",sig_tenant:"Opinión de inquilinos",sig_city:"Registro de la ciudad",questions:"Preguntas para el propietario",copy:"Copiar",copied:"Preguntas copiadas",disclaimer:"Esto no es asesoramiento legal. Verifica los datos importantes con la ciudad o un asesor de inquilinos.",
+profile:"Perfil del edificio",built:"Construido",units:"Unidades",stories:"Pisos",last_sale:"Última venta",unknown:"Desconocido",rc_yes:"Probablemente con control de alquiler. Solo orientativo: confírmalo con el Rent Board.",rc_no:"Probablemente sin control de alquiler. Solo orientativo: confírmalo con el Rent Board.",rc_unknown:"Control de alquiler desconocido.",
+city_flag:"Datos oficiales",city_title:"Lo que consta en la ciudad",city_sub:"Datos públicos de DataSF para esta parcela, de los últimos 10 años.",st_open:"Quejas abiertas",st_c:"Quejas",st_v:"Infracciones",st_e:"Desalojos",st_e_scope:"en la cuadra",tenyears:"10 años",tab_c:"Quejas",tab_v:"Infracciones",tab_p:"Permisos",none:"No hay registros en este período.",unsafe:"Edificio inseguro",closed:"Cerrada",show_all:"Ver todo",show_less:"Ver menos",source:"Fuente: DataSF",near:"Solicitudes 311 cercanas",near_sub:"A menos de 150 m, últimos 12 meses",total:"en total",
+block_flag:"Nivel de cuadra, no este edificio",block_title:"La cuadra alrededor",block_sub:"La ciudad solo publica estos datos por cuadra. No describen este edificio concreto.",ev_title:"Avisos de desalojo en la cuadra",ev_none:"Sin avisos de desalojo en esta cuadra en los últimos 10 años.",rent_title:"Alquileres declarados en la cuadra",bedrooms:"Habitaciones",range:"Alquiler mensual",rent_none:"Sin datos de alquiler para esta cuadra.",
+voice_flag:"Opiniones, no hechos",voice_title:"Lo que dicen los inquilinos",voice_sub:"Experiencias personales con seudónimo. La ciudad no las ha comprobado.",write:"Comparte tu experiencia",tv:"Resumen de opiniones por Mistral",avg:"Valoración media",basedon:"{n} opiniones, {v} verificadas",no_rev:"Aún no hay opiniones. ¿Viviste aquí? Sé el primero.",verified:"Inquilino verificado",verified_tip:"Probó con un documento que vivió aquí",unverified:"No verificado",fict:"Ejemplo ficticio",present:"actualidad",r_overall:"General",r_landlord_responsiveness:"Respuesta del propietario",r_maintenance:"Mantenimiento",r_noise:"Ruido",r_safety:"Seguridad",
+ppl_title:"Gente a quien preguntar",ppl_sub:"Solo seudónimos. No se muestran correos ni teléfonos; el contacto se hace por solicitud en la app.",ppl_tenants:"Inquilinos abiertos al contacto",ppl_none:"Nadie de este edificio se ha apuntado todavía.",ask:"Enviar solicitud",sent:"Solicitud enviada",rm_title:"Busca compañero de piso",rm_sub:"Solo según presupuesto, fechas, barrio y el estilo de vida que declares.",rm_cta:"Crear perfil",rm_none:"Aún no hay coincidencias.",match:"afinidad",you:"Tú:",forget:"Olvidar este perfil",rm_tenant_note:"Tienes un perfil de inquilino. Crea un perfil de compañero de piso para ver coincidencias.",
+role_current_tenant:"Inquilino actual",role_former_tenant:"Antiguo inquilino",role_seeking_roommate:"Busca habitación",role_has_room:"Tiene habitación",budget:"Presupuesto",move_in:"Mudanza",sch_early:"madrugador",sch_late:"noctámbulo",sch_flexible:"horario flexible",clean:"orden",g_rarely:"pocas visitas",g_sometimes:"algunas visitas",g_often:"muchas visitas",smoker:"fumador",nonsmoker:"no fumador",pets:"con mascotas",nopets:"sin mascotas",
+f_review_title:"Comparte tu experiencia",f_pseudo:"Seudónimo",f_pseudo_h:"No uses tu nombre real.",f_start:"Entrada",f_end:"Salida",f_still:"Sigo viviendo aquí",f_ratings:"Valora de 1 (mal) a 5 (excelente)",f_text:"Tu opinión",f_text_h:"Describe tu experiencia. Se eliminan nombres y datos de contacto, y se rechaza el acoso, las amenazas y el lenguaje discriminatorio.",f_proof:"Prueba de residencia (opcional)",f_proof_h:"Un contrato o factura da la insignia de verificado.",f_privacy:"Mistral OCR lee tu documento en memoria. Nunca se guarda; solo conservamos verificado sí o no.",f_cancel:"Cancelar",f_publish:"Enviar opinión",f_checking:"Comprobando…",f_rate_err:"Valora las cinco categorías.",pub_ok:"Tu opinión está publicada.",pub_ver:"Tu opinión está publicada con la insignia de verificado.",rejected:"Tu opinión no se publicó:",
+f_profile_title:"Crea tu perfil",f_role:"Soy…",f_nhood:"Barrio",f_bmin:"Presupuesto mín. ($/mes)",f_bmax:"Presupuesto máx. ($/mes)",f_bio:"Breve descripción",f_bio_h:"No incluyas correo, teléfono ni nombre completo.",f_sched:"Horario",f_cleanl:"Orden (1–5)",f_guests:"Visitas",f_smoke:"Fumo",f_pets:"Tengo mascotas",f_open:"Otros usuarios pueden enviarme solicitudes",f_create:"Crear perfil",f_sched_early:"Temprano",f_sched_late:"Tarde",f_sched_flexible:"Flexible",f_g_rarely:"Pocas",f_g_sometimes:"Algunas",f_g_often:"Muchas",prof_ok:"Perfil creado.",
+f_contact_title:"Enviar solicitud a {p}",f_msg:"Mensaje",f_msg_h:"No compartas aquí tu correo ni teléfono.",f_send:"Enviar solicitud",contact_first:"Primero crea un perfil para que sepan quién pregunta.",contact_ok:"Tu solicitud se envió.",generic_err:"Algo salió mal. Inténtalo de nuevo.",mock_bar:"MODO DE PRUEBA: datos de ejemplo, no registros reales"},
+zh:{search_ph:"输入旧金山地址",search:"查询",try:"试试：",hero_title:"签约之前，先读懂这栋楼。",hero_lede:"输入旧金山地址，查看市政记录、租客评价，以及可以向谁请教。",l1:"市政记录",l1t:"投诉、违规、许可，以及街区的驱逐和租金数据，用通俗的语言说明。",l2:"租客之声",l2t:"现任和前任租客的评价，与官方数据分开显示；证明居住后可获认证标记。",l3:"可信赖的人",l3t:"联系同意被联系的租客，或按预算、日期和生活方式寻找室友。",
+loading:"正在查询",step1:"定位地块",step2:"获取市政记录",step3:"收集租客评价",step4:"Mistral 正在撰写报告",err_title:"无法加载此地址",err_nf:"请检查门牌号和街道名称，例如 777 Bay St。",err_net:"服务暂无响应，请稍后再试。",retry:"重试",
+nav_report:"报告",nav_city:"市政记录",nav_block:"街区",nav_voices:"租客之声",nav_people:"联系人",district:"选区",parcel:"地块",green:"警示信号较少",orange:"需要仔细查看",red:"存在严重警示",ai_note:"由 Mistral 生成的 AI 摘要，依据下方引用的来源。",no_report:"AI 报告暂不可用，下方的市政记录仍可查看。",sig_tenant:"租客意见",sig_city:"市政记录",questions:"可以问房东的问题",copy:"复制",copied:"问题已复制",disclaimer:"本内容不构成法律建议。重要信息请向市政部门或租客顾问核实。",
+profile:"建筑概况",built:"建造年份",units:"单元数",stories:"层数",last_sale:"最近出售",unknown:"未知",rc_yes:"可能受租金管制。仅供参考，请向租金委员会确认。",rc_no:"可能不受租金管制。仅供参考，请向租金委员会确认。",rc_unknown:"租金管制情况未知。",
+city_flag:"官方数据",city_title:"市政部门的记录",city_sub:"该地块近 10 年的 DataSF 公开数据。",st_open:"未结投诉",st_c:"投诉",st_v:"违规",st_e:"驱逐",st_e_scope:"所在街区",tenyears:"10 年",tab_c:"投诉",tab_v:"违规",tab_p:"许可",none:"此期间没有记录。",unsafe:"不安全建筑",closed:"已结",show_all:"显示全部",show_less:"收起",source:"来源：DataSF",near:"附近的 311 请求",near_sub:"建筑周围 150 米内，近 12 个月",total:"总计",
+block_flag:"街区级数据，并非这栋楼",block_title:"所在街区",block_sub:"市政部门只按街区公布这些数据，它们并不描述这栋楼本身。",ev_title:"街区驱逐通知",ev_none:"近 10 年此街区没有驱逐通知。",rent_title:"街区申报租金",bedrooms:"卧室",range:"月租",rent_none:"此街区没有租金数据。",
+voice_flag:"这是意见，不是事实",voice_title:"租客怎么说",voice_sub:"以化名分享的个人经历，未经市政部门核实。",write:"分享你的经历",tv:"Mistral 的评价摘要",avg:"平均评分",basedon:"{n} 条评价，{v} 条已认证",no_rev:"暂无评价。住过这里？欢迎第一个分享。",verified:"已认证租客",verified_tip:"已用文件证明在此居住",unverified:"未认证",fict:"虚构示例",present:"至今",r_overall:"总体",r_landlord_responsiveness:"房东响应",r_maintenance:"维修",r_noise:"噪音",r_safety:"安全",
+ppl_title:"可以请教的人",ppl_sub:"仅显示化名，不显示邮箱或电话，通过应用内请求联系。",ppl_tenants:"愿意被联系的租客",ppl_none:"这栋楼暂时没有人选择接受联系。",ask:"发送请求",sent:"请求已发送",rm_title:"寻找室友",rm_sub:"仅依据预算、日期、社区和你填写的生活方式进行匹配。",rm_cta:"创建资料",rm_none:"暂无匹配。",match:"匹配",you:"你：",forget:"忘记此资料",rm_tenant_note:"你的资料是租客资料。创建室友资料后可查看匹配。",
+role_current_tenant:"现任租客",role_former_tenant:"前任租客",role_seeking_roommate:"正在找房间",role_has_room:"有空房间",budget:"预算",move_in:"入住",sch_early:"早起",sch_late:"晚睡",sch_flexible:"作息灵活",clean:"整洁度",g_rarely:"很少访客",g_sometimes:"偶尔访客",g_often:"常有访客",smoker:"吸烟",nonsmoker:"不吸烟",pets:"有宠物",nopets:"无宠物",
+f_review_title:"分享你的经历",f_pseudo:"化名",f_pseudo_h:"请勿使用真实姓名。",f_start:"入住时间",f_end:"搬出时间",f_still:"我仍住在这里",f_ratings:"评分：1（差）到 5（很好）",f_text:"你的评价",f_text_h:"描述你的经历。姓名和联系方式会被删除；骚扰、威胁和歧视性言论将被拒绝。",f_proof:"居住证明（可选）",f_proof_h:"租约或水电账单可获认证标记。",f_privacy:"Mistral OCR 在内存中读取文件，绝不存储；我们只保留是否认证。",f_cancel:"取消",f_publish:"提交评价",f_checking:"正在检查…",f_rate_err:"请为五个类别全部评分。",pub_ok:"你的评价已发布。",pub_ver:"你的评价已发布并带有认证标记。",rejected:"你的评价未发布：",
+f_profile_title:"创建资料",f_role:"我是…",f_nhood:"社区",f_bmin:"最低预算（美元/月）",f_bmax:"最高预算（美元/月）",f_bio:"简介",f_bio_h:"请勿填写邮箱、电话或全名。",f_sched:"作息",f_cleanl:"整洁度（1–5）",f_guests:"访客",f_smoke:"我吸烟",f_pets:"我有宠物",f_open:"其他用户可以向我发送联系请求",f_create:"创建资料",f_sched_early:"早",f_sched_late:"晚",f_sched_flexible:"灵活",f_g_rarely:"很少",f_g_sometimes:"偶尔",f_g_often:"经常",prof_ok:"资料已创建。",
+f_contact_title:"向 {p} 发送请求",f_msg:"留言",f_msg_h:"请勿在此分享邮箱或电话。",f_send:"发送请求",contact_first:"请先创建资料，让对方知道是谁在询问。",contact_ok:"请求已发送。",generic_err:"出错了，请重试。",mock_bar:"模拟模式：示例数据，并非真实记录"},
+fr:{search_ph:"Entrez une adresse à San Francisco",search:"Rechercher",try:"Essayez :",hero_title:"Lisez l'immeuble avant de signer.",hero_lede:"Tapez une adresse à San Francisco. Voyez ce que la ville a enregistré, ce que disent les locataires et à qui demander.",l1:"Registres de la ville",l1t:"Plaintes, infractions, permis, ainsi qu'évictions et loyers du bloc, expliqués clairement.",l2:"Voix des locataires",l2t:"Avis de locataires actuels et anciens, séparés des données officielles, avec un badge si l'occupation est prouvée.",l3:"Gens de confiance",l3t:"Écrivez aux locataires qui acceptent d'être contactés, ou trouvez un coloc selon le budget, les dates et le mode de vie.",
+loading:"Recherche de",step1:"Localisation de la parcelle",step2:"Récupération des registres de la ville",step3:"Collecte des avis de locataires",step4:"Mistral rédige votre rapport",err_title:"Impossible de charger cette adresse",err_nf:"Vérifiez le numéro et la rue, par exemple 777 Bay St.",err_net:"Le service ne répond pas. Réessayez dans un instant.",retry:"Réessayer",
+nav_report:"Rapport",nav_city:"Registres",nav_block:"Le bloc",nav_voices:"Locataires",nav_people:"Personnes",district:"District",parcel:"Parcelle",green:"Peu de signaux d'alerte",orange:"À regarder de près",red:"Alertes sérieuses",ai_note:"Résumé IA par Mistral, à partir des sources citées ci-dessous.",no_report:"Le rapport IA est indisponible pour le moment. Les registres de la ville restent consultables ci-dessous.",sig_tenant:"Avis de locataires",sig_city:"Registre de la ville",questions:"Questions à poser au propriétaire",copy:"Copier",copied:"Questions copiées",disclaimer:"Ceci n'est pas un conseil juridique. Vérifiez les points importants auprès de la ville ou d'un conseiller pour locataires.",
+profile:"Profil de l'immeuble",built:"Construit en",units:"Logements",stories:"Étages",last_sale:"Dernière vente",unknown:"Inconnu",rc_yes:"Probablement sous contrôle des loyers. À titre indicatif : à confirmer auprès du Rent Board.",rc_no:"Probablement pas sous contrôle des loyers. À titre indicatif : à confirmer auprès du Rent Board.",rc_unknown:"Contrôle des loyers inconnu.",
+city_flag:"Données officielles",city_title:"Ce que la ville a enregistré",city_sub:"Données publiques DataSF pour cette parcelle, sur les 10 dernières années.",st_open:"Plaintes ouvertes",st_c:"Plaintes",st_v:"Infractions",st_e:"Évictions",st_e_scope:"sur le bloc",tenyears:"10 ans",tab_c:"Plaintes",tab_v:"Infractions",tab_p:"Permis",none:"Aucun enregistrement sur cette période.",unsafe:"Immeuble dangereux",closed:"Clôturée",show_all:"Tout afficher",show_less:"Réduire",source:"Source : DataSF",near:"Demandes 311 à proximité",near_sub:"À moins de 150 m, sur les 12 derniers mois",total:"au total",
+block_flag:"Niveau bloc, pas cet immeuble",block_title:"Le bloc autour",block_sub:"La ville publie ces données uniquement par bloc de rue. Elles ne décrivent pas cet immeuble en particulier.",ev_title:"Avis d'éviction sur le bloc",ev_none:"Aucun avis d'éviction sur ce bloc depuis 10 ans.",rent_title:"Loyers déclarés sur le bloc",bedrooms:"Chambres",range:"Loyer mensuel",rent_none:"Pas de données de loyer pour ce bloc.",
+voice_flag:"Des avis, pas des faits",voice_title:"Ce que disent les locataires",voice_sub:"Expériences personnelles publiées sous pseudonyme. La ville ne les a pas vérifiées.",write:"Partager votre expérience",tv:"Synthèse des avis par Mistral",avg:"Note moyenne",basedon:"{n} avis, dont {v} vérifiés",no_rev:"Aucun avis pour l'instant. Vous avez vécu ici ? Soyez le premier.",verified:"Locataire vérifié",verified_tip:"A prouvé son occupation avec un document",unverified:"Non vérifié",fict:"Exemple fictif",present:"aujourd'hui",r_overall:"Global",r_landlord_responsiveness:"Réactivité du propriétaire",r_maintenance:"Entretien",r_noise:"Bruit",r_safety:"Sécurité",
+ppl_title:"Des gens à qui demander",ppl_sub:"Pseudonymes uniquement. Ni e-mail ni téléphone affichés : le contact passe par une demande dans l'app.",ppl_tenants:"Locataires ouverts au contact",ppl_none:"Personne de cet immeuble ne s'est encore inscrit.",ask:"Envoyer une demande",sent:"Demande envoyée",rm_title:"Trouver un coloc",rm_sub:"Selon le budget, les dates, le quartier et le mode de vie déclaré, uniquement.",rm_cta:"Créer un profil",rm_none:"Pas encore de correspondance.",match:"de compatibilité",you:"Vous :",forget:"Oublier ce profil",rm_tenant_note:"Vous avez un profil de locataire. Créez un profil de colocation pour voir les correspondances.",
+role_current_tenant:"Locataire actuel",role_former_tenant:"Ancien locataire",role_seeking_roommate:"Cherche une chambre",role_has_room:"A une chambre",budget:"Budget",move_in:"Emménagement",sch_early:"lève-tôt",sch_late:"couche-tard",sch_flexible:"horaires flexibles",clean:"rangement",g_rarely:"rarement des invités",g_sometimes:"parfois des invités",g_often:"souvent des invités",smoker:"fumeur",nonsmoker:"non-fumeur",pets:"animaux",nopets:"pas d'animaux",
+f_review_title:"Partager votre expérience",f_pseudo:"Pseudonyme",f_pseudo_h:"N'utilisez pas votre vrai nom.",f_start:"Arrivée",f_end:"Départ",f_still:"J'habite encore ici",f_ratings:"Notez de 1 (mauvais) à 5 (excellent)",f_text:"Votre avis",f_text_h:"Décrivez votre expérience. Les noms et coordonnées sont retirés ; le harcèlement, les menaces et les propos discriminatoires sont rejetés.",f_proof:"Preuve d'occupation (facultatif)",f_proof_h:"Un bail ou une facture donne le badge Vérifié.",f_privacy:"Mistral OCR lit votre document en mémoire. Il n'est jamais stocké ; seul le résultat vérifié oui ou non est conservé.",f_cancel:"Annuler",f_publish:"Envoyer l'avis",f_checking:"Vérification…",f_rate_err:"Notez les cinq catégories.",pub_ok:"Votre avis est publié.",pub_ver:"Votre avis est publié avec le badge Vérifié.",rejected:"Votre avis n'a pas été publié :",
+f_profile_title:"Créer votre profil",f_role:"Je suis…",f_nhood:"Quartier",f_bmin:"Budget min ($/mois)",f_bmax:"Budget max ($/mois)",f_bio:"Courte présentation",f_bio_h:"N'indiquez ni e-mail, ni téléphone, ni nom complet.",f_sched:"Rythme",f_cleanl:"Rangement (1–5)",f_guests:"Invités",f_smoke:"Je fume",f_pets:"J'ai des animaux",f_open:"Les autres utilisateurs peuvent m'envoyer des demandes",f_create:"Créer le profil",f_sched_early:"Tôt",f_sched_late:"Tard",f_sched_flexible:"Flexible",f_g_rarely:"Rarement",f_g_sometimes:"Parfois",f_g_often:"Souvent",prof_ok:"Profil créé.",
+f_contact_title:"Envoyer une demande à {p}",f_msg:"Message",f_msg_h:"Ne partagez ici ni e-mail ni téléphone.",f_send:"Envoyer la demande",contact_first:"Créez d'abord un profil pour qu'on sache qui demande.",contact_ok:"Votre demande a été envoyée.",generic_err:"Une erreur s'est produite. Réessayez.",mock_bar:"MODE MOCK : données d'exemple, pas de vrais registres"}
+};
+const LANGS = {en:"English",es:"Español",zh:"中文",fr:"Français"};
+const LOCALE = {en:"en-US",es:"es-US",zh:"zh-CN",fr:"fr-FR"};
+const SRC = {complaints:"gm2e-bten",violations:"nbtm-fbw5",permits:"i98e-djp9",evictions:"5cei-gny5",rents:"gdc7-dmcn",c311:"vw6y-z8j6",tax:"wv5m-vpq2"};
+const RATING_KEYS = ["overall","landlord_responsiveness","maintenance","noise","safety"];
+const EXAMPLES = ["777 Bay St","1400 Pine St"];
+const qs = new URLSearchParams(location.search);
+const MOCK = qs.has("mock");
+
+/* =========================== state & helpers =========================== */
+const store = {
+  get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
+  set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const state = {
+  lang: LANGS[qs.get("lang")] ? qs.get("lang") : (LANGS[store.get("kyb_lang")] ? store.get("kyb_lang") : "en"),
+  view:"landing", address:"", data:null, error:null, tab:"c", showAll:{},
+  profile:store.get("kyb_profile"), matches:null, sent:{}, pendingContact:null, reqId:0
+};
+const $ = (s,el=document)=>el.querySelector(s);
+const t = (k,v)=>{let s=(I18N[state.lang]&&I18N[state.lang][k])??I18N.en[k]??k; if(v) for(const n in v) s=s.replace("{"+n+"}",v[n]); return s};
+const esc = v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl = u=>/^https?:\/\//i.test(u||"")?u:null;
+const truthy = v=>v===true||/^(y|yes|true|1)$/i.test(String(v??""));
+const humanize = s=>{s=String(s??"").replace(/_/g," ").trim();return s?s[0].toUpperCase()+s.slice(1):""};
+function fmtDate(s){
+  if(!s) return "—";
+  const m=String(s).match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/); if(!m) return esc(s);
+  const d=new Date(Date.UTC(+m[1],+m[2]-1,+(m[3]||1)));
+  const o=m[3]?{year:"numeric",month:"short",day:"numeric",timeZone:"UTC"}:{year:"numeric",month:"short",timeZone:"UTC"};
+  return new Intl.DateTimeFormat(LOCALE[state.lang],o).format(d);
+}
+const money = n=>{const x=Number(n); return n==null||n===""||isNaN(x)?"":new Intl.NumberFormat(LOCALE[state.lang],{style:"currency",currency:"USD",maximumFractionDigits:0}).format(x)};
+const num = n=>n==null?"—":esc(n);
+const srcLink = id=>`<a class="source" href="https://data.sf.gov/d/${id}" target="_blank" rel="noopener">${t("source")} ↗</a>`;
+function toast(msg){const el=$("#toast");el.textContent=msg;clearTimeout(toast.h);toast.h=setTimeout(()=>el.textContent="",5000)}
+
+/* =========================== API =========================== */
+async function api(path,opts){
+  const res=await fetch(path,opts);
+  let body=null; try{body=await res.json()}catch(e){}
+  if(!res.ok){const err=new Error((body&&(body.error||body.detail))||"HTTP "+res.status);err.status=res.status;err.hasMsg=!!(body&&(body.error||typeof body.detail==="string"));throw err}
+  return body;
+}
+const mockJson = f=>fetch(new URL("../mocks/"+f,location.href)).then(r=>{if(!r.ok)throw new Error(f);return r.json()});
+async function getReport(address,lang){
+  if(MOCK){
+    const [building,report,community]=await Promise.all([mockJson("mock_building.json"),mockJson("mock_report.json"),mockJson("mock_community.json")]);
+    await new Promise(r=>setTimeout(r,500));
+    building.query_address=address; return {building,report,community};
+  }
+  return api(`/api/report?address=${encodeURIComponent(address)}&lang=${encodeURIComponent(lang)}`);
+}
+async function postReview(reviewIn,proof){
+  if(MOCK){
+    await new Promise(r=>setTimeout(r,500));
+    if(/\b(idiot|stupid)\b/i.test(reviewIn.text)) return {status:"rejected",verified:false,reason:"Mock moderation rejected this text."};
+    return {status:"published",verified:!!proof,reason:""};
+  }
+  const fd=new FormData(); fd.append("review",JSON.stringify(reviewIn)); if(proof) fd.append("proof",proof);
+  return api("/api/reviews",{method:"POST",body:fd});
+}
+async function postProfile(p){
+  if(MOCK) return {...p,id:"mock-me",verified:false,demo:false};
+  return api("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+}
+const getMatches = id=>MOCK?mockJson("mock_roommates.json"):api(`/api/roommates?profile_id=${encodeURIComponent(id)}`);
+async function postContact(b){
+  if(MOCK) return {ok:true};
+  return api("/api/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});
+}
+
+/* =========================== shell =========================== */
+const logo=`<svg width="24" height="28" viewBox="0 0 24 28" aria-hidden="true"><path d="M1 27V4l11-3 11 3v23z" fill="#191d22"/><g fill="#f6f2ea"><rect x="5" y="8" width="4" height="4"/><rect x="15" y="8" width="4" height="4"/><rect x="5" y="15" width="4" height="4"/><rect x="15" y="15" width="4" height="4" fill="#e9a93a"/><rect x="10" y="21" width="4" height="6"/></g></svg>`;
+function renderBar(){
+  const inResult=state.view!=="landing";
+  $("#mockbar").innerHTML=MOCK?`<div class="mockbar">${esc(t("mock_bar"))}</div>`:"";
+  $("#bar").innerHTML=`<div class="wrap">
+    <button class="brand" data-a="home">${logo}<span>Know Your Building</span></button>
+    ${inResult?`<form class="barsearch" data-f="search" role="search"><label class="sr" for="q2">${esc(t("search_ph"))}</label><input id="q2" name="address" value="${esc(state.address)}" placeholder="${esc(t("search_ph"))}" autocomplete="street-address" required><button>${esc(t("search"))}</button></form>`:""}
+    <label class="sr" for="lang">Language</label>
+    <select class="lang" id="lang">${Object.entries(LANGS).map(([k,v])=>`<option value="${k}"${k===state.lang?" selected":""}>${v}</option>`).join("")}</select>
+  </div>`;
+  document.documentElement.lang=state.lang;
+}
+function pushUrl(){
+  const u=new URLSearchParams(); if(MOCK)u.set("mock","1"); if(state.address)u.set("address",state.address); if(state.lang!=="en")u.set("lang",state.lang);
+  const s=u.toString(); history.pushState(null,"",location.pathname+(s?"?"+s:""));
+}
+function render(){
+  renderBar();
+  const app=$("#app");
+  if(state.view==="landing") app.innerHTML=landing();
+  else if(state.view==="loading") app.innerHTML=loadingView();
+  else if(state.view==="error") app.innerHTML=errorView();
+  else { app.innerHTML=resultsView(); initMap(); }
+}
+
+/* =========================== landing, loading, error =========================== */
+function facade(stories,units,w=86){
+  const floors=Math.min(Math.max(+stories||3,1),10), cols=Math.min(Math.max(Math.ceil((+units||floors)/(+stories||floors)),2),6);
+  const wW=8,wH=11,gap=5,pad=7,W=cols*wW+(cols-1)*gap+pad*2,H=floors*(wH+gap)+24;
+  let wins="";
+  for(let f=0;f<floors;f++)for(let c=0;c<cols;c++){
+    const lit=((f*7+c*13+floors)%5)===0;
+    wins+=`<rect x="${pad+c*(wW+gap)}" y="${11+f*(wH+gap)}" width="${wW}" height="${wH}" fill="${lit?"#e9a93a":"#dde6ec"}"/>`;
+  }
+  const doorX=W/2-5;
+  return `<svg class="facade" width="${w}" viewBox="0 0 ${W} ${H}" aria-hidden="true"><rect y="4" width="${W}" height="${H-4}" fill="#1f4560"/><rect x="-0" y="0" width="${W}" height="5" fill="#191d22"/>${wins}<rect x="${doorX}" y="${H-11}" width="10" height="11" fill="#191d22"/></svg>`;
+}
+function landing(){
+  return `<div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>${esc(t("hero_title"))}</h1>
+        <p class="lede">${esc(t("hero_lede"))}</p>
+        <form class="bigsearch" data-f="search" role="search">
+          <label class="sr" for="q">${esc(t("search_ph"))}</label>
+          <input id="q" name="address" placeholder="${esc(t("search_ph"))}" autocomplete="street-address" required autofocus>
+          <button>${esc(t("search"))}</button>
+        </form>
+        <div class="chips"><span class="muted small">${esc(t("try"))}</span>${EXAMPLES.map(a=>`<button class="chip-btn" data-a="example" data-v="${esc(a)}">${esc(a)}</button>`).join("")}</div>
+      </div>
+      <div class="street" aria-hidden="true">${facade(4,12,92)}${facade(9,27,108)}${facade(3,6,80)}</div>
+    </div>
+    <div class="threeup">
+      <div><span class="eyebrow c-city">A</span><h2>${esc(t("l1"))}</h2><p>${esc(t("l1t"))}</p></div>
+      <div><span class="eyebrow c-voice">B</span><h2>${esc(t("l2"))}</h2><p>${esc(t("l2t"))}</p></div>
+      <div><span class="eyebrow">C</span><h2>${esc(t("l3"))}</h2><p>${esc(t("l3t"))}</p></div>
+    </div>
+  </div>`;
+}
+function loadingView(){
+  return `<div class="wrap"><div class="state" role="status" aria-live="polite">
+    <span class="eyebrow muted">${esc(t("loading"))}</span>
+    <h1>${esc(state.address)}</h1>
+    <ul class="steps" id="steps">${["step1","step2","step3","step4"].map((s,i)=>`<li class="${i===0?"on":""}">${esc(t(s))}</li>`).join("")}</ul>
+  </div></div>`;
+}
+function errorView(){
+  const e=state.error||{};
+  return `<div class="wrap"><div class="state" role="alert">
+    <h1>${esc(t("err_title"))}</h1>
+    <p class="summary">${e.status===404?esc(e.hasMsg?e.message+" ":"")+esc(t("err_nf")):esc(t("err_net"))}</p>
+    <button class="btn" data-a="retry">${esc(t("retry"))}</button>
+  </div></div>`;
+}
+
+/* =========================== results =========================== */
+const levelMark={green:"✓",orange:"!",red:"✕"};
+function stamp(level){
+  const icon=level==="green"?`<path d="M3 8l3.5 3.5L13 5" fill="none" stroke="currentColor" stroke-width="2"/>`:level==="orange"?`<path d="M8 3v6.5M8 12v1.5" stroke="currentColor" stroke-width="2"/>`:`<path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2"/>`;
+  return `<span class="stamp lv-${esc(level)}"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">${icon}</svg>${esc(t(level))}</span>`;
+}
+function signalHtml(s,b){
+  const lv=levelMark[s.level]?s.level:"orange";
+  const isVoice=s.source==="community_reviews";
+  const url=!isVoice&&b.sources&&safeUrl(b.sources[s.source]);
+  const tag=isVoice?`<a class="tag voice" href="#voices">${esc(t("sig_tenant"))}</a>`
+    :url?`<a class="tag city" href="${esc(url)}" target="_blank" rel="noopener">${esc(t("sig_city"))} ↗</a>`:`<span class="tag city">${esc(t("sig_city"))}</span>`;
+  return `<li class="signal"><span class="dot ${lv}" aria-label="${esc(t(lv))}">${levelMark[lv]}</span><div><h3>${esc(s.title)}</h3><p>${esc(s.detail)}</p>${tag}</div></li>`;
+}
+function reportInner(){
+  const {report:r,building:b}=state.data;
+  if(!r) return `<p class="summary">${esc(t("no_report"))}</p><p class="disclaimer">${esc(t("disclaimer"))}</p>`;
+  const order={red:0,orange:1,green:2};
+  const sigs=[...(r.signals||[])].sort((x,y)=>(order[x.level]??1)-(order[y.level]??1));
+  const qsList=r.questions_to_ask_landlord||[];
+  return `${stamp(levelMark[r.overall]?r.overall:"orange")}
+    <h2 class="headline">${esc(r.headline)}</h2>
+    <p class="summary">${esc(r.summary)}</p>
+    <p class="ai-note">${esc(t("ai_note"))}</p>
+    ${sigs.length?`<ul class="signals">${sigs.map(s=>signalHtml(s,b)).join("")}</ul>`:""}
+    ${qsList.length?`<div class="questions"><header><h3>${esc(t("questions"))}</h3><button class="btn ghost" data-a="copyq">${esc(t("copy"))}</button></header><ol>${qsList.map(q=>`<li>${esc(q)}</li>`).join("")}</ol></div>`:""}
+    <p class="disclaimer">${esc(r.disclaimer||t("disclaimer"))}</p>`;
+}
+function profilePanel(b){
+  const p=b.profile||{};
+  const rc=p.likely_rent_controlled===true?"rc_yes":p.likely_rent_controlled===false?"rc_no":"rc_unknown";
+  return `<div class="profile">
+    <span class="eyebrow">${esc(t("profile"))}</span>
+    ${facade(p.stories,p.units,86)}
+    <dl>
+      <div><dt>${esc(t("built"))}</dt><dd>${p.year_built?esc(p.year_built):esc(t("unknown"))}</dd></div>
+      <div><dt>${esc(t("units"))} · ${esc(t("stories"))}</dt><dd>${num(p.units)} · ${num(p.stories)}</dd></div>
+      <div><dt>${esc(t("last_sale"))}</dt><dd>${p.last_sale_date?fmtDate(p.last_sale_date):esc(t("unknown"))}</dd></div>
+    </dl>
+    <p class="rentnote">${esc(t(rc))}</p>
+  </div>`;
+}
+function statusPill(s){
+  if(!s) return "<span></span>";
+  return `<span class="status${/open|active|pending/i.test(s)?" open":""}">${esc(humanize(s))}</span>`;
+}
+function recordsInner(){
+  const b=state.data.building;
+  const lists={c:b.dbi_complaints||[],v:b.violations||[],p:b.permits||[]};
+  const ids={c:SRC.complaints,v:SRC.violations,p:SRC.permits};
+  const cur=lists[state.tab];
+  const all=state.showAll[state.tab];
+  const shown=all?cur:cur.slice(0,5);
+  const row={
+    c:x=>`<li><time>${fmtDate(x.date)}</time><div>${esc(x.description)}${x.closed_date?`<small>${esc(t("closed"))} ${fmtDate(x.closed_date)}</small>`:""}</div>${statusPill(x.status)}</li>`,
+    v:x=>`<li><time>${fmtDate(x.date)}</time><div>${esc(x.description||x.category)}${x.description&&x.category?`<small>${esc(x.category)}</small>`:""}${truthy(x.unsafe_building)?`<span class="unsafe">${esc(t("unsafe"))}</span>`:""}</div>${statusPill(x.status)}</li>`,
+    p:x=>`<li><time>${fmtDate(x.date)}</time><div>${esc(x.description)}<small>${esc(humanize(x.type))}${money(x.estimated_cost)?" · "+money(x.estimated_cost):""}</small></div>${statusPill(x.status)}</li>`
+  }[state.tab];
+  return `<div class="tabs" role="tablist">${["c","v","p"].map(k=>`<button role="tab" aria-selected="${k===state.tab}" data-a="tab" data-v="${k}">${esc(t("tab_"+k))} <span class="mono">${lists[k].length}</span></button>`).join("")}</div>
+    ${cur.length?`<ul class="rows" role="tabpanel">${shown.map(row).join("")}</ul>`:`<p class="empty">${esc(t("none"))}</p>`}
+    ${cur.length>5?`<p style="margin-top:12px"><button class="link" data-a="toggleall">${esc(t(all?"show_less":"show_all"))} (${cur.length})</button></p>`:""}
+    ${srcLink(ids[state.tab])}`;
+}
+function nearby(n){
+  if(!n) return `<p class="empty">${esc(t("none"))}</p>`;
+  const cats=n.top_categories||[]; const max=Math.max(1,...cats.map(c=>+c.count||0));
+  return `<p class="small">${esc(t("near_sub"))} · <b>${num(n.total_last_12m)}</b> ${esc(t("total"))}</p>
+    <ul class="bars">${cats.map(c=>`<li><div class="lab"><span>${esc(humanize(c.name))}</span><b>${num(c.count)}</b></div><div class="track"><div class="fill" style="width:${((+c.count||0)/max*100).toFixed(0)}%"></div></div></li>`).join("")}</ul>
+    ${srcLink(SRC.c311)}`;
+}
+function blockPanel(b){
+  const ev=b.block_evictions||[], rents=b.block_rents||[];
+  const y=new Date().getFullYear(); const years=Array.from({length:10},(_,i)=>y-9+i);
+  const counts=Object.fromEntries(years.map(v=>[v,0]));
+  const reasons={};
+  ev.forEach(e=>{const yr=+String(e.date).slice(0,4); if(yr in counts)counts[yr]++; (e.reasons||[]).forEach(r=>reasons[r]=(reasons[r]||0)+1)});
+  const max=Math.max(1,...Object.values(counts));
+  return `<div class="blockpanel" id="block">
+    <span class="blockflag">${esc(t("block_flag"))}</span>
+    <h3 class="subhead" style="margin-top:12px;font-size:27px">${esc(t("block_title"))}</h3>
+    <p class="small" style="margin-top:4px">${esc(t("block_sub"))}</p>
+    <div class="blockgrid">
+      <div><h3 class="subhead">${esc(t("ev_title"))}</h3>
+        ${ev.length?`<div class="yearbars" role="img" aria-label="${esc(t("ev_title"))}: ${ev.length}">${years.map(v=>`<div class="yb" title="${v}: ${counts[v]}">${counts[v]?`<b>${counts[v]}</b>`:""}<i style="height:${counts[v]/max*70}%"></i><span>'${String(v).slice(2)}</span></div>`).join("")}</div>
+        <div class="chiplist">${Object.entries(reasons).sort((a,b)=>b[1]-a[1]).map(([r,n])=>`<span>${esc(humanize(r))} · ${n}</span>`).join("")}</div>`:`<p class="empty">${esc(t("ev_none"))}</p>`}
+        ${srcLink(SRC.evictions)}</div>
+      <div><h3 class="subhead">${esc(t("rent_title"))}</h3>
+        ${rents.length?`<table class="renttable"><thead><tr><th scope="col">${esc(t("bedrooms"))}</th><th scope="col">${esc(t("range"))}</th></tr></thead><tbody>${rents.map(r=>`<tr><td>${esc(r.bedrooms)}</td><td class="mono">${esc(r.rent_range)}</td></tr>`).join("")}</tbody></table>`:`<p class="empty">${esc(t("rent_none"))}</p>`}
+        ${srcLink(SRC.rents)}</div>
+    </div>
+  </div>`;
+}
+function pips(n){n=Math.round(+n||0);return `<span class="pips" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i class="${i<=n?"":"off"}"></i>`).join("")}</span>`}
+function reviewHtml(r){
+  const rt=r.ratings||{};
+  return `<article class="review">
+    <header><b>${esc(r.pseudo)}</b>
+      ${r.verified?`<span class="tag ok" title="${esc(t("verified_tip"))}">✓ ${esc(t("verified"))}</span>`:`<span class="tag voice">${esc(t("unverified"))}</span>`}
+      ${r.demo?`<span class="tag fict">${esc(t("fict"))}</span>`:""}
+      <span class="small muted mono">${fmtDate(r.period_start)} – ${r.period_end?fmtDate(r.period_end):esc(t("present"))}</span>
+    </header>
+    <blockquote>${esc(r.text)}</blockquote>
+    <div class="small muted">${pips(rt.overall)} <span class="sr">${esc(t("r_overall"))}:</span> ${num(rt.overall)}/5</div>
+  </article>`;
+}
+function voicesInner(){
+  const c=state.data.community||{reviews:[],avg_ratings:null,n_reviews:0,n_verified:0};
+  const tv=state.data.report&&state.data.report.tenant_voice;
+  const avg=c.avg_ratings;
+  return `<div class="band-head"><div>
+      <span class="opinion-flag">${esc(t("voice_flag"))}</span>
+      <h2>${esc(t("voice_title"))}</h2><p>${esc(t("voice_sub"))}</p></div>
+      <button class="btn voice" data-a="review">${esc(t("write"))}</button></div>
+    <div class="voice-grid">
+      <aside class="avg">${avg?`<span class="eyebrow c-voice">${esc(t("avg"))}</span>
+        <div class="big" style="margin-top:6px">${(+avg.overall||0).toFixed(1)}<small> / 5</small></div>
+        <p class="small muted">${esc(t("basedon",{n:c.n_reviews||0,v:c.n_verified||0}))}</p>
+        <ul class="bars voiced">${RATING_KEYS.filter(k=>k!=="overall").map(k=>`<li><div class="lab"><span>${esc(t("r_"+k))}</span><b>${avg[k]!=null?(+avg[k]).toFixed(1):"—"}</b></div><div class="track"><div class="fill" style="width:${(+avg[k]||0)/5*100}%"></div></div></li>`).join("")}</ul>`:""}
+      </aside>
+      <div>
+        ${tv?`<div class="tv"><span class="eyebrow c-voice">${esc(t("tv"))}</span><p style="margin-top:6px">${esc(tv)}</p></div>`:""}
+        ${(c.reviews||[]).length?c.reviews.map(reviewHtml).join(""):`<p class="empty">${esc(t("no_rev"))}</p>`}
+      </div>
+    </div>`;
+}
+function lifeLine(l){
+  if(!l) return "";
+  return [t("sch_"+l.schedule),l.cleanliness!=null?t("clean")+" "+l.cleanliness+"/5":null,t("g_"+l.guests),l.smoking?t("smoker"):t("nonsmoker"),l.pets?t("pets"):t("nopets")].filter(x=>x&&!/^(sch_|g_)/.test(x)).map(esc).join(" · ");
+}
+function contactBtn(p){
+  const sent=state.sent[p.id];
+  return `<button class="btn ghost" data-a="contact" data-v="${esc(p.id)}" data-p="${esc(p.pseudo)}"${sent?" disabled":""}>${esc(t(sent?"sent":"ask"))}</button>`;
+}
+function personTags(p){
+  return `<span class="tags"><b>${esc(p.pseudo)}</b><span class="tag city">${esc(t("role_"+p.role))}</span>${p.verified?`<span class="tag ok">✓ ${esc(t("verified"))}</span>`:""}${p.demo?`<span class="tag fict">${esc(t("fict"))}</span>`:""}</span>`;
+}
+function peopleInner(){
+  const c=state.data.community||{};
+  const me=state.profile;
+  const list=(c.contactable_tenants||[]).filter(p=>!me||p.id!==me.id);
+  const seeking=me&&(me.role==="seeking_roommate"||me.role==="has_room");
+  let rm;
+  if(!me) rm=`<button class="btn" data-a="profile" style="margin-top:16px">${esc(t("rm_cta"))}</button>`;
+  else if(!seeking) rm=`<p class="empty">${esc(t("rm_tenant_note"))}</p><button class="btn" data-a="profile">${esc(t("rm_cta"))}</button>`;
+  else if(!state.matches) rm=`<p class="empty">…</p>`;
+  else if(!state.matches.length) rm=`<p class="empty">${esc(t("rm_none"))}</p>`;
+  else rm=state.matches.map(m=>{
+    const p=m.profile||{}; const s=+m.score; const pct=isNaN(s)?null:Math.round(s<=1?s*100:s);
+    const budget=(p.budget_min!=null||p.budget_max!=null)?`${money(p.budget_min)}–${money(p.budget_max)}`:"";
+    return `<div class="person"><div>${personTags(p)}
+      <p>${esc(m.why)}</p>
+      <p class="life">${[esc(p.neighborhood),budget&&esc(t("budget"))+" "+esc(budget),p.move_in&&esc(t("move_in"))+" "+fmtDate(p.move_in)].filter(Boolean).join(" · ")}</p>
+      <p class="life">${lifeLine(p.lifestyle)}</p></div>
+      <div style="text-align:right;flex:none">${pct!=null?`<div class="score">${pct}%</div><div class="small muted" style="margin-bottom:8px">${esc(t("match"))}</div>`:""}${contactBtn(p)}</div></div>`;
+  }).join("");
+  return `<div class="band-head"><div><span class="eyebrow">${esc(t("nav_people"))}</span><h2>${esc(t("ppl_title"))}</h2><p>${esc(t("ppl_sub"))}</p></div></div>
+    ${me?`<div class="me"><span>${esc(t("you"))} <b>${esc(me.pseudo)}</b> (${esc(t("role_"+me.role))})</span><button class="link small" data-a="forget">${esc(t("forget"))}</button></div>`:""}
+    <div class="people-grid">
+      <div><h3 class="subhead">${esc(t("ppl_tenants"))}</h3>
+        ${list.length?`<div style="margin-top:12px">${list.map(p=>`<div class="person"><div>${personTags(p)}<p>${esc(p.bio)}</p></div>${contactBtn(p)}</div>`).join("")}</div>`:`<p class="empty">${esc(t("ppl_none"))}</p>`}
+      </div>
+      <div><h3 class="subhead">${esc(t("rm_title"))}</h3><p class="small muted" style="margin:4px 0 12px">${esc(t("rm_sub"))}</p>${rm}</div>
+    </div>`;
+}
+function resultsView(){
+  const b=state.data.building, s=b.stats||{};
+  return `<div class="wrap addr">
+      <h1>${esc(b.matched_address||b.query_address)}</h1>
+      <div class="meta">${b.neighborhood?`<span>${esc(b.neighborhood)}</span>`:""}${b.supervisor_district?`<span>${esc(t("district"))} ${esc(b.supervisor_district)}</span>`:""}${b.blklot?`<span>${esc(t("parcel"))} ${esc(b.blklot)}</span>`:""}</div>
+    </div>
+    <nav class="subnav" aria-label="Sections"><div class="wrap">
+      <a href="#report">${esc(t("nav_report"))}</a><a href="#city">${esc(t("nav_city"))}</a><a href="#block">${esc(t("nav_block"))}</a><a href="#voices">${esc(t("nav_voices"))}</a><a href="#people">${esc(t("nav_people"))}</a>
+    </div></nav>
+    <section id="report" class="wrap"><div class="report">
+      <div id="reportInner">${reportInner()}</div>
+      <aside class="side"><div id="map"></div>${profilePanel(b)}</aside>
+    </div></section>
+    <section id="city" class="band city"><div class="wrap">
+      <div class="band-head"><div><span class="eyebrow c-city">${esc(t("city_flag"))}</span><h2>${esc(t("city_title"))}</h2><p>${esc(t("city_sub"))}</p></div></div>
+      <div class="stats">
+        <div class="stat${(+s.open_complaints>0)?" alert":""}"><b>${num(s.open_complaints)}</b><span>${esc(t("st_open"))}</span></div>
+        <div class="stat"><b>${num(s.complaints_10y)}</b><span>${esc(t("st_c"))}</span><em>${esc(t("tenyears"))}</em></div>
+        <div class="stat"><b>${num(s.violations_10y)}</b><span>${esc(t("st_v"))}</span><em>${esc(t("tenyears"))}</em></div>
+        <div class="stat"><b>${num(s.evictions_block_10y)}</b><span>${esc(t("st_e"))}</span><em>${esc(t("st_e_scope"))} · ${esc(t("tenyears"))}</em></div>
+      </div>
+      <div class="records">
+        <div id="records">${recordsInner()}</div>
+        <div><h3 class="subhead">${esc(t("near"))}</h3>${nearby(b.neighborhood_311)}</div>
+      </div>
+      ${blockPanel(b)}
+    </div></section>
+    <section id="voices" class="band voice"><div class="wrap" id="voicesInner">${voicesInner()}</div></section>
+    <section id="people" class="band people"><div class="wrap" id="peopleInner">${peopleInner()}</div></section>
+    <footer class="wrap"><p>${esc(t("disclaimer"))}</p></footer>`;
+}
+function initMap(){
+  const b=state.data.building, el=$("#map"); if(!el) return;
+  if(b.lat==null||b.lon==null){el.style.display="none";return}
+  try{
+    const map=L.map(el,{scrollWheelZoom:false}).setView([b.lat,b.lon],16);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+    L.circle([b.lat,b.lon],{radius:150,color:"#1f4560",weight:1.5,fillOpacity:.07,dashArray:"4 5"}).addTo(map);
+    L.marker([b.lat,b.lon],{icon:L.divIcon({className:"",html:'<div class="pin"></div>',iconSize:[20,20],iconAnchor:[10,10]}),title:b.matched_address||""}).addTo(map);
+  }catch(e){ el.innerHTML=`<div class="map-fallback">${esc(b.lat)}, ${esc(b.lon)}</div>`; }
+}
+function refreshInner(){
+  const set=(id,fn)=>{const el=document.getElementById(id); if(el&&state.data) el.innerHTML=fn()};
+  set("reportInner",reportInner); set("voicesInner",voicesInner); set("peopleInner",peopleInner);
+}
+
+/* =========================== loading flow =========================== */
+async function load(address,{silent=false,push=true}={}){
+  const id=++state.reqId;
+  state.address=address;
+  if(push&&!silent) pushUrl();
+  let timer;
+  if(!silent){
+    state.view="loading"; render(); window.scrollTo(0,0);
+    let i=0; timer=setInterval(()=>{
+      const li=document.querySelectorAll("#steps li"); if(!li.length||i>=li.length-1){clearInterval(timer);return}
+      li[i].className="done"; li[++i].className="on";
+    },1700);
+  }
+  try{
+    const data=await getReport(address,state.lang);
+    if(id!==state.reqId) return;
+    clearInterval(timer);
+    state.data=data; state.tab="c"; state.showAll={};
+    if(silent){refreshInner();return}
+    state.view="results"; render();
+    loadMatches();
+  }catch(e){
+    if(id!==state.reqId) return;
+    clearInterval(timer);
+    if(silent){toast(t("generic_err"));return}
+    state.error=e; state.view="error"; render();
+  }
+}
+async function loadMatches(){
+  const me=state.profile;
+  if(!me||!(me.role==="seeking_roommate"||me.role==="has_room")) return;
+  try{ state.matches=await getMatches(me.id); }
+  catch(e){ state.matches=[]; }
+  const el=$("#peopleInner"); if(el) el.innerHTML=peopleInner();
+}
+
+/* =========================== dialogs =========================== */
+const dlg=$("#dlg");
+function openDlg(html){
+  dlg.innerHTML=`<div class="dlg"><button class="close" data-a="close" aria-label="Close">×</button>${html}</div>`;
+  dlg.showModal();
+}
+function reviewDialog(){
+  openDlg(`<h2>${esc(t("f_review_title"))}</h2>
+  <form data-f="review">
+    <label class="field"><span>${esc(t("f_pseudo"))}</span><input name="pseudo" required maxlength="40" autocomplete="off" value="${esc(state.profile?state.profile.pseudo:"")}"><p class="hint">${esc(t("f_pseudo_h"))}</p></label>
+    <div class="two">
+      <label class="field"><span>${esc(t("f_start"))}</span><input type="month" name="period_start" required placeholder="YYYY-MM" pattern="\\d{4}-\\d{2}"></label>
+      <label class="field"><span>${esc(t("f_end"))}</span><input type="month" name="period_end" placeholder="YYYY-MM" pattern="\\d{4}-\\d{2}"></label>
+    </div>
+    <label class="check"><input type="checkbox" name="still" data-c="still"> ${esc(t("f_still"))}</label>
+    <p class="field" style="font-weight:600;font-size:14px;margin-bottom:0">${esc(t("f_ratings"))}</p>
+    ${RATING_KEYS.map(k=>`<fieldset class="rate"><legend>${esc(t("r_"+k))}</legend><div class="opts">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="r_${k}" value="${n}" aria-label="${esc(t("r_"+k))}: ${n}"><span>${n}</span></label>`).join("")}</div></fieldset>`).join("")}
+    <label class="field"><span>${esc(t("f_text"))}</span><textarea name="text" required minlength="10" maxlength="2000"></textarea><p class="hint">${esc(t("f_text_h"))}</p></label>
+    <label class="field"><span>${esc(t("f_proof"))}</span><input type="file" name="proof" accept="image/*,application/pdf"><p class="hint">${esc(t("f_proof_h"))}</p></label>
+    <p class="privacy">${esc(t("f_privacy"))}</p>
+    <div class="formerr" hidden role="alert"></div>
+    <div class="formactions"><button type="button" class="btn ghost" data-a="close">${esc(t("f_cancel"))}</button><button class="btn voice">${esc(t("f_publish"))}</button></div>
+  </form>`);
+}
+function profileDialog(note){
+  const n=state.data&&state.data.building?state.data.building.neighborhood:"";
+  const defaultRole=state.pendingContact?"seeking_roommate":"seeking_roommate";
+  const opt=(arr,pfx)=>arr.map(v=>`<option value="${v}">${esc(t(pfx+v))}</option>`).join("");
+  openDlg(`<h2>${esc(t("f_profile_title"))}</h2>${note?`<p class="hint" style="margin-top:8px">${esc(note)}</p>`:""}
+  <form data-f="profile">
+    <label class="field"><span>${esc(t("f_pseudo"))}</span><input name="pseudo" required maxlength="40" autocomplete="off"><p class="hint">${esc(t("f_pseudo_h"))}</p></label>
+    <label class="field"><span>${esc(t("f_role"))}</span><select name="role" data-c="role">${["seeking_roommate","has_room","current_tenant","former_tenant"].map(v=>`<option value="${v}"${v===defaultRole?" selected":""}>${esc(t("role_"+v))}</option>`).join("")}</select></label>
+    <label class="field"><span>${esc(t("f_nhood"))}</span><input name="neighborhood" value="${esc(n)}" required></label>
+    <div data-roommate>
+      <div class="two">
+        <label class="field"><span>${esc(t("f_bmin"))}</span><input type="number" name="budget_min" min="0" step="50"></label>
+        <label class="field"><span>${esc(t("f_bmax"))}</span><input type="number" name="budget_max" min="0" step="50"></label>
+      </div>
+      <label class="field"><span>${esc(t("move_in"))}</span><input type="month" name="move_in" placeholder="YYYY-MM" pattern="\\d{4}-\\d{2}"></label>
+    </div>
+    <label class="field"><span>${esc(t("f_bio"))}</span><textarea name="bio" maxlength="400" style="min-height:70px"></textarea><p class="hint">${esc(t("f_bio_h"))}</p></label>
+    <div class="two">
+      <label class="field"><span>${esc(t("f_sched"))}</span><select name="schedule">${opt(["early","late","flexible"],"f_sched_")}</select></label>
+      <label class="field"><span>${esc(t("f_guests"))}</span><select name="guests">${opt(["rarely","sometimes","often"],"f_g_")}</select></label>
+    </div>
+    <label class="field"><span>${esc(t("f_cleanl"))}</span><select name="cleanliness">${[1,2,3,4,5].map(v=>`<option${v===3?" selected":""}>${v}</option>`).join("")}</select></label>
+    <label class="check"><input type="checkbox" name="smoking"> ${esc(t("f_smoke"))}</label>
+    <label class="check"><input type="checkbox" name="pets"> ${esc(t("f_pets"))}</label>
+    <label class="check"><input type="checkbox" name="open_to_contact"> ${esc(t("f_open"))}</label>
+    <div class="formerr" hidden role="alert"></div>
+    <div class="formactions"><button type="button" class="btn ghost" data-a="close">${esc(t("f_cancel"))}</button><button class="btn">${esc(t("f_create"))}</button></div>
+  </form>`);
+}
+function contactDialog(id,pseudo){
+  if(!state.profile){ state.pendingContact={id,pseudo}; profileDialog(t("contact_first")); return; }
+  openDlg(`<h2>${esc(t("f_contact_title",{p:pseudo}))}</h2>
+  <form data-f="contact" data-id="${esc(id)}">
+    <label class="field"><span>${esc(t("f_msg"))}</span><textarea name="message" required maxlength="800"></textarea><p class="hint">${esc(t("f_msg_h"))}</p></label>
+    <div class="formerr" hidden role="alert"></div>
+    <div class="formactions"><button type="button" class="btn ghost" data-a="close">${esc(t("f_cancel"))}</button><button class="btn">${esc(t("f_send"))}</button></div>
+  </form>`);
+}
+function formError(form,msg){const e=$(".formerr",form);e.textContent=msg;e.hidden=false;e.scrollIntoView({block:"nearest"})}
+const errMsg=e=>e&&e.hasMsg?e.message:t("generic_err");
+
+/* =========================== form handlers =========================== */
+async function submitReview(form){
+  const fd=new FormData(form), ratings={};
+  for(const k of RATING_KEYS){const v=fd.get("r_"+k); if(!v){formError(form,t("f_rate_err"));return} ratings[k]=+v}
+  const proofFile=fd.get("proof"); const proof=proofFile&&proofFile.size?proofFile:null;
+  const reviewIn={blklot:state.data.building.blklot,pseudo:fd.get("pseudo").trim(),period_start:fd.get("period_start"),
+    period_end:fd.get("still")||!fd.get("period_end")?null:fd.get("period_end"),ratings,text:fd.get("text").trim()};
+  const btn=$("button.voice",form),label=btn.textContent; btn.disabled=true;btn.textContent=t("f_checking");$(".formerr",form).hidden=true;
+  try{
+    const res=await postReview(reviewIn,proof);
+    if(res.status!=="published"){formError(form,t("rejected")+" "+(res.reason||""));return}
+    dlg.close(); toast(t(res.verified?"pub_ver":"pub_ok"));
+    if(MOCK){
+      const c=state.data.community;
+      c.reviews.unshift({...reviewIn,id:"mock-"+Date.now(),verified:!!res.verified,status:"published",created_at:new Date().toISOString(),demo:false});
+      c.n_reviews=(c.n_reviews||0)+1; if(res.verified)c.n_verified=(c.n_verified||0)+1;
+      refreshInner();
+    } else load(state.address,{silent:true});
+  }catch(e){formError(form,errMsg(e))}
+  finally{btn.disabled=false;btn.textContent=label}
+}
+async function submitProfile(form){
+  const f=new FormData(form), role=f.get("role"), rm=role==="seeking_roommate"||role==="has_room";
+  const b=state.data&&state.data.building;
+  const intOrNull=v=>v===""||v==null?null:parseInt(v,10);
+  const p={pseudo:f.get("pseudo").trim(),role,blklot:(role==="current_tenant"||role==="former_tenant")&&b?b.blklot:null,
+    neighborhood:f.get("neighborhood").trim(),budget_min:rm?intOrNull(f.get("budget_min")):null,budget_max:rm?intOrNull(f.get("budget_max")):null,
+    move_in:rm&&f.get("move_in")?f.get("move_in"):null,bio:f.get("bio").trim(),
+    lifestyle:{schedule:f.get("schedule"),cleanliness:+f.get("cleanliness"),guests:f.get("guests"),smoking:!!f.get("smoking"),pets:!!f.get("pets")},
+    open_to_contact:!!f.get("open_to_contact")};
+  const btn=$("button:not([type=button])",form); btn.disabled=true; $(".formerr",form).hidden=true;
+  try{
+    state.profile=await postProfile(p); store.set("kyb_profile",state.profile); state.matches=null;
+    dlg.close(); toast(t("prof_ok"));
+    const el=$("#peopleInner"); if(el) el.innerHTML=peopleInner();
+    loadMatches();
+    if(state.pendingContact){const c=state.pendingContact;state.pendingContact=null;contactDialog(c.id,c.pseudo)}
+  }catch(e){formError(form,errMsg(e))}
+  finally{btn.disabled=false}
+}
+async function submitContact(form){
+  const to=form.dataset.id, message=new FormData(form).get("message").trim();
+  const btn=$("button:not([type=button])",form); btn.disabled=true; $(".formerr",form).hidden=true;
+  try{
+    const r=await postContact({from_profile_id:state.profile.id,to_profile_id:to,message});
+    if(r&&r.ok===false) throw new Error();
+    state.sent[to]=true; dlg.close(); toast(t("contact_ok"));
+    const el=$("#peopleInner"); if(el) el.innerHTML=peopleInner();
+  }catch(e){formError(form,errMsg(e))}
+  finally{btn.disabled=false}
+}
+
+/* =========================== events =========================== */
+document.addEventListener("submit",e=>{
+  const f=e.target, k=f.dataset.f; if(!k) return;
+  e.preventDefault();
+  if(k==="search"){const a=new FormData(f).get("address").trim(); if(a) load(a)}
+  else if(k==="review") submitReview(f);
+  else if(k==="profile") submitProfile(f);
+  else if(k==="contact") submitContact(f);
+});
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-a]"); if(!el) return;
+  const a=el.dataset.a, v=el.dataset.v;
+  if(a==="home"){state.reqId++;state.view="landing";state.address="";state.data=null;pushUrl();render();window.scrollTo(0,0)}
+  else if(a==="example") load(v);
+  else if(a==="retry") load(state.address);
+  else if(a==="tab"){state.tab=v;$("#records").innerHTML=recordsInner();$(`#records [data-v="${v}"]`).focus()}
+  else if(a==="toggleall"){state.showAll[state.tab]=!state.showAll[state.tab];$("#records").innerHTML=recordsInner()}
+  else if(a==="copyq"){
+    const text=(state.data.report.questions_to_ask_landlord||[]).map((q,i)=>`${i+1}. ${q}`).join("\n");
+    (navigator.clipboard?navigator.clipboard.writeText(text):Promise.reject()).then(()=>toast(t("copied")),()=>toast(t("generic_err")));
+  }
+  else if(a==="review") reviewDialog();
+  else if(a==="profile"){state.pendingContact=null;profileDialog()}
+  else if(a==="contact") contactDialog(v,el.dataset.p);
+  else if(a==="close"){state.pendingContact=null;dlg.close()}
+  else if(a==="forget"){state.profile=null;state.matches=null;store.set("kyb_profile",null);$("#peopleInner").innerHTML=peopleInner()}
+});
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.id==="lang"){
+    state.lang=el.value; store.set("kyb_lang",state.lang);
+    if(state.address) load(state.address); else {pushUrl();render()}
+  } else if(el.dataset.c==="still"){
+    const end=el.form.elements.period_end; end.disabled=el.checked; if(el.checked) end.value="";
+  } else if(el.dataset.c==="role"){
+    const rm=el.value==="seeking_roommate"||el.value==="has_room";
+    $("[data-roommate]",el.form).hidden=!rm;
+  }
+});
+dlg.addEventListener("click",e=>{ if(e.target===dlg){state.pendingContact=null;dlg.close()} });
+window.addEventListener("popstate",()=>{
+  const q=new URLSearchParams(location.search), a=q.get("address");
+  if(a) load(a,{push:false}); else {state.reqId++;state.view="landing";state.address="";state.data=null;render()}
+});
+
+/* =========================== start =========================== */
+const initial=qs.get("address");
+if(initial) load(initial,{push:false}); else render();
+</script>
+</body>
+</html>

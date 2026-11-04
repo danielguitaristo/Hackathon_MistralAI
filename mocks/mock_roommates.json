@@ -1,0 +1,24 @@
+[
+  {
+    "profile": {
+      "id": "demo-p3", "pseudo": "SunsetSourdough", "role": "has_room", "blklot": null, "neighborhood": "Russian Hill",
+      "budget_min": 1500, "budget_max": 1900, "move_in": "2027-01",
+      "bio": "Room free in a two-bedroom. I work days and cook a lot.",
+      "lifestyle": {"schedule": "early", "cleanliness": 4, "guests": "sometimes", "smoking": false, "pets": false},
+      "open_to_contact": true, "verified": true, "demo": true
+    },
+    "score": 0.91,
+    "why": "Budgets overlap, move-in dates match, and you both keep similar schedules and cleanliness standards."
+  },
+  {
+    "profile": {
+      "id": "demo-p4", "pseudo": "NoeValleyNightOwl", "role": "has_room", "blklot": null, "neighborhood": "Nob Hill",
+      "budget_min": 1700, "budget_max": 2100, "move_in": "2027-02",
+      "bio": "Quiet flat, one cat, and I work late shifts.",
+      "lifestyle": {"schedule": "late", "cleanliness": 3, "guests": "rarely", "smoking": false, "pets": true},
+      "open_to_contact": true, "verified": false, "demo": true
+    },
+    "score": 0.68,
+    "why": "Budgets overlap and the neighborhood is nearby, but your schedules differ."
+  }
+]
