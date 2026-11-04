@@ -14,6 +14,8 @@ invalide après 1 retry), on renvoie un repli sûr : rapport construit en Python
 Test : python llm.py                 (tout)
        python llm.py report          (ou : moderate, proof, match)
 """
+from __future__ import annotations  # Python 3.9 : annotations « list | None » non évaluées
+
 import base64
 import copy
 import datetime as dt
@@ -31,8 +33,11 @@ from dotenv import load_dotenv
 
 try:  # SDK mistralai >= 2 (version installée : 3.x)
     from mistralai.client import Mistral
-except ImportError:  # SDK mistralai 1.x
-    from mistralai import Mistral
+except ImportError:
+    try:  # SDK mistralai 1.x (seule version installable sous Python 3.9)
+        from mistralai import Mistral
+    except ImportError:  # SDK absent : les fonctions restent chargées et renvoient leurs replis
+        Mistral = None
 
 load_dotenv()
 log = logging.getLogger("llm")
@@ -48,7 +53,7 @@ _client = None
 # ═══════════════════════════════ Client et utilitaires ═══════════════════════════════
 
 def _has_key() -> bool:
-    return bool(os.getenv("MISTRAL_API_KEY"))
+    return Mistral is not None and bool(os.getenv("MISTRAL_API_KEY"))
 
 
 def _mistral() -> Mistral:
