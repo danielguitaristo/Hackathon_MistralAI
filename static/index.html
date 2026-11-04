@@ -1,1 +1,558 @@
-<!doctype html><title>KYB</title><p>Placeholder — la Personne 3 remplace ce fichier.</p>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Know Your Building</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* ---------- Couleurs (modifie-les ici, tout le site suit) ----------
+     Déco : dégradé chaud façon Mistral (m1 → m5).
+     Sens : vert / ambre / rouge pour les signaux, volontairement différents de l'orange déco. */
+  :root {
+    --m1: #FFD800; --m2: #FFAF00; --m3: #FF8205; --m4: #FA500F; --m5: #E10500;
+    --bg: #FFFAEB; --card: #ffffff; --text: #111111; --muted: #5c564a;
+    --brand: #FA500F; --ink: #111111; --border: #E9E0C8;
+    --green: #17703f; --orange: #92560a; --red: #b4140a;
+    --green-bg: #e3f3e8; --orange-bg: #fbefd6; --red-bg: #fde4e1;
+    --radius: 4px;
+    --font: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; }
+  .stripes { display: flex; height: 6px; }
+  .stripes span { flex: 1; }
+  main { max-width: 860px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.9rem; margin: 0; letter-spacing: -0.02em; font-weight: 800; }
+  h2 { font-size: 1.15rem; margin: 0 0 8px; font-weight: 700; }
+  h3 { font-size: .8rem; margin: 18px 0 6px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .muted { color: var(--muted); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 12px 0; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; }
+  .brandmark { display: flex; align-items: center; gap: 12px; }
+  /* Logo maison : un petit immeuble en pixels, aux couleurs du dégradé */
+  .logo { display: grid; grid-template-columns: repeat(4, 8px); grid-auto-rows: 8px; gap: 0; flex: none; }
+  .logo i { display: block; }
+  .hero { background: var(--ink); color: #fff; border: 0; padding: 22px 18px; }
+  .hero h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
+  .hero .muted { color: #cfc8b8; }
+  .hero .chip { background: transparent; color: #fff; border-color: #4a463d; }
+  .hero .chip:hover { border-color: var(--m3); color: var(--m2); }
+  select, input, textarea, button { font: inherit; }
+  select, input[type=text], input[type=number], input[type=date], textarea {
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); width: 100%; }
+  textarea { min-height: 90px; }
+  button { cursor: pointer; border: 0; border-radius: var(--radius); padding: 10px 16px; background: var(--ink); color: #fff; font-weight: 700; transition: background .15s; }
+  button:hover:not(:disabled) { background: var(--brand); }
+  .hero button[type=submit] { background: var(--brand); }
+  .hero button[type=submit]:hover:not(:disabled) { background: var(--m5); }
+  button.secondary { background: #fff; color: var(--ink); border: 1px solid var(--ink); }
+  button.secondary:hover:not(:disabled) { background: var(--ink); color: #fff; }
+  button:disabled { opacity: .5; cursor: wait; }
+  :focus-visible { outline: 3px solid var(--m1); outline-offset: 2px; }
+  .search { display: flex; gap: 8px; margin-top: 12px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; align-items: center; }
+  .chip { background: #fff; color: var(--ink); border: 1px solid var(--border); font-weight: 500; padding: 6px 10px; font-size: .85rem; font-family: var(--mono); }
+  .tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border); margin-top: 12px; }
+  .tab { background: none; color: var(--muted); border-radius: 0; white-space: nowrap; border-bottom: 3px solid transparent; }
+  .tab:hover:not(:disabled) { background: none; color: var(--ink); }
+  .tab[aria-selected=true] { color: var(--ink); border-bottom-color: var(--brand); }
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 2px; font-size: .75rem; font-weight: 700; font-family: var(--mono); }
+  .green { background: var(--green-bg); color: var(--green); }
+  .orange { background: var(--orange-bg); color: var(--orange); }
+  .red { background: var(--red-bg); color: var(--red); }
+  .grey { background: #eceef2; color: var(--muted); }
+  .signal { border-left: 5px solid; padding: 8px 12px; margin: 8px 0; border-radius: 4px; background: #fafbfc; }
+  .signal.green { border-color: var(--green); } .signal.orange { border-color: var(--orange); } .signal.red { border-color: var(--red); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+  .kv { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; font-size: .85rem; }
+  .kv b { display: block; font-size: 1.4rem; font-family: var(--mono); }
+  .timeline { list-style: none; padding: 0; margin: 0; }
+  .timeline li { padding: 6px 0 6px 14px; border-left: 3px solid var(--m2); margin-left: 6px; }
+  #map { height: 240px; border-radius: var(--radius); margin-top: 10px; border: 1px solid var(--border); }
+  .bar { height: 8px; background: #efe8d6; border-radius: 0; overflow: hidden; margin-bottom: 6px; }
+  .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--m1), var(--m3), var(--m4)); }
+  .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .field { margin: 10px 0; }
+  .field label { display: block; font-weight: 600; margin-bottom: 4px; }
+  .error { background: var(--red-bg); color: var(--red); padding: 10px 12px; border-radius: 8px; margin: 12px 0; }
+  .loading { text-align: center; padding: 24px; }
+  /* Chargement : 5 blocs qui s'allument tour à tour, aux couleurs du dégradé */
+  .spinner { display: flex; justify-content: center; gap: 4px; margin: 0 auto 12px; }
+  .spinner i { width: 12px; height: 12px; animation: blink 1s infinite; }
+  .spinner i:nth-child(2) { animation-delay: .1s; } .spinner i:nth-child(3) { animation-delay: .2s; }
+  .spinner i:nth-child(4) { animation-delay: .3s; } .spinner i:nth-child(5) { animation-delay: .4s; }
+  @keyframes blink { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+  .loading { font-family: var(--mono); font-size: .9rem; }
+  footer { font-size: .8rem; color: var(--muted); margin: 24px 0; }
+  .hidden { display: none; }
+  .tip { cursor: help; border-bottom: 1px dotted var(--muted); }
+  a { color: var(--brand); }
+</style>
+</head>
+<body>
+<!-- Bandeau en 5 bandes de couleur (dégradé Mistral) -->
+<div class="stripes" aria-hidden="true"><span style="background:var(--m1)"></span><span style="background:var(--m2)"></span><span style="background:var(--m3)"></span><span style="background:var(--m4)"></span><span style="background:var(--m5)"></span></div>
+<main>
+  <div class="topbar">
+    <div class="brandmark">
+      <div class="logo" id="logo" aria-hidden="true"></div>
+      <div><h1>Know Your Building</h1><div class="muted" id="tagline"></div></div>
+    </div>
+    <label><span class="hidden" id="langLabel">Language</span>
+      <select id="lang" aria-label="Language">
+        <option value="en">English</option><option value="es">Español</option>
+        <option value="zh">中文</option><option value="fr">Français</option>
+      </select>
+    </label>
+  </div>
+
+  <!-- ACCUEIL : champ d'adresse -->
+  <section class="card hero" aria-labelledby="searchTitle">
+    <h2 id="searchTitle"></h2>
+    <form class="search" id="searchForm">
+      <input type="text" id="address" aria-label="Address" placeholder="907 Valencia St" autocomplete="off" required>
+      <button type="submit" id="goBtn"></button>
+    </form>
+    <div class="chips" id="demoChips" aria-label="Demo addresses"></div>
+  </section>
+
+  <div id="status" aria-live="polite"></div>
+
+  <!-- RÉSULTATS -->
+  <section id="result" class="hidden">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="panel"></div>
+  </section>
+
+  <footer id="disclaimer"></footer>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* =====================================================================
+   1) RÉGLAGES
+   - Vrai backend (Fleurine) : `uvicorn main:app --reload --port 8000` puis http://localhost:8000/
+   - Mode mock (sans backend) : `python3 -m http.server 8000` puis http://localhost:8000/static/?mock
+   ===================================================================== */
+const USE_MOCK = new URLSearchParams(location.search).has('mock');
+const API_BASE = '';            // vide = même serveur que la page (main.py sert static/)
+const MOCK_DIR = '../mocks/';   // mocks de l'équipe : mock_api_report.json, mock_community.json
+
+// Adresses de démo (données par Fleurine, toutes réelles)
+const DEMO = ['907 Valencia St', '2288 Broadway', '3033 Cesar Chavez St'];
+
+/* =====================================================================
+   2) TEXTES TRADUITS — chaque langue a les mêmes clés
+   ===================================================================== */
+const I18N = {
+  en: { tagline:'Know what you are signing before you sign.', search:'Look up a building', go:'Search', demo:'Try:',
+    tabOfficial:'Official data', tabVoice:'Tenants’ voice', tabPeople:'Trusted people', tabQuestions:'Questions to ask',
+    overall:'Overall', signals:'Signals', profile:'Building profile', yearBuilt:'Year built', units:'Units',
+    rent:'Rent control', rentProbable:'Probable', rentUnlikely:'Unlikely', rentTip:'Indicative only: based on build year and unit count.',
+    timeline:'Timeline', block:'On this street block', blockNote:'Block-level data, not specific to this building.',
+    evictions:'Evictions (5 yrs)', complaints:'Complaints', openComplaints:'open', violations:'Violations', permits:'Permits (5 yrs)', fire:'Fire incidents (5 yrs)', c311:'311 reports nearby (12 mo)',
+    voice:'What tenants say', averages:'Average ratings', repairs:'Repairs', landlord:'Landlord', safety:'Safety', noise:'Noise', value:'Value',
+    verified:'✓ Verified tenant', fake:'fictional example', noReviews:'No reviews yet for this building.',
+    addReview:'Share your experience', period:'Period (e.g. 2022-2024)', yourText:'Your review', proof:'Proof of tenancy (optional lease or bill)',
+    proofNote:'Your document is read, then deleted. Never stored.', submit:'Submit review',
+    people:'Tenants you can reach', ask:'Ask to talk', asked:'Request sent (demo)', roommates:'Roommate matching', noPeople:'No profiles for this building.',
+    rmForm:'Your roommate profile', budget:'Max budget ($/month)', moveIn:'Move-in date', sleep:'Sleep schedule', clean:'Cleanliness', noiseTol:'Noise tolerance',
+    findMatches:'Find matches', score:'Match', noSensitive:'We never ask about origin, religion, gender or similar.',
+    questions:'Questions to ask the landlord', loading1:'Finding the building…', loading2:'Reading city records…', loading3:'Writing the plain-language report…',
+    notFound:'Address not found in San Francisco. Check the spelling.', generic:'Something went wrong. Try again.', rejected:'Review rejected: ',
+    thanks:'Thanks! Review checked and published (demo).', disclaimer:'Informational only, not legal advice. Official data comes from DataSF; rent-control status is indicative. Tenant reviews marked “fictional example” are demo data.',
+    q1:'Is this unit covered by the SF Rent Ordinance? Please confirm in writing.', q2:'Can I see the history of repairs and open complaints?', q3:'Are any renovations or evictions planned for the building?', q4:'What is the exact rent increase policy, and what is my security deposit?' },
+  fr: { tagline:'Sache ce que tu signes avant de signer.', search:'Chercher un immeuble', go:'Chercher', demo:'Essayer :',
+    tabOfficial:'Données officielles', tabVoice:'La voix des locataires', tabPeople:'Gens de confiance', tabQuestions:'Questions à poser',
+    overall:'Bilan', signals:'Signaux', profile:'Profil du bâtiment', yearBuilt:'Année de construction', units:'Logements',
+    rent:'Contrôle des loyers', rentProbable:'Probable', rentUnlikely:'Peu probable', rentTip:'Indicatif : basé sur l’année de construction et le nombre de logements.',
+    timeline:'Chronologie', block:'Sur ce bloc de rue', blockNote:'Données à l’échelle du bloc, pas propres à cet immeuble.',
+    evictions:'Évictions (5 ans)', complaints:'Plaintes', openComplaints:'ouvertes', violations:'Infractions', permits:'Permis (5 ans)', fire:'Incidents pompiers (5 ans)', c311:'Signalements 311 à proximité (12 mois)',
+    voice:'Ce que disent les locataires', averages:'Notes moyennes', repairs:'Réparations', landlord:'Propriétaire', safety:'Sécurité', noise:'Bruit', value:'Rapport qualité-prix',
+    verified:'✓ Locataire vérifié', fake:'exemple fictif', noReviews:'Pas encore d’avis pour cet immeuble.',
+    addReview:'Partage ton expérience', period:'Période (ex. 2022-2024)', yourText:'Ton avis', proof:'Justificatif (bail ou facture, optionnel)',
+    proofNote:'Ton document est lu puis supprimé, jamais conservé.', submit:'Envoyer l’avis',
+    people:'Locataires contactables', ask:'Demander à échanger', asked:'Demande envoyée (démo)', roommates:'Colocation', noPeople:'Aucun profil pour cet immeuble.',
+    rmForm:'Ton profil de colocation', budget:'Budget max ($/mois)', moveIn:'Date d’emménagement', sleep:'Rythme de sommeil', clean:'Propreté', noiseTol:'Tolérance au bruit',
+    findMatches:'Trouver des matchs', score:'Match', noSensitive:'Nous ne demandons jamais l’origine, la religion, le genre, etc.',
+    questions:'Questions à poser au propriétaire', loading1:'Recherche de l’immeuble…', loading2:'Lecture des données de la ville…', loading3:'Rédaction du rapport…',
+    notFound:'Adresse introuvable à San Francisco. Vérifie l’orthographe.', generic:'Une erreur est survenue. Réessaie.', rejected:'Avis rejeté : ',
+    thanks:'Merci ! Avis vérifié et publié (démo).', disclaimer:'À titre informatif, pas un conseil juridique. Données officielles : DataSF ; le contrôle des loyers est indicatif. Les avis “exemple fictif” sont des données de démonstration.',
+    q1:'Ce logement est-il couvert par la Rent Ordinance de SF ? Merci de le confirmer par écrit.', q2:'Puis-je voir l’historique des réparations et des plaintes ouvertes ?', q3:'Des travaux ou des évictions sont-ils prévus dans l’immeuble ?', q4:'Quelle est la politique exacte d’augmentation du loyer, et le montant du dépôt de garantie ?' },
+  es: { tagline:'Sabe lo que firmas antes de firmar.', search:'Buscar un edificio', go:'Buscar', demo:'Prueba:',
+    tabOfficial:'Datos oficiales', tabVoice:'La voz de los inquilinos', tabPeople:'Personas de confianza', tabQuestions:'Preguntas',
+    overall:'Resumen', signals:'Señales', profile:'Perfil del edificio', yearBuilt:'Año de construcción', units:'Unidades',
+    rent:'Control de alquileres', rentProbable:'Probable', rentUnlikely:'Poco probable', rentTip:'Solo orientativo: según el año y el número de unidades.',
+    timeline:'Cronología', block:'En esta cuadra', blockNote:'Datos de la cuadra, no solo de este edificio.',
+    evictions:'Desalojos (5 años)', complaints:'Quejas', openComplaints:'abiertas', violations:'Infracciones', permits:'Permisos (5 años)', fire:'Incidentes de bomberos (5 años)', c311:'Reportes 311 cercanos (12 meses)',
+    voice:'Lo que dicen los inquilinos', averages:'Puntuación media', repairs:'Reparaciones', landlord:'Propietario', safety:'Seguridad', noise:'Ruido', value:'Calidad-precio',
+    verified:'✓ Inquilino verificado', fake:'ejemplo ficticio', noReviews:'Aún no hay reseñas.',
+    addReview:'Comparte tu experiencia', period:'Periodo (ej. 2022-2024)', yourText:'Tu reseña', proof:'Comprobante (contrato o factura, opcional)',
+    proofNote:'Tu documento se lee y se elimina. Nunca se guarda.', submit:'Enviar reseña',
+    people:'Inquilinos contactables', ask:'Pedir hablar', asked:'Solicitud enviada (demo)', roommates:'Compañeros de piso', noPeople:'Sin perfiles para este edificio.',
+    rmForm:'Tu perfil de compañero', budget:'Presupuesto máx. ($/mes)', moveIn:'Fecha de mudanza', sleep:'Horario de sueño', clean:'Limpieza', noiseTol:'Tolerancia al ruido',
+    findMatches:'Buscar coincidencias', score:'Afinidad', noSensitive:'Nunca preguntamos origen, religión, género, etc.',
+    questions:'Preguntas para el propietario', loading1:'Buscando el edificio…', loading2:'Leyendo datos de la ciudad…', loading3:'Redactando el informe…',
+    notFound:'Dirección no encontrada en San Francisco.', generic:'Algo salió mal. Inténtalo de nuevo.', rejected:'Reseña rechazada: ',
+    thanks:'¡Gracias! Reseña verificada y publicada (demo).', disclaimer:'Solo informativo, no es asesoría legal. Datos oficiales: DataSF; el control de alquileres es orientativo.',
+    q1:'¿Esta unidad está cubierta por la Rent Ordinance de SF? Confírmelo por escrito.', q2:'¿Puedo ver el historial de reparaciones y quejas abiertas?', q3:'¿Hay obras o desalojos previstos en el edificio?', q4:'¿Cuál es la política exacta de aumento de alquiler y el depósito?' },
+  zh: { tagline:'签约之前，先了解你要住的楼。', search:'查询建筑', go:'搜索', demo:'试试：',
+    tabOfficial:'官方数据', tabVoice:'租户心声', tabPeople:'可信的人', tabQuestions:'要问房东的问题',
+    overall:'总体', signals:'信号', profile:'建筑概况', yearBuilt:'建造年份', units:'单元数',
+    rent:'租金管制', rentProbable:'很可能', rentUnlikely:'不太可能', rentTip:'仅供参考：根据建造年份和单元数估算。',
+    timeline:'时间线', block:'本街区', blockNote:'街区层面的数据，并非仅限此楼。',
+    evictions:'驱逐（5年）', complaints:'投诉', openComplaints:'未结', violations:'违规', permits:'许可（5年）', fire:'消防事件（5年）', c311:'附近311报告（12个月）',
+    voice:'租户怎么说', averages:'平均评分', repairs:'维修', landlord:'房东', safety:'安全', noise:'噪音', value:'性价比',
+    verified:'✓ 已验证租户', fake:'虚构示例', noReviews:'此楼暂无评价。',
+    addReview:'分享你的经历', period:'时间段（如 2022-2024）', yourText:'你的评价', proof:'证明材料（租约或账单，可选）',
+    proofNote:'你的文件读取后即删除，绝不保存。', submit:'提交评价',
+    people:'可联系的租户', ask:'请求交流', asked:'请求已发送（演示）', roommates:'室友匹配', noPeople:'此楼暂无资料。',
+    rmForm:'你的室友资料', budget:'最高预算（美元/月）', moveIn:'入住日期', sleep:'作息', clean:'整洁度', noiseTol:'噪音容忍度',
+    findMatches:'查找匹配', score:'匹配度', noSensitive:'我们绝不询问出身、宗教、性别等。',
+    questions:'向房东提问', loading1:'正在查找建筑…', loading2:'正在读取市政数据…', loading3:'正在撰写报告…',
+    notFound:'在旧金山未找到该地址。', generic:'出错了，请重试。', rejected:'评价被拒绝：',
+    thanks:'谢谢！评价已验证并发布（演示）。', disclaimer:'仅供参考，不构成法律意见。官方数据来自 DataSF；租金管制为估算。',
+    q1:'这个单元受旧金山租金条例保护吗？请书面确认。', q2:'我可以查看维修记录和未结投诉吗？', q3:'大楼是否计划翻修或驱逐租户？', q4:'租金上涨的具体规定和押金是多少？' },
+};
+let lang = 'en';
+const t = k => (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
+
+// Textes ajoutés pour coller au backend (es/zh retombent sur l'anglais s'il manque une clé)
+Object.assign(I18N.en, {
+  r_overall:'Overall', r_landlord_responsiveness:'Landlord responsiveness', r_maintenance:'Maintenance', r_noise:'Noise', r_safety:'Safety',
+  pseudo:'Pseudonym (no real name)', periodStart:'From (month)', periodEnd:'To (month)',
+  role:'I am…', rCurrent:'current tenant', rFormer:'former tenant', rSeek:'looking for a roommate', rHas:'I have a room',
+  neighborhood:'Neighborhood', bio:'A few words (optional)', budgetMin:'Min budget ($/month)',
+  needProfile:'Create your profile in the form below first, then you can ask to talk.',
+  bldStats:'This building', openC:'Open DBI complaints', c10:'DBI complaints (10 yrs)', v10:'Violations (10 yrs)', stories:'Stories',
+  evBlock:'Eviction notices on this block (10 yrs)', blockRents:'Rents reported on this block', recentEv:'Recent eviction notices',
+  hood:'Neighborhood', hood311:'311 reports in the neighborhood (12 mo)', unsafe:'unsafe',
+  reviewsN:'reviews', verifiedN:'verified', published:'Published!', publishedV:'Published with the ✓ verified badge.',
+  guests:'Guests', smoking:'Smoking', pets:'Pets', noMatches:'No match yet.', profileSaved:'Profile created. Your matches:', mockBanner:'Demo mode: mock data',
+});
+Object.assign(I18N.fr, {
+  r_overall:'Global', r_landlord_responsiveness:'Réactivité du propriétaire', r_maintenance:'Entretien', r_noise:'Bruit', r_safety:'Sécurité',
+  pseudo:'Pseudo (pas de vrai nom)', periodStart:'Du (mois)', periodEnd:'Au (mois)',
+  role:'Je suis…', rCurrent:'locataire actuel', rFormer:'ancien locataire', rSeek:'je cherche un coloc', rHas:'j’ai une chambre',
+  neighborhood:'Quartier', bio:'Quelques mots (optionnel)', budgetMin:'Budget min ($/mois)',
+  needProfile:'Crée d’abord ton profil dans le formulaire ci-dessous, puis tu pourras demander à échanger.',
+  bldStats:'Cet immeuble', openC:'Plaintes DBI ouvertes', c10:'Plaintes DBI (10 ans)', v10:'Infractions (10 ans)', stories:'Étages',
+  evBlock:'Avis d’éviction sur le bloc (10 ans)', blockRents:'Loyers déclarés sur le bloc', recentEv:'Avis d’éviction récents',
+  hood:'Quartier', hood311:'Signalements 311 dans le quartier (12 mois)', unsafe:'dangereux',
+  reviewsN:'avis', verifiedN:'vérifiés', published:'Publié !', publishedV:'Publié avec le badge ✓ vérifié.',
+  guests:'Invités', smoking:'Fumeur', pets:'Animaux', noMatches:'Pas encore de match.', profileSaved:'Profil créé. Tes matchs :', mockBanner:'Mode démo : données fictives',
+});
+
+/* =====================================================================
+   3) OUTILS
+   ===================================================================== */
+// esc() protège contre le HTML injecté dans un avis (sécurité). À utiliser sur tout texte venant d'un utilisateur ou de l'API.
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const state = { query: '', reportLang: null, building: null, report: null, community: null,
+                tab: 'official', myProfile: null, matches: null, asked: {} };
+
+/* =====================================================================
+   4) COUCHE DONNÉES — le SEUL endroit qui parle au backend (main.py).
+   Routes : GET /api/report, GET /api/community, POST /api/reviews,
+            POST /api/profiles, GET /api/roommates, POST /api/contact
+   ===================================================================== */
+async function getJSON(url, opts) {
+  const r = await fetch(url, opts);
+  if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; try { e.body = await r.json(); } catch {} throw e; }
+  return r.json();
+}
+// -> { building, report, community }
+async function fetchReport(address) {
+  if (USE_MOCK) { await sleep(1200); if (!/\d/.test(address)) { const e = new Error('nf'); e.status = 404; throw e; } return getJSON(MOCK_DIR + 'mock_api_report.json'); }
+  return getJSON(`${API_BASE}/api/report?address=${encodeURIComponent(address)}&lang=${lang}`);
+}
+async function fetchCommunity(blklot) {
+  if (USE_MOCK) return state.community;   // en mock, on garde la version locale (avec les avis ajoutés)
+  return getJSON(`${API_BASE}/api/community?blklot=${encodeURIComponent(blklot)}`);
+}
+// review = { blklot, pseudo, period_start, period_end, ratings:{overall,...}, text } ; file = justificatif optionnel
+// -> { status: 'published' | 'rejected', verified, reason }
+async function postReview(review, file) {
+  if (USE_MOCK) {
+    await sleep(1500);
+    if (review.text.trim().length < 20) return { status: 'rejected', verified: false, reason: 'Too short (demo rule: 20 characters min).' };
+    state.community.reviews.unshift({ ...review, id: Date.now(), verified: !!file, demo: false });
+    return { status: 'published', verified: !!file, reason: '' };
+  }
+  const fd = new FormData();
+  fd.append('review', JSON.stringify(review));
+  if (file) fd.append('proof', file);
+  return getJSON(`${API_BASE}/api/reviews`, { method: 'POST', body: fd });
+}
+async function postProfile(p) {
+  if (USE_MOCK) return { ...p, id: 999 };
+  return getJSON(`${API_BASE}/api/profiles`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
+}
+// -> [{ profile, score (0-1), why }]
+async function fetchRoommates(profileId) {
+  if (USE_MOCK) { await sleep(1000); return [
+    { profile: { pseudo: 'bernal_local', role: 'has_room', neighborhood: 'Mission', demo: true }, score: 0.82, why: 'Similar budget, same neighborhood, compatible schedules.' },
+    { profile: { pseudo: 'night_owl', role: 'seeking_roommate', neighborhood: 'Castro', demo: true }, score: 0.61, why: 'Budget overlaps; different sleep schedules.' }]; }
+  return getJSON(`${API_BASE}/api/roommates?profile_id=${profileId}`);
+}
+async function postContact(fromId, toId, message) {
+  if (USE_MOCK) return { ok: true };
+  return getJSON(`${API_BASE}/api/contact`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from_profile_id: fromId, to_profile_id: toId, message }) });
+}
+const errMsg = e => (e.body && (e.body.detail || e.body.error || e.body.reason)) || t('generic');
+
+/* =====================================================================
+   5) AFFICHAGE
+   ===================================================================== */
+const LV = { green: '🟢', orange: '🟠', red: '🔴' };
+const lvl = x => (LV[x] ? x : 'orange');
+const RATING_KEYS = ['overall', 'landlord_responsiveness', 'maintenance', 'noise', 'safety'];
+const ROLE = { current_tenant: 'rCurrent', former_tenant: 'rFormer', seeking_roommate: 'rSeek', has_room: 'rHas' };
+const SPIN = '<div class="spinner" aria-hidden="true">' + [1,2,3,4,5].map(i => `<i style="background:var(--m${i})"></i>`).join('') + '</div>';
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  $('tagline').textContent = t('tagline'); $('searchTitle').textContent = t('search'); $('goBtn').textContent = t('go');
+  $('disclaimer').textContent = t('disclaimer');
+  $('demoChips').innerHTML = `<span class="muted">${esc(t('demo'))}</span>` + DEMO.map(d => `<button type="button" class="chip" data-addr="${esc(d)}">${esc(d)}</button>`).join('')
+    + (USE_MOCK ? ` <span class="badge orange">${esc(t('mockBanner'))}</span>` : '');
+  document.querySelectorAll('.chip').forEach(b => b.onclick = () => { $('address').value = b.dataset.addr; search(); });
+  if (state.building) renderResult();
+}
+function setStatus(html) { $('status').innerHTML = html; }
+function showLoading(step) { setStatus(`<div class="card loading" role="status">${SPIN}${esc(t('loading' + step))}</div>`); }
+function showError(msg) { setStatus(`<div class="error" role="alert">${esc(msg)}</div>`); }
+
+// Logo : un immeuble 4 colonnes × 5 étages, chaque étage d'une couleur du dégradé. 1 = bloc, 0 = fenêtre
+function drawLogo() {
+  const rows = ['1111', '1011', '1101', '1011', '1001'];
+  $('logo').innerHTML = rows.map((r, i) => [...r].map(c => `<i style="background:${c === '1' ? `var(--m${i + 1})` : 'transparent'}"></i>`).join('')).join('');
+}
+
+async function search() {
+  const q = $('address').value.trim(); if (!q) return;
+  $('goBtn').disabled = true; $('result').classList.add('hidden');
+  // Une seule requête, mais le LLM peut prendre 10-20 s : on fait défiler les étapes pendant l'attente
+  let step = 1; showLoading(1);
+  const timer = setInterval(() => { if (step < 3) showLoading(++step); }, 2500);
+  try {
+    const res = await fetchReport(q);
+    Object.assign(state, { query: q, reportLang: lang, building: res.building, report: res.report, community: res.community,
+                           tab: 'official', matches: null });
+    setStatus(''); renderResult();
+  } catch (e) {
+    showError(e.status === 404 ? t('notFound') : t('generic'));
+  } finally { clearInterval(timer); $('goBtn').disabled = false; }
+}
+
+function renderResult() {
+  $('result').classList.remove('hidden');
+  const tabs = [['official', 'tabOfficial'], ['voice', 'tabVoice'], ['people', 'tabPeople'], ['questions', 'tabQuestions']];
+  $('tabs').innerHTML = tabs.map(([id, k]) => `<button class="tab" role="tab" aria-selected="${state.tab === id}" data-tab="${id}">${esc(t(k))}</button>`).join('');
+  document.querySelectorAll('.tab').forEach(b => b.onclick = () => { state.tab = b.dataset.tab; renderResult(); });
+  const fn = { official: panelOfficial, voice: panelVoice, people: panelPeople, questions: panelQuestions }[state.tab];
+  $('panel').innerHTML = fn();
+  if (state.tab === 'official') drawMap();
+  if (state.tab === 'voice') bindReviewForm();
+  if (state.tab === 'people') bindPeople();
+}
+
+const kv = (label, value, extra = '') => `<div class="kv">${label}<b>${esc(value ?? '–')}</b>${extra}</div>`;
+
+function panelOfficial() {
+  const b = state.building, r = state.report || {}, p = b.profile || {}, s = b.stats || {}, src = b.sources || {};
+  const overall = lvl(r.overall);
+  // Chronologie : plaintes + infractions + permis, triés du plus récent au plus ancien
+  const events = [
+    ...(b.dbi_complaints || []).map(x => ({ date: x.date, type: 'DBI', text: `${x.description || ''} (${x.status || ''})` })),
+    ...(b.violations || []).map(x => ({ date: x.date, type: 'NOV', text: `${x.category || ''}: ${x.description || ''} (${x.status || ''})${x.unsafe_building ? ' ⚠ ' + t('unsafe') : ''}` })),
+    ...(b.permits || []).map(x => ({ date: x.date, type: 'Permit', text: `${x.type || ''} — ${x.description || ''}` })),
+  ].filter(e => e.date).sort((a, z) => String(z.date).localeCompare(String(a.date))).slice(0, 15);
+  // Loyers du bloc : on compte chaque combinaison "taille / fourchette"
+  const rents = {};
+  (b.block_rents || []).forEach(x => { const k = `${x.bedrooms}: ${x.rent_range}`; rents[k] = (rents[k] || 0) + 1; });
+  const topRents = Object.entries(rents).sort((a, z) => z[1] - a[1]).slice(0, 6);
+  const n311 = b.neighborhood_311 || {};
+  return `
+  <div class="card">
+    <div class="row"><h2>${esc(b.matched_address)}</h2><span class="badge ${overall}">${LV[overall]} ${esc(t('overall'))}</span></div>
+    <p><b>${esc(r.headline)}</b></p><p>${esc(r.summary)}</p>
+    <h3>${esc(t('signals'))}</h3>
+    ${(r.signals || []).map(sg => { const l = lvl(sg.level); return `<div class="signal ${l}"><b>${LV[l]} ${esc(sg.title)}</b><div>${esc(sg.detail)}</div>${src[sg.source] ? `<a href="${esc(src[sg.source])}" target="_blank" rel="noopener">source · DataSF</a>` : ''}</div>`; }).join('') || '<p class="muted">–</p>'}
+  </div>
+  <div class="card">
+    <h2>${esc(t('profile'))}</h2>
+    <div class="grid">
+      ${kv(esc(t('yearBuilt')), p.year_built)}${kv(esc(t('units')), p.units)}${kv(esc(t('stories')), p.stories)}
+      ${kv(`<span class="tip" title="${esc(t('rentTip'))}" tabindex="0">${esc(t('rent'))} ⓘ</span>`, p.likely_rent_controlled ? t('rentProbable') : t('rentUnlikely'))}
+    </div>
+    <h3>${esc(t('bldStats'))}</h3>
+    <div class="grid">${kv(esc(t('openC')), s.open_complaints)}${kv(esc(t('c10')), s.complaints_10y)}${kv(esc(t('v10')), s.violations_10y)}</div>
+    <h3>${esc(t('timeline'))}</h3>
+    <ul class="timeline">${events.map(e => `<li><span class="badge grey">${esc(e.type)}</span> <span class="muted">${esc(e.date)}</span> — ${esc(e.text)}</li>`).join('') || '<li class="muted">–</li>'}</ul>
+    <div id="map" role="img" aria-label="Map"></div>
+  </div>
+  <div class="card">
+    <h2>${esc(t('block'))}</h2><p class="muted">${esc(t('blockNote'))}</p>
+    <div class="grid">${kv(esc(t('evBlock')), s.evictions_block_10y)}</div>
+    <h3>${esc(t('recentEv'))}</h3>
+    <ul class="timeline">${(b.block_evictions || []).slice(0, 5).map(x => `<li><span class="muted">${esc(x.date)}</span> — ${esc((x.reasons || []).join(', ').replace(/_/g, ' '))}</li>`).join('') || '<li class="muted">–</li>'}</ul>
+    <h3>${esc(t('blockRents'))}</h3>
+    ${topRents.map(([k, n]) => `<div class="row"><span>${esc(k)}</span><span class="muted">×${n}</span></div>`).join('') || '<p class="muted">–</p>'}
+  </div>
+  <div class="card">
+    <h2>${esc(t('hood'))} · ${esc(b.neighborhood || '')}</h2>
+    <div class="grid">${kv(esc(t('hood311')), n311.total_last_12m)}</div>
+    ${(n311.top_categories || []).slice(0, 5).map(c => `<div class="row"><span>${esc(c.name)}</span><span class="muted">${esc(c.count)}</span></div>`).join('')}
+  </div>`;
+}
+let map;
+function drawMap() {
+  const b = state.building; if (!b.lat || typeof L === 'undefined') return;
+  if (map) map.remove();
+  map = L.map('map').setView([b.lat, b.lon], 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+  L.marker([b.lat, b.lon]).addTo(map);
+}
+
+function panelVoice() {
+  const c = state.community || {}, reviews = c.reviews || [], avg = c.avg_ratings;
+  const voice = state.report && state.report.tenant_voice;
+  const opts = sel => [1, 2, 3, 4, 5].map(n => `<option ${n === sel ? 'selected' : ''}>${n}</option>`).join('');
+  return `
+  <div class="card"><h2>${esc(t('voice'))}</h2>
+    <p class="muted">${esc(c.n_reviews ?? reviews.length)} ${esc(t('reviewsN'))} · ${esc(c.n_verified ?? 0)} ${esc(t('verifiedN'))}</p>
+    ${voice ? `<p>${esc(voice)}</p>` : ''}
+    ${avg ? `<h3>${esc(t('averages'))}</h3>` + RATING_KEYS.filter(k => avg[k] != null).map(k => `<div class="row"><span>${esc(t('r_' + k))}</span><b>${avg[k]}/5</b></div><div class="bar" aria-hidden="true"><span style="width:${avg[k] * 20}%"></span></div>`).join('') : ''}
+  </div>
+  <div class="card">
+    ${reviews.map(r => `<article style="border-top:1px solid var(--border);padding:10px 0">
+      <div><b>${esc(r.pseudo)}</b> ${r.verified ? `<span class="badge green">${esc(t('verified'))}</span>` : ''} ${r.demo ? `<span class="badge grey">${esc(t('fake'))}</span>` : ''}
+        <span class="muted">${esc(r.period_start || '')}${r.period_end ? ' → ' + esc(r.period_end) : ''}</span></div>
+      <p>${esc(r.text)}</p>
+      <div class="muted">${RATING_KEYS.filter(k => r.ratings && r.ratings[k] != null).map(k => `${esc(t('r_' + k))} ${r.ratings[k]}/5`).join(' · ')}</div></article>`).join('') || `<p class="muted">${esc(t('noReviews'))}</p>`}
+  </div>
+  <form class="card" id="reviewForm">
+    <h2>${esc(t('addReview'))}</h2>
+    <div class="field"><label for="rPseudo">${esc(t('pseudo'))}</label><input type="text" id="rPseudo" maxlength="40" required></div>
+    <div class="grid">
+      <div class="field"><label for="rStart">${esc(t('periodStart'))}</label><input type="text" id="rStart" placeholder="2022-01" pattern="\\d{4}-\\d{2}"></div>
+      <div class="field"><label for="rEnd">${esc(t('periodEnd'))}</label><input type="text" id="rEnd" placeholder="2025-06" pattern="\\d{4}-\\d{2}"></div>
+    </div>
+    <div class="grid">${RATING_KEYS.map(k => `<div class="field"><label for="r_${k}">${esc(t('r_' + k))}</label><select id="r_${k}">${opts(3)}</select></div>`).join('')}</div>
+    <div class="field"><label for="rText">${esc(t('yourText'))}</label><textarea id="rText" maxlength="3000" required></textarea></div>
+    <div class="field"><label for="rFile">${esc(t('proof'))}</label><input type="file" id="rFile" accept=".pdf,image/*"><div class="muted">🔒 ${esc(t('proofNote'))}</div></div>
+    <button type="submit" id="rBtn">${esc(t('submit'))}</button><div id="rMsg" aria-live="polite"></div>
+  </form>`;
+}
+function bindReviewForm() {
+  const f = $('reviewForm'); if (!f) return;
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const btn = $('rBtn'); btn.disabled = true;
+    $('rMsg').innerHTML = `<div class="loading">${SPIN}${esc(t('loading2'))}</div>`;
+    const review = {
+      blklot: state.building.blklot, pseudo: $('rPseudo').value.trim(),
+      period_start: $('rStart').value.trim() || null, period_end: $('rEnd').value.trim() || null,
+      ratings: Object.fromEntries(RATING_KEYS.map(k => [k, Number($('r_' + k).value)])),
+      text: $('rText').value.trim(),
+    };
+    const file = $('rFile').files[0] || null;
+    try {
+      const res = await postReview(review, file);
+      if (res.status === 'rejected') throw { body: { reason: res.reason } };
+      state.community = await fetchCommunity(state.building.blklot);
+      renderResult();
+      $('rMsg').innerHTML = `<p style="color:var(--green);font-weight:700">${esc(res.verified ? t('publishedV') : t('published'))}</p>`;
+    } catch (err) {
+      $('rMsg').innerHTML = `<div class="error" role="alert">${esc(t('rejected'))}${esc(errMsg(err))}</div>`;
+      btn.disabled = false;
+    }
+  };
+}
+
+function panelPeople() {
+  const c = state.community || {}, people = c.contactable_tenants || [], b = state.building;
+  const ls = (id, label, vals) => `<div class="field"><label for="${id}">${esc(t(label))}</label><select id="${id}">${vals.map(v => `<option>${v}</option>`).join('')}</select></div>`;
+  return `
+  <div class="card"><h2>${esc(t('people'))}</h2>
+    <div id="askMsg" aria-live="polite"></div>
+    ${people.map(p => `<div class="row" style="padding:10px 0;border-top:1px solid var(--border)">
+      <div><b>${esc(p.pseudo)}</b> ${p.verified ? `<span class="badge green">${esc(t('verified'))}</span>` : ''} ${p.demo ? `<span class="badge grey">${esc(t('fake'))}</span>` : ''}
+        <div class="muted">${esc(t(ROLE[p.role] || p.role))}${p.bio ? ' · ' + esc(p.bio) : ''}</div></div>
+      <button class="secondary askBtn" data-id="${esc(p.id)}" ${state.asked[p.id] ? 'disabled' : ''}>${esc(state.asked[p.id] ? t('asked') : t('ask'))}</button></div>`).join('') || `<p class="muted">${esc(t('noPeople'))}</p>`}
+  </div>
+  <form class="card" id="rmForm"><h2>${esc(t('roommates'))}</h2><p class="muted">${esc(t('noSensitive'))}</p>
+    ${state.myProfile ? '' : `
+    <div class="field"><label for="m_pseudo">${esc(t('pseudo'))}</label><input type="text" id="m_pseudo" maxlength="40" required></div>
+    <div class="field"><label for="m_role">${esc(t('role'))}</label><select id="m_role"><option value="seeking_roommate">${esc(t('rSeek'))}</option><option value="has_room">${esc(t('rHas'))}</option></select></div>
+    <div class="field"><label for="m_hood">${esc(t('neighborhood'))}</label><input type="text" id="m_hood" value="${esc(b.neighborhood || '')}"></div>
+    <div class="grid">
+      <div class="field"><label for="m_bmin">${esc(t('budgetMin'))}</label><input type="number" id="m_bmin" min="0" value="1200"></div>
+      <div class="field"><label for="m_bmax">${esc(t('budget'))}</label><input type="number" id="m_bmax" min="0" value="2000"></div>
+      <div class="field"><label for="m_move">${esc(t('moveIn'))}</label><input type="date" id="m_move"></div>
+    </div>
+    <div class="grid">${ls('m_sleep', 'sleep', ['early', 'flexible', 'late'])}${ls('m_clean', 'clean', [1, 2, 3, 4, 5])}${ls('m_guests', 'guests', ['rarely', 'sometimes', 'often'])}
+      ${ls('m_smoke', 'smoking', ['no', 'yes'])}${ls('m_pets', 'pets', ['no', 'yes'])}</div>
+    <div class="field"><label for="m_bio">${esc(t('bio'))}</label><textarea id="m_bio" maxlength="1000"></textarea></div>
+    <button type="submit" id="mBtn">${esc(t('findMatches'))}</button>`}
+    <div id="matches" aria-live="polite">${state.matches ? `<p><b>${esc(t('profileSaved'))}</b></p>` + (state.matches.map(m => `<div class="card"><div class="row"><b>${esc(m.profile.pseudo)}</b><span class="badge green">${esc(t('score'))} ${Math.round((m.score <= 1 ? m.score * 100 : m.score))}%</span></div><div class="muted">${esc(t(ROLE[m.profile.role] || m.profile.role || ''))} · ${esc(m.profile.neighborhood || '')}</div><p>${esc(m.why)}</p></div>`).join('') || `<p class="muted">${esc(t('noMatches'))}</p>`) : ''}</div>
+  </form>`;
+}
+function bindPeople() {
+  document.querySelectorAll('.askBtn').forEach(btn => btn.onclick = async () => {
+    // Le backend a besoin de TON profil pour envoyer une demande de contact
+    if (!state.myProfile) { $('askMsg').innerHTML = `<p class="muted">${esc(t('needProfile'))}</p>`; const el = $('m_pseudo'); if (el) el.focus(); return; }
+    btn.disabled = true;
+    try { await postContact(state.myProfile.id, Number(btn.dataset.id), ''); state.asked[btn.dataset.id] = true; btn.textContent = t('asked'); }
+    catch (e) { $('askMsg').innerHTML = `<div class="error" role="alert">${esc(errMsg(e))}</div>`; btn.disabled = false; }
+  });
+  const f = $('rmForm'); if (!f || state.myProfile) return;
+  f.onsubmit = async e => {
+    e.preventDefault(); $('mBtn').disabled = true; $('matches').innerHTML = `<div class="loading">${SPIN}</div>`;
+    const num = id => ($(id).value ? Number($(id).value) : null);
+    const profile = {
+      pseudo: $('m_pseudo').value.trim(), role: $('m_role').value, neighborhood: $('m_hood').value.trim() || null,
+      blklot: $('m_role').value === 'has_room' ? state.building.blklot : null,
+      budget_min: num('m_bmin'), budget_max: num('m_bmax'), move_in: $('m_move').value || null,
+      // mêmes clés que les profils du seed de Fleurine
+      lifestyle: { schedule: $('m_sleep').value, cleanliness: Number($('m_clean').value), guests: $('m_guests').value,
+                   smoking: $('m_smoke').value === 'yes', pets: $('m_pets').value === 'yes' },
+      bio: $('m_bio').value.trim(), open_to_contact: true,
+    };
+    try {
+      state.myProfile = await postProfile(profile);
+      state.matches = await fetchRoommates(state.myProfile.id);
+      renderResult();
+    } catch (err) { $('matches').innerHTML = `<div class="error" role="alert">${esc(errMsg(err))}</div>`; $('mBtn').disabled = false; }
+  };
+}
+
+function panelQuestions() {
+  const r = state.report || {};
+  const qs = (r.questions_to_ask_landlord && r.questions_to_ask_landlord.length) ? r.questions_to_ask_landlord : [t('q1'), t('q2'), t('q3'), t('q4')];
+  return `<div class="card"><h2>${esc(t('questions'))}</h2><ol>${qs.map(q => `<li>${esc(q)}</li>`).join('')}</ol>
+    ${r.disclaimer ? `<p class="muted">${esc(r.disclaimer)}</p>` : ''}</div>`;
+}
+
+/* =====================================================================
+   6) DÉMARRAGE
+   ===================================================================== */
+$('searchForm').onsubmit = e => { e.preventDefault(); search(); };
+$('lang').onchange = e => {
+  lang = e.target.value; applyLang();
+  // Le rapport Mistral est généré dans la langue demandée : on le relance si la langue change
+  if (state.building && !USE_MOCK && state.reportLang !== lang) { $('address').value = state.query; search(); }
+};
+drawLogo();
+applyLang();
+</script>
+</body>
+</html>
