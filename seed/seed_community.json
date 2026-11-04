@@ -1,0 +1,28 @@
+{
+  "_note": "Seed minimal de test (Personne 1). La Personne 3 le remplace par la version complète. Tout est FICTIF.",
+  "reviews": [
+    {"blklot": "3609042", "pseudo": "mission_renter", "period_start": "2022-01", "period_end": "2025-06",
+     "ratings": {"overall": 2, "landlord_responsiveness": 1, "maintenance": 2, "noise": 3, "safety": 2},
+     "text": "Fire alarm kept beeping for weeks and repair requests went unanswered. Great location though.", "verified": true},
+    {"blklot": "3609042", "pseudo": "valencia_2019", "period_start": "2019-03", "period_end": "2021-08",
+     "ratings": {"overall": 3, "landlord_responsiveness": 2, "maintenance": 3, "noise": 2, "safety": 3},
+     "text": "Hallway often blocked by construction materials. Rent was fair for the area.", "verified": false},
+    {"blklot": "0564C104", "pseudo": "pacific_heights_tenant", "period_start": "2020-09", "period_end": null,
+     "ratings": {"overall": 5, "landlord_responsiveness": 5, "maintenance": 5, "noise": 4, "safety": 5},
+     "text": "Management fixes things within days. Quiet building, well maintained.", "verified": true}
+  ],
+  "profiles": [
+    {"pseudo": "valencia_now", "role": "current_tenant", "blklot": "3609042", "neighborhood": "Mission",
+     "bio": "Happy to answer questions about the building.", "lifestyle": {}, "open_to_contact": true, "verified": true},
+    {"pseudo": "grad_student_sf", "role": "seeking_roommate", "blklot": null, "neighborhood": "Mission",
+     "budget_min": 1200, "budget_max": 1700, "move_in": "2027-01",
+     "bio": "Grad student, quiet weekdays, loves cooking.",
+     "lifestyle": {"schedule": "early", "cleanliness": 4, "guests": "sometimes", "smoking": false, "pets": false},
+     "open_to_contact": true},
+    {"pseudo": "room_in_mission", "role": "has_room", "blklot": null, "neighborhood": "Mission",
+     "budget_min": 1400, "budget_max": 1600, "move_in": "2026-12",
+     "bio": "Bright room in a 3BR, we cook together sometimes.",
+     "lifestyle": {"schedule": "flexible", "cleanliness": 4, "guests": "sometimes", "smoking": false, "pets": true},
+     "open_to_contact": true}
+  ]
+}

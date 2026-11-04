@@ -1,0 +1,966 @@
+{
+  "query_address": "907 Valencia St",
+  "matched_address": "907 VALENCIA ST",
+  "lat": 37.75834293024844,
+  "lon": -122.42109638325194,
+  "block": "3609",
+  "lot": "042",
+  "blklot": "3609042",
+  "neighborhood": "Mission",
+  "supervisor_district": "9",
+  "profile": {
+    "year_built": 1908,
+    "units": 28,
+    "stories": 4,
+    "last_sale_date": "2020-01-10",
+    "likely_rent_controlled": true
+  },
+  "dbi_complaints": [
+    {
+      "date": "2026-08-27",
+      "description": "Egress obstruction in hallway.",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-06-22",
+      "description": "The storefront was observed to be an active construction site without a permit.",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-03-25",
+      "description": "Complainant states there is renovation work being done on the 2 units next to his.",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-27",
+      "description": "Damaged floor, damaged wall, window painted shut",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-27",
+      "description": "Clogged and chipped bathtub.",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-27",
+      "description": "Common area issues, smoke alarm chirping/low battery, garbage in light well, rodent infesation, unsanitary premises, and missing door threshold at # 21.",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-27",
+      "description": "Broken floor in rear corner bedroom.",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-27",
+      "description": "Broken glass window pane in kitchen.",
+      "status": "closed",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-27",
+      "description": "No heat",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-27",
+      "description": "Gaps at windows/weather intrusion at windows",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-23",
+      "description": "Broken window in the kitchen",
+      "status": "closed",
+      "closed_date": "2026-01-29"
+    },
+    {
+      "date": "2026-01-15",
+      "description": "Broken window, electric outlet, refrigerator not working",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-09",
+      "description": "Bathtub tile, sink not draining, kitchen sink leaking, window dilapidated",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-08",
+      "description": "Windows not sealed properly",
+      "status": "closed",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-08",
+      "description": "Outlet, walls, stove, carpet",
+      "status": "closed",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-08",
+      "description": "Window not working properly, damaged flooring",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2026-01-08",
+      "description": "Window not working properly, toilet handle stuck",
+      "status": "closed",
+      "closed_date": null
+    },
+    {
+      "date": "2025-12-23",
+      "description": "Dilapidated flooring, damaged walls, peeling paint, windows not working properly",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2025-12-18",
+      "description": "No heat. air ducts are broken. some pipies underneath the heater are coming out of the floor.",
+      "status": "closed",
+      "closed_date": null
+    },
+    {
+      "date": "2025-11-17",
+      "description": "Date last observed: 13-nov-25; floor: ground; exact location: main bldg; building type: commercial/business vacant structure; ; additional information: unregisterred vacant storefront, formerly matcha n¿ more icecream;",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2025-11-14",
+      "description": "Date last observed: 13-nov-25; exact location: main bldg; building type: residence/dwelling other building; ; additional information: expired permts 202202117797 ;",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2025-11-03",
+      "description": "Needs to renew boiler permit for permit no 152243 , serial no c20302617",
+      "status": "closed",
+      "closed_date": null
+    },
+    {
+      "date": "2025-08-20",
+      "description": "Garbage not picked up in 2 weeks, no mail access, recent fire in building, damaged flooring in the common area",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2025-08-14",
+      "description": "Garbage not picked up in 2 weeks, no mail access, recent fire in building, damaged flooring in the common area",
+      "status": "open",
+      "closed_date": null
+    },
+    {
+      "date": "2025-02-10",
+      "description": "Fire damage",
+      "status": "closed",
+      "closed_date": "2025-07-29"
+    },
+    {
+      "date": "2025-02-04",
+      "description": "Date last observed: 31-jan-25; time last observed: 12:00 pm; identity of person performing the work: mosser; floor: 3rd floor; unit: 25; exact location: main bldg; building type: residence/dwelling insects/rodents; leaking ceiling; leaky fixtures; ; additional information: the leak is in the kitchen of my unit apt 25, on the 3rd floor, the top floor, i do not believe they are maintaining the roof. there is also rats in the garbage area.;",
+      "status": "closed",
+      "closed_date": "2025-04-30"
+    },
+    {
+      "date": "2025-02-03",
+      "description": "Leaky roof, rodents in the garbage area",
+      "status": "closed",
+      "closed_date": "2025-02-10"
+    },
+    {
+      "date": "2023-03-23",
+      "description": "Date last observed: 22-mar-23; floor: ground; exact location: main bldg; building type: commercial/business vacant structure; ; additional information: vacant commercial space: https://www.mavenproperties.com/leasing/1042-3591-20th-st-;",
+      "status": "closed",
+      "closed_date": "2025-11-17"
+    },
+    {
+      "date": "2020-03-30",
+      "description": "Date last observed: 12-mar-20; time last observed: 2pm; identity of person performing the work: mavic(?); floor: 1; unit: commercial; exact location: main bldg; building type: commercial/business work w/o permit; illegal change of use; ; additional information: interior work being performed without permit. filed initial complaint on 3/12 and was not processed.;",
+      "status": "closed",
+      "closed_date": "2020-04-15"
+    },
+    {
+      "date": "2020-01-24",
+      "description": "Leak in ceiling",
+      "status": "closed",
+      "closed_date": null
+    }
+  ],
+  "violations": [
+    {
+      "date": "2026-08-27",
+      "category": "building section",
+      "description": "907 valencia common areas",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-08-27",
+      "category": "smoke detection section",
+      "description": "repair central alarm system (908, 909 hc) — at time of inspection, both central fire alarm control panels on second floor were indicating trouble and beeping intermittently. have central alarm system serviced and tagged by a licensed professional.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-08-27",
+      "category": "fire section",
+      "description": "remove egress obstruction at (801,1001(l) hc) — at the time of inspection, there was a plastic containment barrier stretching out into the main common area hallway. the barrier is anchored to the floor with wood 2x4's. the containment barrier encroaches into the hallway to the extent that the clearance to pass through the exit corridor is less th",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-03-25",
+      "category": "",
+      "description": "A complaint investigation revealed that remodeling of a kitchen and bathroom was occuring in unit 6. Faucet, dishwasher, cabinets had been replaced. In bathroom, toilet, tub/shower, and sink had been replaced. Also in bathroom, sheetrock above tub had been removed.  Code/Section: SFBC 103A Monthly m",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "smoke detection section",
+      "description": "repair smoke detector (908 911 hc) — repair/replace smoke detector dangling from ceiling in entry hallway.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "other section",
+      "description": "provide smoke detector and carbon monoxide affidavit (907.2.11 & 915 cabc; 502.6, 502.7, 503.14, 503.15 caebc) — provide self-certification affidavit for smoke alarms and carbon monoxide detectors (enclosed). affidavit is for entire building including all units. affidavit does not need to be completed by licensed professional. completed form may be emailed directly to joseph.barber@sfgov.org.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "interior surfaces section",
+      "description": "repair damaged walls (1001b,h,o hc) — repair wood wall slats that are separating at 2nd floor common hallway on same side of hallway as unit #2.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "907 valencia # 2",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "repair/replace all window hardware, glazing seals, sash cords, sash frames and latches or cranks/operator handles (708 & 1001(h),(j) hc) — several windows in unit require maintenance/repair. ensure that all windows in unit are repaired/maintained in an approved manner and in proper working order. all windows must open easily, remain open, close easily and close securely with a latch. all windows must prevent weather intrusion as design",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "other section",
+      "description": "provide shutoff tool for gas utility shutoff (712 hc) — install shutoff tool in a visible and accessible location adjacent to main gas valve. make sure that the type/size of tool fits the existing valve(s).",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "other section",
+      "description": "general dilapidation or improper maintenance (1001 (b)(13)) — repair/replace detached bathroom sink drain lift rod.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "907 valencia # 11",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "907 valencia # 4",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "other section",
+      "description": "comply with section 604 of the san francisco housing code (604 hc) — complete and return to housing inspection services the compliance affidavit for section 604 of the san francisco housing code (enclosed). exterior wood and metal decks, stairs, balconies, fire escapes, and other building areas that are weather exposed shall be inspected by a licensed general contrac",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "interior surfaces section",
+      "description": "repair floor covering (1001b,j,o hc) — at corner bedroom floor and threshold from hallway to bedroom, tile flooring is damaged/missing in several locations. repair/replace all damaged or missing floor covering so that floor is smooth, cleanable, and does not present a tripping/falling hazard.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "sanitation section",
+      "description": "eliminate rodent infestation (1001b, 1306 hc) — evidence of rodent infestation exists in the basement area of this building. excessive rodent droppings observed throughout side trash area and rat carcass observed in basement area. have a licensed pest control contractor treat building in approved manner to eliminate rodents, and provide routine/r",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "common areas of 907 valencia, # 21",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "907 valencia # 3",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "smoke detection section",
+      "description": "repair/replace smoke detector (908 911 hc) — at time of inspection, smoke alarm in common hallway outside unit 23 was chirping indicating low battery. ensure all smoke detectors are functioning properly.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "sanitation section",
+      "description": "clean or sanitize (1306 hc) — clean/sanitize areas with rodent feces and bird feces in common areas. rodent feces observed throughout side garbage area. bird feces observed at far corner of rear courtyard area.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "other section",
+      "description": "provide heat to each occupied habitable room capable of maintaining a min. room temp. of 70 degrees f. (21 degrees c.). (701(a) hc) — on the date of inspection, the heat in unit # 11 was not functioning. work for this repair must begin within 3 working days of receiving this notice. note: if heating unit is replaced, you must attain an appropriate permit, and must have installation inspected and approved by inspector from division",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "maintain fire escape drop ladder in working condition (sec 908 hc) — provide proof of the workability of all fire escape ladders at building. either provide a written and signed report from a qualified service company or contractor stating that all parts and cables have been tested and are functional, or lower the ladder on re-inspection day to verify its proper full",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "repair/replace all window hardware, glazing seals, sash cords, sash frames and latches or cranks/operator handles (708 & 1001(h),(j) hc) provide natural ventilation for bathrooms (504(a)(c), 1001(b)(7),(8) hc) — repair bathroom window so that it opens, can stay open, and closes properly and provides ventilation to bathroom. window unable to open at time of inspection.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "repair handrails (802(c),1001(b)(13)hc) — repair handrails at interior entry stairs. just before second floor, two wall brackets are missing bolts to wall. one on each side of stairs.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "sanitation section",
+      "description": "clean or sanitize (1306 hc) — clean light well/shaft outside bathroom window of unit #2. excessive trash and debris observed.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "security requirements section",
+      "description": "provide primary locking devices at exterior doors (706 hc) — lock to front gate at entry of building not functioning at time of inspection. repair/replace the front gate lock.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "907 valencia # 10",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "replace broken glass window pane (1001(h),708 hc) — replace broken glass window pane in kitchen of unit # 1.",
+      "status": "closed",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "interior surfaces section",
+      "description": "repair floor covering (1001b,j,o hc) — repair/replace missing metal threshold at entry doorway to unit # 21.",
+      "status": "open",
+      "unsafe_building": false
+    },
+    {
+      "date": "2026-01-27",
+      "category": "building section",
+      "description": "907 valencia # 1",
+      "status": "closed",
+      "unsafe_building": false
+    }
+  ],
+  "permits": [
+    {
+      "date": "2022-02-11",
+      "type": "otc alterations permit",
+      "description": "apt 9: relocate (e) kitchen to other side of wall. revision to pa#202110210901",
+      "status": "issued",
+      "estimated_cost": 1.0
+    },
+    {
+      "date": "2021-10-21",
+      "type": "otc alterations permit",
+      "description": "#24. kitchen and bath remodel. no structural/exterior work required. no change to wall layout. all work within unit. no fire alarm or sprinkler work required. unit 24 only.",
+      "status": "complete",
+      "estimated_cost": 30000.0
+    },
+    {
+      "date": "2021-10-21",
+      "type": "otc alterations permit",
+      "description": "#18. kitchen and bath remodel. no structural/exterior work required. no change to wall layout. all work within unit. no fire alarm or sprinkler work required. unit 18 only.",
+      "status": "cancelled",
+      "estimated_cost": 30000.0
+    },
+    {
+      "date": "2021-10-21",
+      "type": "otc alterations permit",
+      "description": "#9. kitchen and bath remodel. no structural/exterior work required. no change to wall layout. all work within unit. no fire alarm or sprinkler work required. unit 9 only.",
+      "status": "issued",
+      "estimated_cost": 30000.0
+    },
+    {
+      "date": "2019-11-12",
+      "type": "additions alterations or repairs",
+      "description": "change (e) commercial store to limited restaurant. including new lightings, fixtures, & hvac system installation.",
+      "status": "withdrawn",
+      "estimated_cost": 60000.0
+    },
+    {
+      "date": "2019-10-10",
+      "type": "sign - erect",
+      "description": "comply with planning enf#2019-012-139. reattach existing historic sign to building; change business copy at cabinet from \"la rondalla\" with new double face illuminated vinyl over polycarbonate \"mixt\" sign. existing arrow with bulbs to remain and maintained in proper working order.",
+      "status": "complete",
+      "estimated_cost": 11000.0
+    },
+    {
+      "date": "2019-06-05",
+      "type": "additions alterations or repairs",
+      "description": "change out in kind & refurbish (e) windows & doors to comply w/ requirement of article 10 \"liberty hill\" historic neighborhood, work done on ground floor retail only. interior work done under separate permit.**maher n/a**",
+      "status": "complete",
+      "estimated_cost": 12000.0
+    },
+    {
+      "date": "2019-04-15",
+      "type": "otc alterations permit",
+      "description": "ti shell - new ada restroom, new drywall, new electrical & plm, uncover (e) boarded-up windows, new ceiling",
+      "status": "complete",
+      "estimated_cost": 25000.0
+    },
+    {
+      "date": "2018-12-13",
+      "type": "otc alterations permit",
+      "description": "to obtain final inspection for work approved under pa# 201609268793. all work is complete.",
+      "status": "complete",
+      "estimated_cost": 1.0
+    },
+    {
+      "date": "2018-08-06",
+      "type": "additions alterations or repairs",
+      "description": "fire alarm- wireless system cwsi. adding 1 facu, 6 reapeaters, 39 low frequency horns and 6 smoke detectors. voluntary add on to system",
+      "status": "complete",
+      "estimated_cost": 15000.0
+    },
+    {
+      "date": "2018-05-15",
+      "type": "otc alterations permit",
+      "description": "revistion to 2018-0403-5419 - add 6 flexhead connections; relocate riser",
+      "status": "complete",
+      "estimated_cost": 1.0
+    },
+    {
+      "date": "2018-05-14",
+      "type": "otc alterations permit",
+      "description": "nozzles replacement on the ansul fire system. work will be performed in resturant only",
+      "status": "complete",
+      "estimated_cost": 1500.0
+    },
+    {
+      "date": "2018-05-10",
+      "type": "otc alterations permit",
+      "description": "fire alarm ti at 1/f add (n) f/a devices and connect to (e) f/a system pa#201711093626",
+      "status": "complete",
+      "estimated_cost": 7500.0
+    },
+    {
+      "date": "2018-04-05",
+      "type": "sign - erect",
+      "description": "to erect electric, projecting, double faced sign. install 2 illuminated 6x2 projection signs.",
+      "status": "filed",
+      "estimated_cost": 6000.0
+    },
+    {
+      "date": "2018-04-03",
+      "type": "otc alterations permit",
+      "description": "re-install fire sprinkler system per nfpa 13 for the remodel restaurant. ground floor 39 heads. n/a for maher.",
+      "status": "complete",
+      "estimated_cost": 20000.0
+    },
+    {
+      "date": "2018-03-08",
+      "type": "otc alterations permit",
+      "description": "street space w/mta",
+      "status": "issued",
+      "estimated_cost": null
+    },
+    {
+      "date": "2017-12-08",
+      "type": "otc alterations permit",
+      "description": "#17 - kitchen & bathroom remdoel. no structural walls change; window replace like kind; not visible from street. sam size same location, max u-factor 0.32. n/a maher ordinance",
+      "status": "complete",
+      "estimated_cost": 35000.0
+    },
+    {
+      "date": "2017-11-09",
+      "type": "otc alterations permit",
+      "description": "replace contractor on project permit # 201703030633 remove shower and fixtures. capp off plumbing all work in upstairs commericail area. n/a maher",
+      "status": "complete",
+      "estimated_cost": 3000.0
+    },
+    {
+      "date": "2017-11-09",
+      "type": "otc alterations permit",
+      "description": "tenant improvement of an existing ground floor and basement floor restaurand space to a new restaurant. new interior non structural partitions, kitchen equipment, millwork and finishes. new structural beam and column. new exterior paint only. maher na",
+      "status": "complete",
+      "estimated_cost": 302468.0
+    },
+    {
+      "date": "2017-11-07",
+      "type": "otc alterations permit",
+      "description": "to comply with complaint #201414651 item#2 replace in-like kind. n/a for maher.",
+      "status": "complete",
+      "estimated_cost": 1500.0
+    },
+    {
+      "date": "2017-11-03",
+      "type": "otc alterations permit",
+      "description": "to comply with nov201491422 item 2: repair in kind, less than 50% rear stairs. to comply with complaint #201524131 item #2: window replace like in-kind in unit #9. maher n/a.",
+      "status": "complete",
+      "estimated_cost": 3000.0
+    },
+    {
+      "date": "2017-11-03",
+      "type": "otc alterations permit",
+      "description": "unit 15: to comply with complaint #201561891 item #2. to install type 'x' 5/8in sheetrock to ceiling where damage occur.",
+      "status": "complete",
+      "estimated_cost": 3000.0
+    },
+    {
+      "date": "2017-09-13",
+      "type": "otc alterations permit",
+      "description": "revision to pa 2017-0727-3067(no plan permit), unit 19 - adding a wall, combing living room with dining, convert (e) living room to bedroom",
+      "status": "complete",
+      "estimated_cost": 44000.0
+    },
+    {
+      "date": "2017-08-08",
+      "type": "otc alterations permit",
+      "description": "street space",
+      "status": "issued",
+      "estimated_cost": null
+    },
+    {
+      "date": "2017-07-27",
+      "type": "otc alterations permit",
+      "description": "#19 -kitchen & bath remodel & comply w/ nov 201414657",
+      "status": "complete",
+      "estimated_cost": 44000.0
+    },
+    {
+      "date": "2017-07-27",
+      "type": "otc alterations permit",
+      "description": "#19 -kitchen & bath remodel & comply w/ nov 201414657",
+      "status": "complete",
+      "estimated_cost": 44000.0
+    },
+    {
+      "date": "2017-07-27",
+      "type": "otc alterations permit",
+      "description": "#1 - kitchen & bathroom remodel and comply w/ nov 201561891 # item 3, 5 & 6",
+      "status": "complete",
+      "estimated_cost": 44000.0
+    },
+    {
+      "date": "2017-07-27",
+      "type": "otc alterations permit",
+      "description": "#1 - kitchen & bathroom remodel and comply w/ nov 201561891 # item 3, 5 & 6",
+      "status": "complete",
+      "estimated_cost": 44000.0
+    },
+    {
+      "date": "2017-05-08",
+      "type": "otc alterations permit",
+      "description": "reroofing n/a maher",
+      "status": "complete",
+      "estimated_cost": 64500.0
+    },
+    {
+      "date": "2017-05-08",
+      "type": "otc alterations permit",
+      "description": "reroofing n/a maher",
+      "status": "complete",
+      "estimated_cost": 64500.0
+    }
+  ],
+  "block_evictions": [
+    {
+      "date": "2025-08-25",
+      "reasons": [
+        "breach"
+      ]
+    },
+    {
+      "date": "2025-08-13",
+      "reasons": [
+        "breach"
+      ]
+    },
+    {
+      "date": "2025-08-13",
+      "reasons": [
+        "breach"
+      ]
+    },
+    {
+      "date": "2025-08-11",
+      "reasons": [
+        "breach"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    },
+    {
+      "date": "2025-04-28",
+      "reasons": [
+        "capital_improvement"
+      ]
+    }
+  ],
+  "block_rents": [
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$1001-$1250"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$1501-$1750"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$751-$1000"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$2001-$2250"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1751-$2000"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1751-$2000"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$1001-$1250"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$2001-$2250"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1751-$2000"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$501-$750"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1501-$1750"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$751-$1000"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$1251-$1500"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1751-$2000"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$751-$1000"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$751-$1000"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$751-$1000"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$1501-$1750"
+    },
+    {
+      "bedrooms": "Two-Bedroom",
+      "rent_range": "$1001-$1250"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1001-$1250"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1751-$2000"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$751-$1000"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$1751-$2000"
+    },
+    {
+      "bedrooms": "Studio",
+      "rent_range": "$501-$750"
+    },
+    {
+      "bedrooms": "Two-Bedroom",
+      "rent_range": "$1501-$1750"
+    },
+    {
+      "bedrooms": "One-Bedroom",
+      "rent_range": "$2251-$2500"
+    }
+  ],
+  "neighborhood_311": {
+    "total_last_12m": 3815,
+    "top_categories": [
+      {
+        "name": "Street and Sidewalk Cleaning",
+        "count": 1662
+      },
+      {
+        "name": "Parking Enforcement",
+        "count": 743
+      },
+      {
+        "name": "Graffiti Public",
+        "count": 534
+      },
+      {
+        "name": "General Request",
+        "count": 208
+      },
+      {
+        "name": "Graffiti Private",
+        "count": 193
+      },
+      {
+        "name": "Encampment",
+        "count": 150
+      },
+      {
+        "name": "RPD General",
+        "count": 89
+      },
+      {
+        "name": "Noise",
+        "count": 47
+      }
+    ]
+  },
+  "stats": {
+    "open_complaints": 17,
+    "complaints_10y": 36,
+    "violations_10y": 25,
+    "evictions_block_10y": 33
+  },
+  "sources": {
+    "addresses": "https://data.sf.gov/d/ramy-di5m",
+    "parcels": "https://data.sf.gov/d/acdm-wktn",
+    "tax_rolls": "https://data.sf.gov/d/wv5m-vpq2",
+    "dbi_complaints": "https://data.sf.gov/d/gm2e-bten",
+    "violations": "https://data.sf.gov/d/nbtm-fbw5",
+    "permits": "https://data.sf.gov/d/i98e-djp9",
+    "evictions": "https://data.sf.gov/d/5cei-gny5",
+    "rent_inventory": "https://data.sf.gov/d/gdc7-dmcn",
+    "311": "https://data.sf.gov/d/vw6y-z8j6"
+  }
+}
