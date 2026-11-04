@@ -9,15 +9,15 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
   /* ---------- Couleurs (modifie-les ici, tout le site suit) ----------
-     Déco : dégradé chaud façon Mistral (m1 → m5).
-     Sens : vert / ambre / rouge pour les signaux, volontairement différents de l'orange déco. */
+     Déco : palette Elastic (jaune, rose, turquoise, bleu clair, bleu) → m1 à m5.
+     Sens : vert / ambre / rouge pour les signaux, distincts des couleurs déco. */
   :root {
-    --m1: #FFD800; --m2: #FFAF00; --m3: #FF8205; --m4: #FA500F; --m5: #E10500;
-    --bg: #FFFAEB; --card: #ffffff; --text: #111111; --muted: #5c564a;
-    --brand: #FA500F; --ink: #111111; --border: #E9E0C8;
-    --green: #17703f; --orange: #92560a; --red: #b4140a;
-    --green-bg: #e3f3e8; --orange-bg: #fbefd6; --red-bg: #fde4e1;
-    --radius: 4px;
+    --m1: #FEC514; --m2: #F04E98; --m3: #00BFB3; --m4: #1BA9F5; --m5: #0077CC;
+    --bg: #F5F7FA; --card: #ffffff; --text: #101C3F; --muted: #5A6275;
+    --brand: #0077CC; --ink: #101C3F; --border: #D3DAE6;
+    --green: #017D73; --orange: #8A5A00; --red: #BD271E;
+    --green-bg: #E0F3F1; --orange-bg: #FDF3D8; --red-bg: #F8E1DF;
+    --radius: 6px;
     --font: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
   }
@@ -38,9 +38,9 @@
   .logo i { display: block; }
   .hero { background: var(--ink); color: #fff; border: 0; padding: 22px 18px; }
   .hero h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
-  .hero .muted { color: #cfc8b8; }
-  .hero .chip { background: transparent; color: #fff; border-color: #4a463d; }
-  .hero .chip:hover { border-color: var(--m3); color: var(--m2); }
+  .hero .muted { color: #B7C0D6; }
+  .hero .chip { background: transparent; color: #fff; border-color: #3A4670; }
+  .hero .chip:hover { border-color: var(--m3); color: var(--m3); }
   select, input, textarea, button { font: inherit; }
   select, input[type=text], input[type=number], input[type=date], textarea {
     padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); width: 100%; }
@@ -48,7 +48,7 @@
   button { cursor: pointer; border: 0; border-radius: var(--radius); padding: 10px 16px; background: var(--ink); color: #fff; font-weight: 700; transition: background .15s; }
   button:hover:not(:disabled) { background: var(--brand); }
   .hero button[type=submit] { background: var(--brand); }
-  .hero button[type=submit]:hover:not(:disabled) { background: var(--m5); }
+  .hero button[type=submit]:hover:not(:disabled) { background: var(--m4); }
   button.secondary { background: #fff; color: var(--ink); border: 1px solid var(--ink); }
   button.secondary:hover:not(:disabled) { background: var(--ink); color: #fff; }
   button:disabled { opacity: .5; cursor: wait; }
@@ -73,7 +73,7 @@
   .timeline { list-style: none; padding: 0; margin: 0; }
   .timeline li { padding: 6px 0 6px 14px; border-left: 3px solid var(--m2); margin-left: 6px; }
   #map { height: 240px; border-radius: var(--radius); margin-top: 10px; border: 1px solid var(--border); }
-  .bar { height: 8px; background: #efe8d6; border-radius: 0; overflow: hidden; margin-bottom: 6px; }
+  .bar { height: 8px; background: #E4E9F2; border-radius: 0; overflow: hidden; margin-bottom: 6px; }
   .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--m1), var(--m3), var(--m4)); }
   .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
   .field { margin: 10px 0; }
