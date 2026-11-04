@@ -74,16 +74,20 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
 .chip-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;min-height:34px}
 .chip-btn:hover{border-color:var(--muted)}
-.features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px;margin-bottom:56px}
+.lease-link{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:0;border:0;background:none;color:var(--ink);font-weight:500;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.lease-link svg.ic{width:18px;height:18px}
+.features{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:28px;margin-bottom:56px}
 .feature{padding:18px;border-radius:var(--radius);background:var(--tint)}
 .feature .fi{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:#fff;color:var(--c)}
-.feature h2{font-size:17px;letter-spacing:-.01em;margin-top:12px}
-.feature p{font-size:14px;color:var(--muted);margin-top:3px;line-height:1.35}
+.feature .ft{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.18;margin-top:12px}
+.feature .fd{display:block;font-size:14px;color:var(--muted);margin-top:3px;line-height:1.35}
+.feature-btn{display:block;width:100%;border:1px solid transparent;color:inherit;text-align:left;cursor:pointer}
+.feature-btn:hover{border-color:var(--amber)}
 .t-report{--c:var(--bridge-strong);--tint:var(--bridge-tint)}
 .t-city{--c:var(--city);--tint:var(--city-tint)}
 .t-voices{--c:var(--voice);--tint:var(--voice-tint)}
 .t-people{--c:var(--people);--tint:var(--people-tint)}
-.t-map{--c:var(--ink)}
+.t-lease{--c:var(--amber);--tint:var(--amber-tint)}
 
 /* states */
 .state{min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:56px 0}
@@ -104,8 +108,8 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 .addr h1{font-size:clamp(26px,3.6vw,36px);letter-spacing:-.025em;overflow-wrap:anywhere}
 .addr .meta{color:var(--muted);font-size:15px;margin-top:2px}
 .mainnav{position:sticky;top:0;z-index:900;background:var(--fog-soft);border-bottom:1px solid var(--line)}
-.mainnav .wrap{display:flex;gap:6px}
-.mainnav button{display:flex;align-items:center;gap:8px;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:11px 14px 10px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap}
+.mainnav .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.mainnav button{display:flex;align-items:center;gap:8px;background:none;border:0;border-bottom:3px solid transparent;padding:11px 10px 10px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap}
 .mainnav button:hover{color:var(--ink)}
 .mainnav button[aria-current=page]{color:var(--c);border-bottom-color:var(--c)}
 .panel{padding-top:24px;padding-bottom:48px}
@@ -114,7 +118,7 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 .ai-card{padding:20px 22px 8px;border:1px solid var(--line);border-radius:var(--radius)}
 .verdict-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
 .verdict{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px 4px 10px;font-size:14px;font-weight:500}
-.lv-green{color:var(--green);background:var(--green-tint)} .lv-orange{color:var(--amber);background:var(--amber-tint)} .lv-red{color:var(--red);background:var(--red-tint)}
+.lv-green{color:var(--green);background:var(--green-tint)} .lv-orange{color:var(--amber);background:var(--amber-tint)} .lv-red{color:var(--red);background:var(--red-tint)} .lv-low{color:var(--city);background:var(--city-tint)}
 .meter{display:flex;gap:4px;width:96px}
 .meter i{flex:1;height:6px;border-radius:3px;background:var(--fog)}
 .meter .on-green{background:#2E9B6A}
@@ -257,8 +261,12 @@ fieldset{border:0;padding:0;margin:0}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:3000;max-width:calc(100vw - 32px);background:var(--ink);color:#fff;border-radius:10px;padding:11px 16px;font-size:14.5px;box-shadow:0 8px 24px rgba(28,62,87,.25)}
 .toast:empty{display:none}
 
+@media (max-width:1040px){
+  .features{grid-template-columns:repeat(3,1fr)}
+}
 @media (max-width:860px){
   .features{grid-template-columns:1fr 1fr}
+  .feature-btn{grid-column:1/-1}
   .hero-copy{max-width:470px}
 }
 @media (max-width:700px){
@@ -304,8 +312,8 @@ fieldset{border:0;padding:0;margin:0}
 .map-legend{position:absolute;left:12px;bottom:12px;z-index:2;max-width:calc(100% - 24px);padding:9px 12px 8px;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(28,62,87,.18);font-size:12.5px;line-height:1.3}
 .map-legend:empty{display:none}
 .lg-title{font-weight:500;margin-bottom:6px}
-.lg-scale{display:flex;gap:2px}
-.lg-item{flex:1 1 0;min-width:42px}
+.lg-scale{display:flex;gap:5px}
+.lg-item{flex:1 1 auto;min-width:34px}
 .lg-item i{display:block;height:8px;border-radius:2px}
 .lg-item small{display:block;margin-top:3px;color:var(--muted);font-size:11.5px;white-space:nowrap}
 .map-tip{position:absolute;left:0;top:0;z-index:3;max-width:300px;padding:5px 9px;background:var(--ink);border-radius:8px;color:#fff;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
@@ -322,7 +330,36 @@ fieldset{border:0;padding:0;margin:0}
 .pop-stats b{display:block;font-size:20px;font-weight:600;line-height:1.1}
 .pop-stats span{display:block;margin-top:2px;color:var(--muted);font-size:12px;line-height:1.2}
 .map-pop .btn{width:100%;min-height:40px}
-.mainnav .nav-map{display:none}
+.map-fab{display:none}
+
+/* lease */
+.lease-drop{position:relative;display:block;padding:30px 20px;background:var(--fog-soft);border:1.5px dashed #B8C6CF;border-radius:var(--radius);text-align:center;cursor:pointer}
+.lease-drop:hover,.lease-drop.over{background:var(--bridge-tint);border-color:var(--bridge-strong)}
+.lease-drop:focus-within{outline:2px solid var(--bridge-strong);outline-offset:2px}
+.lease-drop input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.lease-drop .fi{display:inline-grid;place-items:center;width:44px;height:44px;margin-bottom:10px;background:#fff;border-radius:12px;color:var(--amber)}
+.lease-drop b{display:block;font-size:17px;font-weight:600}
+.lease-drop small{display:block;margin-top:3px;color:var(--muted);font-size:14px}
+.lease-foot{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;align-items:center;margin-top:12px;font-size:13.5px;color:var(--muted)}
+.lease-foot .link{color:var(--ink);font-weight:500;font-size:14.5px}
+.lease-wait{display:flex;gap:14px;align-items:center;padding:26px 20px;background:var(--fog-soft);border-radius:var(--radius)}
+.lease-wait b{font-weight:500}
+.lease-wait p{overflow-wrap:anywhere}
+.spin{flex:none;width:24px;height:24px;border:2.5px solid var(--bridge);border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+.lease-head h3{font-size:21px}
+.lease-file{margin-top:2px;color:var(--muted);font-size:13.5px;overflow-wrap:anywhere}
+.lease-counts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.lease-fake{margin-top:12px;padding:10px 12px;background:var(--amber-tint);border-radius:10px;color:var(--amber);font-size:14px}
+.clauses{margin-top:14px;border-bottom:1px solid var(--line)}
+.clause{padding:14px 0;border-top:1px solid var(--line)}
+.clause header{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.clause .verdict{padding:2px 10px 2px 8px;font-size:13px}
+.clause h4{margin:8px 0 0;font-size:16px;font-weight:500;line-height:1.35}
+.clause blockquote{margin:6px 0 0;padding-left:10px;border-left:3px solid var(--line);color:var(--muted);font-size:14.5px;overflow-wrap:anywhere}
+.lease-ok{display:flex;gap:10px;align-items:flex-start;padding:16px;background:var(--green-tint);border-radius:var(--radius)}
+.lease-ok b{display:block;font-weight:500}
+.lease-ok p{margin-top:2px;font-size:14px}
+.lease-done .btn{margin-top:14px}
 
 /* results: the report beside the map */
 @media (min-width:901px){
@@ -337,20 +374,21 @@ fieldset{border:0;padding:0;margin:0}
 @media (max-width:900px){
   .split-right{display:none}
   body.map-open .split-right{display:block;position:fixed;top:0;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:850}
-  .mainnav .nav-map{display:flex}
+  .map-fab{display:inline-flex;align-items:center;gap:7px;position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:860;height:44px;padding:0 15px;border:0;border-radius:999px;background:var(--ink);color:#fff;font-weight:500;box-shadow:0 6px 18px rgba(28,62,87,.32);cursor:pointer}
+  body.map-open .map-fab{bottom:calc(136px + env(safe-area-inset-bottom))}
   .mainnav{position:fixed;left:0;right:0;bottom:0;top:auto;background:#fff;border-top:1px solid var(--line);border-bottom:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 18px rgba(28,62,87,.08)}
   .mainnav .wrap{gap:0;padding:0}
   .mainnav button{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:8px 2px 8px;margin:0;border-bottom:0;border-top:3px solid transparent;font-size:12.5px;white-space:normal;line-height:1.15;text-align:center}
   .mainnav button[aria-current=page]{border-top-color:var(--c)}
   .panel{padding-top:18px;padding-bottom:28px}
-  .has-tabs footer{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+  .has-tabs footer{padding-bottom:calc(128px + env(safe-area-inset-bottom))}
   .has-tabs .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
 }
 @media (max-width:440px){
   .avg{grid-template-columns:minmax(0,1fr);gap:12px}
   .map-top{right:50px}
 }
-@media (prefers-reduced-motion:reduce){.steps li.on::before{animation:none}.chev{transition:none}}
+@media (prefers-reduced-motion:reduce){.steps li.on::before,.spin{animation:none}.chev{transition:none}}
 </style>
 </head>
 <body>
@@ -364,7 +402,7 @@ fieldset{border:0;padding:0;margin:0}
 "use strict";
 /* =========================== i18n =========================== */
 const I18N = {
-en:{search_ph:"Enter a San Francisco address",search:"Look up",try:"Try:",hero_title:"Know the building before you sign.",l1t:"Complaints, violations, permits",l2t:"What tenants really say",l3t:"Ask a tenant, find a roommate",
+en:{map_close:"Close map",search_ph:"Enter a San Francisco address",search:"Look up",try:"Try:",hero_title:"Know the building before you sign.",l1t:"Complaints, violations, permits",l2t:"What tenants really say",l3t:"Ask a tenant, find a roommate",
 loading:"Looking up",step1:"Finding the parcel",step2:"Pulling city records",step3:"Collecting tenant reviews",step4:"Mistral is writing your report",err_title:"We couldn't load this address",err_nf:"Check the street number and name, like 777 Bay St.",err_net:"The service isn't responding. Try again in a moment.",retry:"Try again",
 nav_report:"Report",nav_city:"City records",nav_voices:"Reviews",nav_people:"People",district:"District",parcel:"Parcel",green:"Few warning signs",orange:"Look closer",red:"Serious warning signs",ai_note:"AI summary by Mistral",no_report:"The AI report isn't available right now. City records are still available.",sig_tenant:"Tenant opinion",sig_city:"City record",questions:"Questions to ask the landlord",copy:"Copy",copied:"Questions copied",disclaimer:"This is not legal advice. Verify important details with the city or a tenant counselor.",
 profile:"Building profile",built:"Built",units:"Units",stories:"Stories",last_sale:"Last sale",unknown:"Unknown",rc_yes:"Likely rent-controlled · confirm with the Rent Board",rc_no:"Probably not rent-controlled · confirm with the Rent Board",rc_unknown:"Rent control status unknown.",
@@ -375,8 +413,8 @@ ppl_sub:"Pseudonyms only. No email or phone shown.",ppl_tenants:"Ask a tenant",p
 role_current_tenant:"Current tenant",role_former_tenant:"Former tenant",role_seeking_roommate:"Looking for a room",role_has_room:"Has a room",budget:"Budget",move_in:"Move-in",sch_early:"early riser",sch_late:"night owl",sch_flexible:"flexible schedule",clean:"tidiness",g_rarely:"guests rarely",g_sometimes:"guests sometimes",g_often:"guests often",smoker:"smoker",nonsmoker:"non-smoker",pets:"has pets",nopets:"no pets",
 f_review_title:"Write a review",f_pseudo:"Pseudonym",f_pseudo_h:"Don't use your real name.",f_start:"Moved in",f_end:"Moved out",f_still:"I still live here",f_ratings:"Rate from 1 (poor) to 5 (great)",f_text:"Your review",f_text_h:"Names and contact details are removed. Harassment and discrimination are rejected.",f_proof:"Proof you lived here (optional)",f_proof_h:"A lease or utility bill earns the Verified badge.",f_privacy:"Your document is read in memory, never stored.",f_cancel:"Cancel",f_publish:"Submit review",f_checking:"Checking…",f_rate_err:"Please rate all five categories.",pub_ok:"Your review is published.",pub_ver:"Your review is published with the Verified badge.",rejected:"Your review wasn't published:",
 f_profile_title:"Create your profile",f_role:"I am…",f_nhood:"Neighborhood",f_bmin:"Budget min ($/month)",f_bmax:"Budget max ($/month)",f_bio:"Short bio",f_bio_h:"Don't include your email, phone number or full name.",f_sched:"Schedule",f_cleanl:"Tidiness (1–5)",f_guests:"Guests",f_smoke:"I smoke",f_pets:"I have pets",f_open:"Other users can send me contact requests",f_create:"Create profile",f_sched_early:"Early",f_sched_late:"Late",f_sched_flexible:"Flexible",f_g_rarely:"Rarely",f_g_sometimes:"Sometimes",f_g_often:"Often",prof_ok:"Profile created.",
-f_contact_title:"Send a request to {p}",f_msg:"Message",f_msg_h:"Don't share your email or phone number here.",f_send:"Send request",contact_first:"Create a profile first so they know who's asking.",contact_ok:"Your request was sent.",generic_err:"Something went wrong. Please try again.",l0t:"Risks at a glance",tab_e:"Block evictions",tab_r:"Block rents",tab_n:"311",not_official:"Independent project. Not a City and County of San Francisco service.",map_title:"Explore the map",nav_map:"Map",map_by_nh:"by neighborhood",map_by_blk:"by block",map_by_par:"by building",map_by_face:"by street block",map_hint_nh:"Click a neighborhood to zoom in",map_hint_blk:"Click a block to see its buildings",map_hint_par:"Click a building to see its report",map_zoom_in:"Zoom in to pick a building",map_loading:"Loading city data…",map_error:"City data isn't responding.",map_off:"The map can't be shown on this device. You can still search by address.",see_report:"See full report",no_address:"No street address on this parcel.",map_on_block:"on this block",coop_win:"Use Ctrl + scroll to zoom the map",coop_mac:"Use ⌘ + scroll to zoom the map",coop_mobile:"Use two fingers to move the map",mock_bar:"MOCK MODE: sample data, not real city records"},
-es:{search_ph:"Escribe una dirección de San Francisco",search:"Buscar",try:"Prueba:",hero_title:"Conoce el edificio antes de firmar.",l1t:"Quejas, infracciones, permisos",l2t:"Lo que dicen los inquilinos",l3t:"Pregunta a inquilinos, busca compañero",
+f_contact_title:"Send a request to {p}",f_msg:"Message",f_msg_h:"Don't share your email or phone number here.",f_send:"Send request",contact_first:"Create a profile first so they know who's asking.",contact_ok:"Your request was sent.",generic_err:"Something went wrong. Please try again.",l0t:"Risks at a glance",tab_e:"Block evictions",tab_r:"Block rents",tab_n:"311",not_official:"Independent project. Not a City and County of San Francisco service.",map_title:"Explore the map",nav_map:"Map",map_by_nh:"by neighborhood",map_by_blk:"by block",map_by_par:"by building",map_by_face:"by street block",map_hint_nh:"Click a neighborhood to zoom in",map_hint_blk:"Click a block to see its buildings",map_hint_par:"Click a building to see its report",map_zoom_in:"Zoom in to pick a building",map_loading:"Loading city data…",map_error:"City data isn't responding.",map_off:"The map can't be shown on this device. You can still search by address.",see_report:"See full report",no_address:"No street address on this parcel.",map_on_block:"on this block",coop_win:"Use Ctrl + scroll to zoom the map",coop_mac:"Use ⌘ + scroll to zoom the map",coop_mobile:"Use two fingers to move the map",nav_lease:"Lease",lease_title:"Check your lease",l4t:"Spot clauses that may break SF rent rules",lease_link:"Check a lease",lease_pick:"Choose your lease",lease_hint:"or drop it here · PDF or photo · 10 MB max",lease_sample:"Try a sample lease",lease_privacy:"Mistral OCR reads your file. We don't store it.",lease_reading:"Reading your lease…",lease_wait:"This usually takes about 10 seconds.",lease_found:"{n} clauses to review",lease_found_1:"1 clause to review",lease_none:"No clause flagged",lease_none_sub:"That doesn't prove the lease is fine. Reread it or ask a tenant counselor.",lease_again:"Check another lease",lease_err:"We couldn't analyze this lease.",lease_type:"Upload a PDF, PNG, JPEG or WEBP file.",lease_big:"This file is too large (10 MB max).",lease_fake:"Sample result: the analysis isn't available right now. These clauses don't come from your lease.",sev_high:"High",sev_medium:"Medium",sev_low:"Low",mock_bar:"MOCK MODE: sample data, not real city records"},
+es:{map_close:"Cerrar el mapa",search_ph:"Escribe una dirección de San Francisco",search:"Buscar",try:"Prueba:",hero_title:"Conoce el edificio antes de firmar.",l1t:"Quejas, infracciones, permisos",l2t:"Lo que dicen los inquilinos",l3t:"Pregunta a inquilinos, busca compañero",
 loading:"Buscando",step1:"Localizando la parcela",step2:"Obteniendo registros de la ciudad",step3:"Reuniendo opiniones de inquilinos",step4:"Mistral está escribiendo tu informe",err_title:"No pudimos cargar esta dirección",err_nf:"Revisa el número y la calle, por ejemplo 777 Bay St.",err_net:"El servicio no responde. Inténtalo de nuevo en un momento.",retry:"Reintentar",
 nav_report:"Informe",nav_city:"Registros",nav_voices:"Opiniones",nav_people:"Personas",district:"Distrito",parcel:"Parcela",green:"Pocas señales de alerta",orange:"Mira con atención",red:"Alertas serias",ai_note:"Resumen de IA por Mistral",no_report:"El informe de IA no está disponible ahora. Los registros de la ciudad siguen disponibles.",sig_tenant:"Opinión de inquilinos",sig_city:"Registro de la ciudad",questions:"Preguntas para el propietario",copy:"Copiar",copied:"Preguntas copiadas",disclaimer:"Esto no es asesoramiento legal. Verifica los datos importantes con la ciudad o un asesor de inquilinos.",
 profile:"Perfil del edificio",built:"Construido",units:"Unidades",stories:"Pisos",last_sale:"Última venta",unknown:"Desconocido",rc_yes:"Probablemente con control de alquiler · confírmalo con el Rent Board",rc_no:"Probablemente sin control de alquiler · confírmalo con el Rent Board",rc_unknown:"Control de alquiler desconocido.",
@@ -387,8 +425,8 @@ ppl_sub:"Solo seudónimos. Sin correo ni teléfono.",ppl_tenants:"Pregunta a un 
 role_current_tenant:"Inquilino actual",role_former_tenant:"Antiguo inquilino",role_seeking_roommate:"Busca habitación",role_has_room:"Tiene habitación",budget:"Presupuesto",move_in:"Mudanza",sch_early:"madrugador",sch_late:"noctámbulo",sch_flexible:"horario flexible",clean:"orden",g_rarely:"pocas visitas",g_sometimes:"algunas visitas",g_often:"muchas visitas",smoker:"fumador",nonsmoker:"no fumador",pets:"con mascotas",nopets:"sin mascotas",
 f_review_title:"Escribir una opinión",f_pseudo:"Seudónimo",f_pseudo_h:"No uses tu nombre real.",f_start:"Entrada",f_end:"Salida",f_still:"Sigo viviendo aquí",f_ratings:"Valora de 1 (mal) a 5 (excelente)",f_text:"Tu opinión",f_text_h:"Se eliminan nombres y datos de contacto. Se rechazan el acoso y la discriminación.",f_proof:"Prueba de residencia (opcional)",f_proof_h:"Un contrato o factura da la insignia de verificado.",f_privacy:"Tu documento se lee en memoria y nunca se guarda.",f_cancel:"Cancelar",f_publish:"Enviar opinión",f_checking:"Comprobando…",f_rate_err:"Valora las cinco categorías.",pub_ok:"Tu opinión está publicada.",pub_ver:"Tu opinión está publicada con la insignia de verificado.",rejected:"Tu opinión no se publicó:",
 f_profile_title:"Crea tu perfil",f_role:"Soy…",f_nhood:"Barrio",f_bmin:"Presupuesto mín. ($/mes)",f_bmax:"Presupuesto máx. ($/mes)",f_bio:"Breve descripción",f_bio_h:"No incluyas correo, teléfono ni nombre completo.",f_sched:"Horario",f_cleanl:"Orden (1–5)",f_guests:"Visitas",f_smoke:"Fumo",f_pets:"Tengo mascotas",f_open:"Otros usuarios pueden enviarme solicitudes",f_create:"Crear perfil",f_sched_early:"Temprano",f_sched_late:"Tarde",f_sched_flexible:"Flexible",f_g_rarely:"Pocas",f_g_sometimes:"Algunas",f_g_often:"Muchas",prof_ok:"Perfil creado.",
-f_contact_title:"Enviar solicitud a {p}",f_msg:"Mensaje",f_msg_h:"No compartas aquí tu correo ni teléfono.",f_send:"Enviar solicitud",contact_first:"Primero crea un perfil para que sepan quién pregunta.",contact_ok:"Tu solicitud se envió.",generic_err:"Algo salió mal. Inténtalo de nuevo.",l0t:"Los riesgos de un vistazo",tab_e:"Desalojos en la cuadra",tab_r:"Alquileres en la cuadra",tab_n:"311",not_official:"Proyecto independiente. No es un servicio de la Ciudad y el Condado de San Francisco.",map_title:"Explora el mapa",nav_map:"Mapa",map_by_nh:"por barrio",map_by_blk:"por cuadra",map_by_par:"por edificio",map_by_face:"por cuadra",map_hint_nh:"Haz clic en un barrio para acercarte",map_hint_blk:"Haz clic en una cuadra para ver sus edificios",map_hint_par:"Haz clic en un edificio para ver su informe",map_zoom_in:"Acércate para elegir un edificio",map_loading:"Cargando datos…",map_error:"Los datos de la ciudad no responden.",map_off:"El mapa no se puede mostrar en este dispositivo. Aún puedes buscar por dirección.",see_report:"Ver el informe completo",no_address:"Esta parcela no tiene dirección.",map_on_block:"en esta cuadra",coop_win:"Usa Ctrl + rueda para hacer zoom",coop_mac:"Usa ⌘ + rueda para hacer zoom",coop_mobile:"Usa dos dedos para mover el mapa",mock_bar:"MODO DE PRUEBA: datos de ejemplo, no registros reales"},
-zh:{search_ph:"输入旧金山地址",search:"查询",try:"试试：",hero_title:"签约之前，先读懂这栋楼。",l1t:"投诉、违规、许可",l2t:"租客的真实评价",l3t:"联系租客，寻找室友",
+f_contact_title:"Enviar solicitud a {p}",f_msg:"Mensaje",f_msg_h:"No compartas aquí tu correo ni teléfono.",f_send:"Enviar solicitud",contact_first:"Primero crea un perfil para que sepan quién pregunta.",contact_ok:"Tu solicitud se envió.",generic_err:"Algo salió mal. Inténtalo de nuevo.",l0t:"Los riesgos de un vistazo",tab_e:"Desalojos en la cuadra",tab_r:"Alquileres en la cuadra",tab_n:"311",not_official:"Proyecto independiente. No es un servicio de la Ciudad y el Condado de San Francisco.",map_title:"Explora el mapa",nav_map:"Mapa",map_by_nh:"por barrio",map_by_blk:"por cuadra",map_by_par:"por edificio",map_by_face:"por cuadra",map_hint_nh:"Haz clic en un barrio para acercarte",map_hint_blk:"Haz clic en una cuadra para ver sus edificios",map_hint_par:"Haz clic en un edificio para ver su informe",map_zoom_in:"Acércate para elegir un edificio",map_loading:"Cargando datos…",map_error:"Los datos de la ciudad no responden.",map_off:"El mapa no se puede mostrar en este dispositivo. Aún puedes buscar por dirección.",see_report:"Ver el informe completo",no_address:"Esta parcela no tiene dirección.",map_on_block:"en esta cuadra",coop_win:"Usa Ctrl + rueda para hacer zoom",coop_mac:"Usa ⌘ + rueda para hacer zoom",coop_mobile:"Usa dos dedos para mover el mapa",nav_lease:"Contrato",lease_title:"Revisa tu contrato",l4t:"Detecta cláusulas contrarias a las reglas de SF",lease_link:"Revisar un contrato",lease_pick:"Elige tu contrato",lease_hint:"o suéltalo aquí · PDF o foto · 10 MB máx.",lease_sample:"Probar con un contrato de ejemplo",lease_privacy:"Mistral OCR lee tu archivo. No lo guardamos.",lease_reading:"Leyendo tu contrato…",lease_wait:"Suele tardar unos 10 segundos.",lease_found:"{n} cláusulas por revisar",lease_found_1:"1 cláusula por revisar",lease_none:"Ninguna cláusula señalada",lease_none_sub:"Eso no prueba que el contrato esté bien. Reléelo o consulta a un asesor de inquilinos.",lease_again:"Revisar otro contrato",lease_err:"No pudimos analizar este contrato.",lease_type:"Sube un archivo PDF, PNG, JPEG o WEBP.",lease_big:"Este archivo es demasiado grande (máx. 10 MB).",lease_fake:"Resultado de ejemplo: el análisis no está disponible ahora. Estas cláusulas no provienen de tu contrato.",sev_high:"Alto",sev_medium:"Medio",sev_low:"Bajo",mock_bar:"MODO DE PRUEBA: datos de ejemplo, no registros reales"},
+zh:{map_close:"关闭地图",search_ph:"输入旧金山地址",search:"查询",try:"试试：",hero_title:"签约之前，先读懂这栋楼。",l1t:"投诉、违规、许可",l2t:"租客的真实评价",l3t:"联系租客，寻找室友",
 loading:"正在查询",step1:"定位地块",step2:"获取市政记录",step3:"收集租客评价",step4:"Mistral 正在撰写报告",err_title:"无法加载此地址",err_nf:"请检查门牌号和街道名称，例如 777 Bay St。",err_net:"服务暂无响应，请稍后再试。",retry:"重试",
 nav_report:"报告",nav_city:"市政记录",nav_voices:"租客评价",nav_people:"联系人",district:"选区",parcel:"地块",green:"警示信号较少",orange:"需要仔细查看",red:"存在严重警示",ai_note:"由 Mistral 生成的 AI 摘要",no_report:"AI 报告暂不可用，市政记录仍可查看。",sig_tenant:"租客意见",sig_city:"市政记录",questions:"可以问房东的问题",copy:"复制",copied:"问题已复制",disclaimer:"本内容不构成法律建议。重要信息请向市政部门或租客顾问核实。",
 profile:"建筑概况",built:"建造年份",units:"单元数",stories:"层数",last_sale:"最近出售",unknown:"未知",rc_yes:"可能受租金管制 · 请向租金委员会确认",rc_no:"可能不受租金管制 · 请向租金委员会确认",rc_unknown:"租金管制情况未知。",
@@ -399,8 +437,8 @@ ppl_sub:"仅显示化名，不显示邮箱或电话。",ppl_tenants:"询问租�
 role_current_tenant:"现任租客",role_former_tenant:"前任租客",role_seeking_roommate:"正在找房间",role_has_room:"有空房间",budget:"预算",move_in:"入住",sch_early:"早起",sch_late:"晚睡",sch_flexible:"作息灵活",clean:"整洁度",g_rarely:"很少访客",g_sometimes:"偶尔访客",g_often:"常有访客",smoker:"吸烟",nonsmoker:"不吸烟",pets:"有宠物",nopets:"无宠物",
 f_review_title:"写评价",f_pseudo:"化名",f_pseudo_h:"请勿使用真实姓名。",f_start:"入住时间",f_end:"搬出时间",f_still:"我仍住在这里",f_ratings:"评分：1（差）到 5（很好）",f_text:"你的评价",f_text_h:"姓名和联系方式会被删除；骚扰和歧视内容将被拒绝。",f_proof:"居住证明（可选）",f_proof_h:"租约或水电账单可获认证标记。",f_privacy:"文件仅在内存中读取，绝不存储。",f_cancel:"取消",f_publish:"提交评价",f_checking:"正在检查…",f_rate_err:"请为五个类别全部评分。",pub_ok:"你的评价已发布。",pub_ver:"你的评价已发布并带有认证标记。",rejected:"你的评价未发布：",
 f_profile_title:"创建资料",f_role:"我是…",f_nhood:"社区",f_bmin:"最低预算（美元/月）",f_bmax:"最高预算（美元/月）",f_bio:"简介",f_bio_h:"请勿填写邮箱、电话或全名。",f_sched:"作息",f_cleanl:"整洁度（1–5）",f_guests:"访客",f_smoke:"我吸烟",f_pets:"我有宠物",f_open:"其他用户可以向我发送联系请求",f_create:"创建资料",f_sched_early:"早",f_sched_late:"晚",f_sched_flexible:"灵活",f_g_rarely:"很少",f_g_sometimes:"偶尔",f_g_often:"经常",prof_ok:"资料已创建。",
-f_contact_title:"向 {p} 发送请求",f_msg:"留言",f_msg_h:"请勿在此分享邮箱或电话。",f_send:"发送请求",contact_first:"请先创建资料，让对方知道是谁在询问。",contact_ok:"请求已发送。",generic_err:"出错了，请重试。",l0t:"一眼看清风险",tab_e:"街区驱逐",tab_r:"街区租金",tab_n:"311",not_official:"独立项目，并非旧金山市县政府的服务。",map_title:"浏览地图",nav_map:"地图",map_by_nh:"按社区",map_by_blk:"按街区",map_by_par:"按建筑",map_by_face:"按街区",map_hint_nh:"点击社区放大",map_hint_blk:"点击街区查看建筑",map_hint_par:"点击建筑查看报告",map_zoom_in:"放大以选择建筑",map_loading:"正在加载数据…",map_error:"市政数据暂无响应。",map_off:"此设备无法显示地图，仍可按地址搜索。",see_report:"查看完整报告",no_address:"此地块没有门牌地址。",map_on_block:"在此街区",coop_win:"按住 Ctrl 并滚动以缩放地图",coop_mac:"按住 ⌘ 并滚动以缩放地图",coop_mobile:"用两根手指移动地图",mock_bar:"模拟模式：示例数据，并非真实记录"},
-fr:{search_ph:"Entrez une adresse à San Francisco",search:"Rechercher",try:"Essayez :",hero_title:"Connaissez l'immeuble avant de signer.",l1t:"Plaintes, infractions, permis",l2t:"Ce que disent les locataires",l3t:"Contacter un locataire, trouver un coloc",
+f_contact_title:"向 {p} 发送请求",f_msg:"留言",f_msg_h:"请勿在此分享邮箱或电话。",f_send:"发送请求",contact_first:"请先创建资料，让对方知道是谁在询问。",contact_ok:"请求已发送。",generic_err:"出错了，请重试。",l0t:"一眼看清风险",tab_e:"街区驱逐",tab_r:"街区租金",tab_n:"311",not_official:"独立项目，并非旧金山市县政府的服务。",map_title:"浏览地图",nav_map:"地图",map_by_nh:"按社区",map_by_blk:"按街区",map_by_par:"按建筑",map_by_face:"按街区",map_hint_nh:"点击社区放大",map_hint_blk:"点击街区查看建筑",map_hint_par:"点击建筑查看报告",map_zoom_in:"放大以选择建筑",map_loading:"正在加载数据…",map_error:"市政数据暂无响应。",map_off:"此设备无法显示地图，仍可按地址搜索。",see_report:"查看完整报告",no_address:"此地块没有门牌地址。",map_on_block:"在此街区",coop_win:"按住 Ctrl 并滚动以缩放地图",coop_mac:"按住 ⌘ 并滚动以缩放地图",coop_mobile:"用两根手指移动地图",nav_lease:"租约",lease_title:"检查你的租约",l4t:"找出可能违反旧金山租房规定的条款",lease_link:"检查租约",lease_pick:"选择租约文件",lease_hint:"或拖放到此处 · PDF 或照片 · 最大 10 MB",lease_sample:"用示例租约试试",lease_privacy:"Mistral OCR 读取你的文件，我们不会保存。",lease_reading:"正在读取租约…",lease_wait:"通常需要约 10 秒。",lease_found:"{n} 条条款需要查看",lease_found_1:"1 条条款需要查看",lease_none:"未发现问题条款",lease_none_sub:"这并不代表租约没有问题。请再次阅读或咨询租客顾问。",lease_again:"检查其他租约",lease_err:"无法分析此租约。",lease_type:"请上传 PDF、PNG、JPEG 或 WEBP 文件。",lease_big:"文件过大（最大 10 MB）。",lease_fake:"示例结果：分析暂不可用，这些条款并非来自你的租约。",sev_high:"高",sev_medium:"中",sev_low:"低",mock_bar:"模拟模式：示例数据，并非真实记录"},
+fr:{map_close:"Fermer la carte",search_ph:"Entrez une adresse à San Francisco",search:"Rechercher",try:"Essayez :",hero_title:"Connaissez l'immeuble avant de signer.",l1t:"Plaintes, infractions, permis",l2t:"Ce que disent les locataires",l3t:"Contacter un locataire, trouver un coloc",
 loading:"Recherche de",step1:"Localisation de la parcelle",step2:"Récupération des registres de la ville",step3:"Collecte des avis de locataires",step4:"Mistral rédige votre rapport",err_title:"Impossible de charger cette adresse",err_nf:"Vérifiez le numéro et la rue, par exemple 777 Bay St.",err_net:"Le service ne répond pas. Réessayez dans un instant.",retry:"Réessayer",
 nav_report:"Rapport",nav_city:"Registres",nav_voices:"Avis",nav_people:"Personnes",district:"District",parcel:"Parcelle",green:"Peu de signaux d'alerte",orange:"À regarder de près",red:"Alertes sérieuses",ai_note:"Résumé IA par Mistral",no_report:"Le rapport IA est indisponible pour le moment. Les registres de la ville restent consultables.",sig_tenant:"Avis de locataires",sig_city:"Registre de la ville",questions:"Questions à poser au propriétaire",copy:"Copier",copied:"Questions copiées",disclaimer:"Ceci n'est pas un conseil juridique. Vérifiez les points importants auprès de la ville ou d'un conseiller pour locataires.",
 profile:"Profil de l'immeuble",built:"Construit en",units:"Logements",stories:"Étages",last_sale:"Dernière vente",unknown:"Inconnu",rc_yes:"Probablement sous contrôle des loyers · à confirmer auprès du Rent Board",rc_no:"Probablement pas sous contrôle des loyers · à confirmer auprès du Rent Board",rc_unknown:"Contrôle des loyers inconnu.",
@@ -411,7 +449,7 @@ ppl_sub:"Pseudonymes uniquement. Ni e-mail ni téléphone.",ppl_tenants:"Demande
 role_current_tenant:"Locataire actuel",role_former_tenant:"Ancien locataire",role_seeking_roommate:"Cherche une chambre",role_has_room:"A une chambre",budget:"Budget",move_in:"Emménagement",sch_early:"lève-tôt",sch_late:"couche-tard",sch_flexible:"horaires flexibles",clean:"rangement",g_rarely:"rarement des invités",g_sometimes:"parfois des invités",g_often:"souvent des invités",smoker:"fumeur",nonsmoker:"non-fumeur",pets:"animaux",nopets:"pas d'animaux",
 f_review_title:"Écrire un avis",f_pseudo:"Pseudonyme",f_pseudo_h:"N'utilisez pas votre vrai nom.",f_start:"Arrivée",f_end:"Départ",f_still:"J'habite encore ici",f_ratings:"Notez de 1 (mauvais) à 5 (excellent)",f_text:"Votre avis",f_text_h:"Les noms et coordonnées sont retirés. Le harcèlement et les propos discriminatoires sont rejetés.",f_proof:"Preuve d'occupation (facultatif)",f_proof_h:"Un bail ou une facture donne le badge Vérifié.",f_privacy:"Votre document est lu en mémoire, jamais stocké.",f_cancel:"Annuler",f_publish:"Envoyer l'avis",f_checking:"Vérification…",f_rate_err:"Notez les cinq catégories.",pub_ok:"Votre avis est publié.",pub_ver:"Votre avis est publié avec le badge Vérifié.",rejected:"Votre avis n'a pas été publié :",
 f_profile_title:"Créer votre profil",f_role:"Je suis…",f_nhood:"Quartier",f_bmin:"Budget min ($/mois)",f_bmax:"Budget max ($/mois)",f_bio:"Courte présentation",f_bio_h:"N'indiquez ni e-mail, ni téléphone, ni nom complet.",f_sched:"Rythme",f_cleanl:"Rangement (1–5)",f_guests:"Invités",f_smoke:"Je fume",f_pets:"J'ai des animaux",f_open:"Les autres utilisateurs peuvent m'envoyer des demandes",f_create:"Créer le profil",f_sched_early:"Tôt",f_sched_late:"Tard",f_sched_flexible:"Flexible",f_g_rarely:"Rarement",f_g_sometimes:"Parfois",f_g_often:"Souvent",prof_ok:"Profil créé.",
-f_contact_title:"Envoyer une demande à {p}",f_msg:"Message",f_msg_h:"Ne partagez ici ni e-mail ni téléphone.",f_send:"Envoyer la demande",contact_first:"Créez d'abord un profil pour qu'on sache qui demande.",contact_ok:"Votre demande a été envoyée.",generic_err:"Une erreur s'est produite. Réessayez.",l0t:"Les risques en un coup d'œil",tab_e:"Évictions du bloc",tab_r:"Loyers du bloc",tab_n:"311",not_official:"Projet indépendant. Ce n'est pas un service de la Ville et du Comté de San Francisco.",map_title:"Explorer la carte",nav_map:"Carte",map_by_nh:"par quartier",map_by_blk:"par bloc",map_by_par:"par immeuble",map_by_face:"par bloc de rue",map_hint_nh:"Cliquez sur un quartier pour zoomer",map_hint_blk:"Cliquez sur un bloc pour voir ses immeubles",map_hint_par:"Cliquez sur un immeuble pour voir son rapport",map_zoom_in:"Zoomez pour choisir un immeuble",map_loading:"Chargement des données…",map_error:"Les données de la ville ne répondent pas.",map_off:"La carte ne peut pas s'afficher sur cet appareil. La recherche par adresse reste possible.",see_report:"Voir le rapport complet",no_address:"Pas d'adresse sur cette parcelle.",map_on_block:"sur ce bloc",coop_win:"Ctrl + molette pour zoomer sur la carte",coop_mac:"⌘ + molette pour zoomer sur la carte",coop_mobile:"Utilisez deux doigts pour déplacer la carte",mock_bar:"MODE MOCK : données d'exemple, pas de vrais registres"}
+f_contact_title:"Envoyer une demande à {p}",f_msg:"Message",f_msg_h:"Ne partagez ici ni e-mail ni téléphone.",f_send:"Envoyer la demande",contact_first:"Créez d'abord un profil pour qu'on sache qui demande.",contact_ok:"Votre demande a été envoyée.",generic_err:"Une erreur s'est produite. Réessayez.",l0t:"Les risques en un coup d'œil",tab_e:"Évictions du bloc",tab_r:"Loyers du bloc",tab_n:"311",not_official:"Projet indépendant. Ce n'est pas un service de la Ville et du Comté de San Francisco.",map_title:"Explorer la carte",nav_map:"Carte",map_by_nh:"par quartier",map_by_blk:"par bloc",map_by_par:"par immeuble",map_by_face:"par bloc de rue",map_hint_nh:"Cliquez sur un quartier pour zoomer",map_hint_blk:"Cliquez sur un bloc pour voir ses immeubles",map_hint_par:"Cliquez sur un immeuble pour voir son rapport",map_zoom_in:"Zoomez pour choisir un immeuble",map_loading:"Chargement des données…",map_error:"Les données de la ville ne répondent pas.",map_off:"La carte ne peut pas s'afficher sur cet appareil. La recherche par adresse reste possible.",see_report:"Voir le rapport complet",no_address:"Pas d'adresse sur cette parcelle.",map_on_block:"sur ce bloc",coop_win:"Ctrl + molette pour zoomer sur la carte",coop_mac:"⌘ + molette pour zoomer sur la carte",coop_mobile:"Utilisez deux doigts pour déplacer la carte",nav_lease:"Bail",lease_title:"Vérifier votre bail",l4t:"Repérer les clauses contraires aux règles de SF",lease_link:"Vérifier un bail",lease_pick:"Choisir votre bail",lease_hint:"ou déposez-le ici · PDF ou photo · 10 Mo max",lease_sample:"Essayer avec un bail d'exemple",lease_privacy:"Mistral OCR lit votre fichier. Nous ne le conservons pas.",lease_reading:"Lecture de votre bail…",lease_wait:"Cela prend environ 10 secondes.",lease_found:"{n} clauses à vérifier",lease_found_1:"1 clause à vérifier",lease_none:"Aucune clause signalée",lease_none_sub:"Cela ne prouve pas que le bail est sans problème. Relisez-le ou demandez à un conseiller pour locataires.",lease_again:"Vérifier un autre bail",lease_err:"Impossible d'analyser ce bail.",lease_type:"Importez un fichier PDF, PNG, JPEG ou WEBP.",lease_big:"Ce fichier est trop lourd (10 Mo max).",lease_fake:"Résultat d'exemple : l'analyse est indisponible pour le moment. Ces clauses ne viennent pas de votre bail.",sev_high:"Élevé",sev_medium:"Moyen",sev_low:"Faible",mock_bar:"MODE MOCK : données d'exemple, pas de vrais registres"}
 };
 const LANGS = {en:"English",es:"Español",zh:"中文",fr:"Français"};
 const LOCALE = {en:"en-US",es:"es-US",zh:"zh-CN",fr:"fr-FR"};
@@ -420,7 +458,7 @@ const RATING_KEYS = ["overall","landlord_responsiveness","maintenance","noise","
 const EXAMPLES = ["777 Bay St","1400 Pine St"];
 const qs = new URLSearchParams(location.search);
 const MOCK = qs.has("mock");
-const SECTIONS = ["report","city","voices","people"];
+const SECTIONS = ["report","city","voices","people","lease"];
 const validSection = v=>SECTIONS.includes(v)?v:"report";
 
 /* =========================== state & helpers =========================== */
@@ -430,7 +468,7 @@ const store = {
 };
 const state = {
   lang: LANGS[qs.get("lang")] ? qs.get("lang") : (LANGS[store.get("kyb_lang")] ? store.get("kyb_lang") : "en"),
-  view:"landing", address:"", data:null, error:null, section:validSection(qs.get("tab")), mapOpen:false, tab:"c", showAll:{},
+  view:"landing", address:"", data:null, error:null, section:validSection(qs.get("tab")), mapOpen:false, lease:{status:"idle"}, tab:"c", showAll:{},
   profile:store.get("kyb_profile"), matches:null, sent:{}, pendingContact:null, reqId:0
 };
 const $ = (s,el=document)=>el.querySelector(s);
@@ -482,6 +520,14 @@ async function postProfile(p){
   if(MOCK) return {...p,id:"mock-me",verified:false,demo:false};
   return api("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
 }
+async function postLease(file){
+  if(MOCK){
+    await new Promise(r=>setTimeout(r,700));
+    return mockJson("lease.json");
+  }
+  const fd=new FormData(); fd.append("file",file);
+  return api("/api/lease",{method:"POST",body:fd});
+}
 const getMatches = id=>MOCK?mockJson("mock_roommates.json"):api(`/api/roommates?profile_id=${encodeURIComponent(id)}`);
 async function postContact(b){
   if(MOCK) return {ok:true};
@@ -524,10 +570,11 @@ const ICONS={
   city:icon(`<path d="M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18"/>`),
   voices:icon(`<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-5A8 8 0 1 1 21 12z"/>`),
   people:icon(`<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>`),
+  lease:icon(`<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 15l2 2 4-4"/>`),
   map:icon(`<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>`)
 };
 const chev=`<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
-const NAV_LABEL={report:"nav_report",city:"nav_city",voices:"nav_voices",people:"nav_people"};
+const NAV_LABEL={report:"nav_report",city:"nav_city",voices:"nav_voices",people:"nav_people",lease:"nav_lease"};
 function renderBar(){
   const inResult=state.view!=="landing";
   $("#mockbar").innerHTML=MOCK?`<div class="mockbar">${esc(t("mock_bar"))}</div>`:"";
@@ -563,7 +610,7 @@ function siteFooter(){
   return `<footer><div class="wrap">${esc(t("not_official"))}</div></footer>`;
 }
 function landing(){
-  const items=[["report","l0t"],["city","l1t"],["voices","l2t"],["people","l3t"]];
+  const items=[["report","l0t"],["city","l1t"],["voices","l2t"],["people","l3t"],["lease","l4t"]];
   return `<div class="hero-band">
       ${bridgeArt}
       <div class="wrap hero"><div class="hero-copy">
@@ -574,13 +621,17 @@ function landing(){
           <button>${esc(t("search"))}</button>
         </form>
         <div class="chips"><span class="muted small">${esc(t("try"))}</span>${EXAMPLES.map(a=>`<button class="chip-btn" data-a="example" data-v="${esc(a)}">${esc(a)}</button>`).join("")}</div>
+        <button class="lease-link" data-a="leaseopen">${ICONS.lease}<span>${esc(t("lease_link"))}</span></button>
       </div></div>
     </div>
     <section class="map-section" aria-labelledby="maptitle">
       <div class="wrap map-head"><h2 id="maptitle">${esc(t("map_title"))}</h2></div>
       <div class="map-slot" id="mapslot"></div>
     </section>
-    <div class="wrap"><div class="features">${items.map(([k,d])=>`<div class="feature t-${k}"><span class="fi">${ICONS[k]}</span><h2>${esc(t(NAV_LABEL[k]))}</h2><p>${esc(t(d))}</p></div>`).join("")}</div></div>
+    <div class="wrap"><div class="features">${items.map(([k,d])=>{
+      const inner=`<span class="fi">${ICONS[k]}</span><span class="ft">${esc(t(NAV_LABEL[k]))}</span><span class="fd">${esc(t(d))}</span>`;
+      return k==="lease"?`<button class="feature feature-btn t-lease" data-a="leaseopen">${inner}</button>`:`<div class="feature t-${k}">${inner}</div>`;
+    }).join("")}</div></div>
     ${siteFooter()}`;
 }
 function loadingView(){
@@ -770,6 +821,77 @@ function peopleInner(){
     </div>`;
 }
 
+/* =========================== lease tab =========================== */
+const LEASE_MAX_BYTES=10*1024*1024;
+const LEASE_ACCEPT=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp";
+const SEVERITY={high:{cls:"lv-red",mark:"✕"},medium:{cls:"lv-orange",mark:"!"},low:{cls:"lv-low",mark:"i"}};
+let leaseReq=0;
+const sevKey=s=>SEVERITY[s]?s:"medium";
+const sevPill=(s,label)=>`<span class="verdict ${SEVERITY[s].cls}"><span aria-hidden="true">${SEVERITY[s].mark}</span>${esc(label)}</span>`;
+function clauseHtml(c){
+  const s=sevKey(c.severity);
+  return `<article class="clause"><header>${sevPill(s,t("sev_"+s))}${c.rule_ref?`<span class="tag city">${esc(c.rule_ref)}</span>`:""}</header>
+    <h4>${esc(c.issue)}</h4>${c.text?`<blockquote>${esc(c.text)}</blockquote>`:""}</article>`;
+}
+function leaseInner(){
+  const l=state.lease;
+  if(l.status==="loading") return `<div class="lease-wait" role="status" aria-live="polite"><span class="spin" aria-hidden="true"></span><div><b>${esc(t("lease_reading"))}</b><p class="small muted">${esc(l.file)} · ${esc(t("lease_wait"))}</p></div></div>`;
+  if(l.status==="done"){
+    const order=["high","medium","low"], n=l.clauses.length;
+    const sorted=[...l.clauses].sort((a,b)=>order.indexOf(sevKey(a.severity))-order.indexOf(sevKey(b.severity)));
+    const counts=order.map(s=>[s,l.clauses.filter(c=>sevKey(c.severity)===s).length]).filter(([,v])=>v);
+    return `<div class="lease-done" aria-live="polite">
+      ${n?`<div class="lease-head"><h3>${esc(n===1?t("lease_found_1"):t("lease_found",{n}))}</h3><p class="lease-file">${esc(l.file)}</p></div>
+        <div class="lease-counts">${counts.map(([s,v])=>sevPill(s,`${v} · ${t("sev_"+s)}`)).join("")}</div>`
+      :`<div class="lease-ok"><span class="dot lv-green" aria-hidden="true">✓</span><div><b>${esc(t("lease_none"))}</b><p>${esc(t("lease_none_sub"))}</p><p class="lease-file">${esc(l.file)}</p></div></div>`}
+      ${l.fake?`<p class="lease-fake">${esc(t("lease_fake"))}</p>`:""}
+      ${n?`<div class="clauses">${sorted.map(clauseHtml).join("")}</div>`:""}
+      <p class="legal">${esc(t("disclaimer"))}</p>
+      <button class="btn ghost" data-a="leaseagain">${esc(t("lease_again"))}</button>
+    </div>`;
+  }
+  return `${l.error?`<div class="formerr" role="alert" style="margin:0 0 12px"><b style="font-weight:500">${esc(t("lease_err"))}</b> ${esc(l.error)}</div>`:""}
+    <label class="lease-drop"><input type="file" accept="${LEASE_ACCEPT}" data-c="leasefile" aria-label="${esc(t("lease_pick"))}">
+      <span class="fi">${ICONS.lease}</span><b>${esc(t("lease_pick"))}</b><small>${esc(t("lease_hint"))}</small></label>
+    <div class="lease-foot"><span>${esc(t("lease_privacy"))}</span><button class="link" data-a="leasesample">${esc(t("lease_sample"))}</button></div>`;
+}
+function leasePanel(){return `<div class="lease-inner">${leaseInner()}</div>`}
+function renderLease(){document.querySelectorAll(".lease-inner").forEach(el=>{el.innerHTML=leaseInner()})}
+async function analyzeLease(file){
+  if(!file) return;
+  const okType=/^(application\/pdf|image\/(png|jpeg|webp))$/.test(file.type)||/\.(pdf|png|jpe?g|webp)$/i.test(file.name);
+  if(!okType||file.size>LEASE_MAX_BYTES){
+    leaseReq++;
+    state.lease={status:"idle",error:t(okType?"lease_big":"lease_type")};
+    renderLease();
+    return;
+  }
+  const id=++leaseReq;
+  state.lease={status:"loading",file:file.name};
+  renderLease();
+  try{
+    const res=await postLease(file);
+    if(id!==leaseReq) return;
+    const clauses=Array.isArray(res&&res.clauses)?res.clauses:[];
+    state.lease=res&&res.error&&!clauses.length?{status:"idle",error:res.error}:{status:"done",file:file.name,clauses,fake:!!(res&&res._mock)};
+  }catch(e){
+    if(id!==leaseReq) return;
+    state.lease={status:"idle",error:errMsg(e)};
+  }
+  renderLease();
+}
+async function tryLeaseSample(){
+  try{
+    const r=await fetch("samples/demo_lease_bad_clauses.pdf");
+    if(!r.ok) throw new Error(r.status);
+    const blob=await r.blob();
+    analyzeLease(new File([blob],"demo_lease_bad_clauses.pdf",{type:"application/pdf"}));
+  }catch(e){
+    state.lease={status:"idle",error:t("generic_err")};
+    renderLease();
+  }
+}
+
 /* =========================== results shell =========================== */
 function resultsView(){
   const b=state.data.building;
@@ -780,15 +902,15 @@ function resultsView(){
     </div></div>
     <nav class="mainnav" aria-label="Sections"><div class="wrap">
       ${SECTIONS.map(k=>`<button class="t-${k}" data-a="nav" data-v="${k}"${k===state.section?` aria-current="page"`:""}>${ICONS[k]}<span>${esc(t(NAV_LABEL[k]))}</span></button>`).join("")}
-      <button class="nav-map t-map" data-a="mapopen">${ICONS.map}<span>${esc(t("nav_map"))}</span></button>
     </div></nav>
+    <button class="map-fab" data-a="mapopen">${ICONS.map}<span>${esc(t("nav_map"))}</span></button>
     <div id="panel" class="wrap panel"></div>
     ${siteFooter()}`;
 }
 function renderPanel(){
   const el=$("#panel"); if(!el||!state.data) return;
   const k=state.section;
-  el.innerHTML=k==="city"?cityPanel():k==="voices"?voicesPanel():k==="people"?`<div id="peopleInner">${peopleInner()}</div>`:reportPanel();
+  el.innerHTML=k==="city"?cityPanel():k==="voices"?voicesPanel():k==="people"?`<div id="peopleInner">${peopleInner()}</div>`:k==="lease"?leasePanel():reportPanel();
   showSelectedSubtab();
 }
 function showSelectedSubtab(){
@@ -797,9 +919,10 @@ function showSelectedSubtab(){
 }
 function syncNav(){
   document.querySelectorAll(".mainnav button").forEach(b=>{
-    const on=state.mapOpen?b.dataset.a==="mapopen":b.dataset.v===state.section;
-    if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
+    if(!state.mapOpen&&b.dataset.v===state.section) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
   });
+  const fab=$(".map-fab");
+  if(fab) fab.innerHTML=state.mapOpen?`<span aria-hidden="true">×</span><span>${esc(t("map_close"))}</span>`:`${ICONS.map}<span>${esc(t("nav_map"))}</span>`;
   document.body.classList.toggle("map-open",state.mapOpen);
   if(state.mapOpen) MapView.resize();
 }
@@ -1502,7 +1625,10 @@ document.addEventListener("click",e=>{
   else if(a==="example") load(v);
   else if(a==="retry") load(state.address);
   else if(a==="nav") showSection(v);
-  else if(a==="mapopen"){state.mapOpen=true;syncNav()}
+  else if(a==="mapopen"){state.mapOpen=!state.mapOpen;syncNav()}
+  else if(a==="leaseopen"){openDlg(`<h2>${esc(t("lease_title"))}</h2><div class="lease-inner" style="margin-top:14px">${leaseInner()}</div>`)}
+  else if(a==="leasesample") tryLeaseSample();
+  else if(a==="leaseagain"){leaseReq++;state.lease={status:"idle"};renderLease()}
   else if(a==="metric") MapView.setMetric(v);
   else if(a==="mapretry") MapView.retry();
   else if(a==="pick") load(v,{point:{lat:+el.dataset.lat,lon:+el.dataset.lon,blklot:el.dataset.b}});
@@ -1524,6 +1650,8 @@ document.addEventListener("change",e=>{
   if(el.id==="lang"){
     state.lang=el.value; store.set("kyb_lang",state.lang);
     if(state.address) load(state.address); else {pushUrl();render()}
+  } else if(el.dataset.c==="leasefile"){
+    analyzeLease(el.files[0]);
   } else if(el.dataset.c==="still"){
     const end=el.form.elements.period_end; end.disabled=el.checked; if(el.checked) end.value="";
   } else if(el.dataset.c==="role"){
@@ -1531,6 +1659,10 @@ document.addEventListener("change",e=>{
     $("[data-roommate]",el.form).hidden=!rm;
   }
 });
+const dropZone=e=>e.target&&e.target.closest?e.target.closest(".lease-drop"):null;
+["dragenter","dragover"].forEach(n=>document.addEventListener(n,e=>{const z=dropZone(e);if(z){e.preventDefault();z.classList.add("over")}}));
+document.addEventListener("dragleave",e=>{const z=dropZone(e);if(z)z.classList.remove("over")});
+document.addEventListener("drop",e=>{const z=dropZone(e);if(z){e.preventDefault();z.classList.remove("over");analyzeLease(e.dataTransfer.files[0])}});
 dlg.addEventListener("click",e=>{ if(e.target===dlg){state.pendingContact=null;dlg.close()} });
 window.addEventListener("popstate",()=>{
   const q=new URLSearchParams(location.search), a=q.get("address");
