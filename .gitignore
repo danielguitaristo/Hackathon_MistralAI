@@ -2,3 +2,10 @@
 community.db
 __pycache__/
 .venv/
+.env.*
+!.env.example
+node_modules/
+*.pyc
+.next/
+dist/
+.DS_Store
