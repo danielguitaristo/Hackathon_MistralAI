@@ -3,4 +3,5 @@ uvicorn[standard]>=0.29
 python-multipart>=0.0.9
 python-dotenv>=1.0
 requests>=2.31
-mistralai>=1.0
+mistralai>=3.7,<4
+elasticsearch>=8.13,<9

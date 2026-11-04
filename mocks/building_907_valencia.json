@@ -1,0 +1,233 @@
+{
+  "address": {
+    "normalized": "907 VALENCIA ST, SAN FRANCISCO, CA",
+    "block": "3609",
+    "lot": "042",
+    "lat": 37.75834293024844,
+    "lon": -122.42109638325194,
+    "blklot": "3609042",
+    "neighborhood": "Mission"
+  },
+  "property": {
+    "year_built": 1908,
+    "units": 28,
+    "use": "Multi-Family Residential",
+    "zoning": "VALEN",
+    "likely_rent_controlled": true
+  },
+  "evictions": {
+    "total": 33,
+    "last_5y": 30,
+    "by_cause": {
+      "capital_improvement": 26,
+      "breach": 5,
+      "access_denial": 1,
+      "other_cause": 1,
+      "unapproved_subtenant": 1
+    },
+    "recent": [
+      {
+        "date": "2025-08-25",
+        "cause": "breach"
+      },
+      {
+        "date": "2025-08-13",
+        "cause": "breach"
+      },
+      {
+        "date": "2025-08-13",
+        "cause": "breach"
+      },
+      {
+        "date": "2025-08-11",
+        "cause": "breach"
+      },
+      {
+        "date": "2025-04-28",
+        "cause": "capital_improvement"
+      }
+    ],
+    "scope": "street_block"
+  },
+  "dbi": {
+    "complaints_total": 36,
+    "complaints_open": 17,
+    "nov_total": 25,
+    "nov_open": 15,
+    "recent": [
+      {
+        "date": "2026-08-27",
+        "description": "Egress obstruction in hallway.",
+        "status": "open"
+      },
+      {
+        "date": "2026-06-22",
+        "description": "The storefront was observed to be an active construction site without a permit.",
+        "status": "open"
+      },
+      {
+        "date": "2026-03-25",
+        "description": "Complainant states there is renovation work being done on the 2 units next to his.",
+        "status": "open"
+      },
+      {
+        "date": "2026-01-27",
+        "description": "Damaged floor, damaged wall, window painted shut",
+        "status": "open"
+      },
+      {
+        "date": "2026-01-27",
+        "description": "Clogged and chipped bathtub.",
+        "status": "open"
+      },
+      {
+        "date": "2026-01-27",
+        "description": "Common area issues, smoke alarm chirping/low battery, garbage in light well, rodent infesation, unsanitary premises, and missing door threshold at # 21.",
+        "status": "open"
+      },
+      {
+        "date": "2026-01-27",
+        "description": "Broken floor in rear corner bedroom.",
+        "status": "open"
+      },
+      {
+        "date": "2026-01-27",
+        "description": "Broken glass window pane in kitchen.",
+        "status": "closed"
+      }
+    ]
+  },
+  "permits": {
+    "last_5y": 1,
+    "recent": [
+      {
+        "date": "2022-02-11",
+        "type": "otc alterations permit",
+        "description": "apt 9: relocate (e) kitchen to other side of wall. revision to pa#202110210901",
+        "cost": 1.0
+      },
+      {
+        "date": "2021-10-21",
+        "type": "otc alterations permit",
+        "description": "#24. kitchen and bath remodel. no structural/exterior work required. no change to wall layout. all work within unit. no fire alarm or sprinkler work required. unit 24 only.",
+        "cost": 30000.0
+      },
+      {
+        "date": "2021-10-21",
+        "type": "otc alterations permit",
+        "description": "#18. kitchen and bath remodel. no structural/exterior work required. no change to wall layout. all work within unit. no fire alarm or sprinkler work required. unit 18 only.",
+        "cost": 30000.0
+      },
+      {
+        "date": "2021-10-21",
+        "type": "otc alterations permit",
+        "description": "#9. kitchen and bath remodel. no structural/exterior work required. no change to wall layout. all work within unit. no fire alarm or sprinkler work required. unit 9 only.",
+        "cost": 30000.0
+      },
+      {
+        "date": "2019-11-12",
+        "type": "additions alterations or repairs",
+        "description": "change (e) commercial store to limited restaurant. including new lightings, fixtures, & hvac system installation.",
+        "cost": 60000.0
+      }
+    ]
+  },
+  "fire": {
+    "incidents_5y": 8,
+    "recent": [
+      {
+        "date": "2025-04-11",
+        "situation": "Alarm system activation, no fire - unintentional"
+      },
+      {
+        "date": "2025-02-10",
+        "situation": "Building fire"
+      },
+      {
+        "date": "2024-10-04",
+        "situation": "False alarm or false call, other"
+      },
+      {
+        "date": "2024-09-25",
+        "situation": "Alarm system sounded due to malfunction"
+      },
+      {
+        "date": "2024-06-01",
+        "situation": "Alarm system sounded due to malfunction"
+      }
+    ]
+  },
+  "311": {
+    "nearby_100m_12m": 1815,
+    "top_categories": {
+      "Street and Sidewalk Cleaning": 834,
+      "Graffiti Public": 317,
+      "Parking Enforcement": 187,
+      "Graffiti Private": 132,
+      "General Request": 126
+    },
+    "recent": [
+      {
+        "date": "2026-11-02",
+        "category": "Blocked Street and Sidewalk"
+      },
+      {
+        "date": "2026-11-02",
+        "category": "Street and Sidewalk Cleaning"
+      },
+      {
+        "date": "2026-11-02",
+        "category": "Graffiti Public"
+      },
+      {
+        "date": "2026-11-02",
+        "category": "Street and Sidewalk Cleaning"
+      },
+      {
+        "date": "2026-11-01",
+        "category": "Street and Sidewalk Cleaning"
+      }
+    ]
+  },
+  "neighborhood_benchmark": {
+    "radius_m": 500,
+    "years": 3,
+    "scope": "immeubles avec au moins une plainte DBI dans le rayon",
+    "buildings_compared": 319,
+    "this_building_complaints": 27,
+    "percentile": 99,
+    "median_neighbor": 2,
+    "worst_neighbors": [
+      {
+        "blklot": "3615031A",
+        "address": "604 CAPP ST",
+        "complaints": 82,
+        "open": 0
+      },
+      {
+        "blklot": "3609042",
+        "address": "907 VALENCIA ST",
+        "complaints": 27,
+        "open": 17
+      },
+      {
+        "blklot": "3589080",
+        "address": "174 LEXINGTON ST",
+        "complaints": 16,
+        "open": 14
+      },
+      {
+        "blklot": "3632001",
+        "address": "3415 22ND ST",
+        "complaints": 15,
+        "open": 3
+      },
+      {
+        "blklot": "3608032",
+        "address": "65 LIBERTY ST",
+        "complaints": 14,
+        "open": 0
+      }
+    ]
+  }
+}
