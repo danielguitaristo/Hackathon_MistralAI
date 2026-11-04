@@ -1,0 +1,6 @@
+{
+  "clauses": [
+    {"text": "Le loyer sera augmenté de 10% chaque année.", "issue": "Hausse annuelle supérieure au plafond autorisé pour un logement sous contrôle des loyers.", "severity": "high", "rule_ref": "SF Rent Ordinance §37.3"},
+    {"text": "Le locataire renonce à tout recours.", "issue": "Les droits du locataire ne peuvent pas être annulés par contrat.", "severity": "medium", "rule_ref": "SF Rent Ordinance §37.9"}
+  ]
+}

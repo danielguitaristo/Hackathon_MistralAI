@@ -1,0 +1,9 @@
+{
+  "address": {"normalized": "123 MAIN ST, SAN FRANCISCO, CA", "block": "3708", "lot": "001", "lat": 37.7749, "lon": -122.4194},
+  "property": {"year_built": 1925, "units": 12, "use": "Apartment", "zoning": "RM-2"},
+  "evictions": {"total": 9, "last_5y": 4, "by_cause": {"owner_move_in": 2, "ellis_act": 1, "nonpayment": 6}, "recent": [{"date": "2025-03-14", "cause": "ellis_act"}]},
+  "dbi": {"complaints_total": 14, "complaints_open": 2, "nov_total": 5, "nov_open": 1, "recent": [{"date": "2025-08-02", "description": "No heat in unit", "status": "open"}]},
+  "permits": {"last_5y": 6, "recent": [{"date": "2024-11-10", "type": "alterations", "description": "Kitchen remodel", "cost": 85000}]},
+  "fire": {"incidents_5y": 3, "recent": [{"date": "2024-06-21", "situation": "Alarm system activation"}]},
+  "311": {"nearby_100m_12m": 37, "top_categories": {"Street and Sidewalk Cleaning": 18, "Graffiti": 9}, "recent": [{"date": "2025-09-01", "category": "Graffiti"}]}
+}

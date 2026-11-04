@@ -1,0 +1,10 @@
+{
+  "risk_score": 68,
+  "risk_level": "high",
+  "headline": "Immeuble à risque : évictions fréquentes et plaintes de chauffage ouvertes",
+  "summary": "4 avis d'éviction ces 5 dernières années, dont une retrait Ellis. 2 plaintes DBI restent ouvertes.",
+  "red_flags": [
+    {"title": "Retrait Ellis Act", "detail": "1 avis d'éviction Ellis Act en 2025.", "source": "evictions"},
+    {"title": "Plaintes ouvertes", "detail": "2 plaintes DBI non résolues, dont absence de chauffage.", "source": "dbi"}
+  ]
+}
