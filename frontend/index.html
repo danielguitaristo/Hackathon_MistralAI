@@ -210,6 +210,10 @@ details.theme .inner { padding: 0 14px 14px; }
 .pin { width: 20px; height: 20px; background: var(--blue); border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0,119,204,.55); animation: pulse 2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,119,204,.5) } 70% { box-shadow: 0 0 0 16px rgba(0,119,204,0) } 100% { box-shadow: 0 0 0 0 rgba(0,119,204,0) } }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.mapbadge { width: 26px; height: 26px; display: grid; place-items: center; background: var(--blue); color: #fff; font: 700 14px var(--pixel); border: 2px solid #fff; box-shadow: 0 3px 10px rgba(0,119,204,.45); }
+.mapbadge.sm { width: 20px; height: 20px; font-size: 12px; border: 0; box-shadow: none; }
+.pricepin { transform: translate(-50%, -50%); display: inline-block; white-space: nowrap; padding: 4px 9px; border-radius: 999px; font: 700 12px var(--font); color: var(--blue);
+  background: var(--glass-solid); border: 1px solid var(--rim); box-shadow: 0 4px 14px rgba(16,28,63,.18); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); }
 table.cmp { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 table.cmp td, table.cmp th { padding: 8px 4px; text-align: center; border-top: 1px solid var(--hair); }
 table.cmp td:first-child { text-align: left; color: var(--muted); }
@@ -324,7 +328,17 @@ if (L.maplibreGL) {
 }
 const wide = () => innerWidth >= 900;
 const PAD = () => (wide() ? { paddingTopLeft: [430, 70], paddingBottomRight: [60, 100] } : { paddingTopLeft: [20, 120], paddingBottomRight: [20, 380] });
-map.fitBounds([[37.708, -122.515], [37.812, -122.357]], PAD());
+{ const sz = map.getSize(), p = PAD(); map.fitBounds([[37.708, -122.515], [37.812, -122.357]], sz.y - p.paddingTopLeft[1] - p.paddingBottomRight[1] > 120 ? p : {}); }
+// Zoom animé vers une zone, en gardant de la place pour le panneau. Si la fenêtre est trop petite
+// pour ces marges, on les réduit (sinon Leaflet calcule des coordonnées invalides).
+function flyBounds(bounds, extra = {}) {
+  if (!bounds || !bounds.isValid || !bounds.isValid()) return;
+  map.stop();
+  const o = { ...PAD(), duration: 1, ...extra }, size = map.getSize();
+  const px = o.paddingTopLeft[0] + o.paddingBottomRight[0], py = o.paddingTopLeft[1] + o.paddingBottomRight[1];
+  if (size.x - px < 120 || size.y - py < 120) { o.paddingTopLeft = [10, 10]; o.paddingBottomRight = [10, 10]; }
+  map.flyToBounds(bounds, o);
+}
 let hoodLayer = null, buildingMarker = null;
 const worksLayer = L.layerGroup().addTo(map), shopsLayer = L.layerGroup().addTo(map), crimePts = L.layerGroup().addTo(map), routeLayer = L.layerGroup().addTo(map);
 
@@ -370,7 +384,7 @@ async function loadHoods() {
 function restyle() { if (hoodLayer) hoodLayer.setStyle(hoodStyle); renderLayers(); }
 function focusHood(n) {
   if (!hoodLayer) return;
-  hoodLayer.eachLayer(l => { if (l.feature.properties.nhood === n) { map.flyToBounds(l.getBounds(), { ...PAD(), duration: .9 }); setTimeout(() => l.openPopup(), 950); } });
+  hoodLayer.eachLayer(l => { if (l.feature.properties.nhood === n) { flyBounds(l.getBounds(), { duration: .9 }); setTimeout(() => l.openPopup(), 950); } });
   collapseMobile();
 }
 async function loadWorks() {
@@ -445,10 +459,10 @@ function bindAddr() { document.querySelectorAll('[data-addr]').forEach(b => b.on
 /* =====================================================================
    7) EXPLORER
    ===================================================================== */
-function ranking(budget, f = 1) {
-  const cr = rankOf(S.crime), rr = rankOf(S.rent);
+function ranking(budget, f = 1, prio) {
+  const cr = rankOf(S.crime), rr = rankOf(S.rent), w = prio === 'safety' ? .85 : prio === 'price' ? .3 : .6;
   return Object.keys(S.rent).map(n => { const c = cr(S.crime[n]) ?? .5, p = rr(S.rent[n]) ?? .5, rent = S.rent[n] * f;
-    return { n, rent, c, fits: rent <= budget, score: (1 - c) * .6 + (1 - p) * .4 }; }).sort((a, b) => (b.fits - a.fits) || (b.score - a.score));
+    return { n, rent, c, fits: rent <= budget, score: (1 - c) * w + (1 - p) * (1 - w) }; }).sort((a, b) => (b.fits - a.fits) || (b.score - a.score));
 }
 function vExplore() {
   const head = `${pixline()}<h1>${tr('Where could you live?', 'Où pourrais-tu vivre ?')}</h1>`;
@@ -487,7 +501,7 @@ async function search() {
       buildingTab: 'report', lease: null, letter: null, commute: null, open: {} });
     routeLayer.clearLayers();
     const f = followed(); if (f) { f.diff = diffOf(snap(res.building), f.snap); saveFollow(); }
-    S.bench = null; placeBuilding(); render(); loadSafety(); loadBench(q);
+    S.bench = null; chatLayer.clearLayers(); placeBuilding(); render(); loadSafety(); loadBench(q);
   } catch (e) {
     $('body').innerHTML = `${pixline()}<h1>${esc(q)}</h1><div class="err">${esc(e.status === 404 ? tr('Address not found in San Francisco.', 'Adresse introuvable à San Francisco.') : errMsg(e))}</div>`;
   } finally { clearInterval(tm); $('goBtn').disabled = false; }
@@ -763,7 +777,7 @@ async function runCommute(dest) {
     routeLayer.clearLayers();
     const line = L.geoJSON(rt.geometry, { style: { color: '#0077CC', weight: 5, opacity: .9 } }).addTo(routeLayer);
     L.circleMarker(to, { radius: 7, color: '#fff', weight: 3, fillColor: '#F04E98', fillOpacity: 1 }).bindPopup(esc(g[0].display_name.split(',')[0])).addTo(routeLayer);
-    map.flyToBounds(line.getBounds(), { ...PAD(), duration: .9 }); render();
+    flyBounds(line.getBounds(), { duration: .9 }); render();
   } catch (e) { $('commuteOut').innerHTML = `<div class="err">${esc(e.message || errMsg(e))}</div>`; }
 }
 
@@ -804,72 +818,155 @@ function bindLetter() {
 /* =====================================================================
    13) ASSISTANT
    POST /api/chat (si Personne 2 l'ajoute) : { messages, lang, slots } -> { reply, slots?, neighborhoods?, listings? }
-   Sinon : agent local qui pose les questions manquantes puis s'appuie sur les loyers et la sécurité réels.
+   Sinon : agent local. Il répond dès qu'il connaît le budget, montre le résultat sur la carte,
+   puis pose la question suivante pour affiner (quartier, nombre de personnes, durée).
    ===================================================================== */
+const chatLayer = L.layerGroup().addTo(map);
+// Annonces de démonstration (les 3 premières sont les adresses réelles de la démo)
 const LISTINGS = [
-  { title: 'Sunny 1BR near Valencia', hood: 'Mission', rent: 3150, beds: 1, address: '907 Valencia St' },
-  { title: '2BR with bay windows', hood: 'Pacific Heights', rent: 5200, beds: 2, address: '2288 Broadway' },
-  { title: 'Quiet 2BR, garden access', hood: 'Bernal Heights', rent: 3900, beds: 2, address: '3033 Cesar Chavez St' },
+  { title: 'Sunny 1BR near Valencia', hood: 'Mission', rent: 3150, beds: 1, address: '907 Valencia St', lat: 37.7583, lon: -122.4211 },
+  { title: '2BR with bay windows', hood: 'Pacific Heights', rent: 5200, beds: 2, address: '2288 Broadway', lat: 37.7946, lon: -122.4335 },
+  { title: 'Quiet 2BR, garden access', hood: 'Bernal Heights', rent: 3900, beds: 2, address: '3033 Cesar Chavez St', lat: 37.7481, lon: -122.4139 },
   { title: 'Studio near Golden Gate Park', hood: 'Inner Sunset', rent: 2100, beds: 0 },
-  { title: '3BR flat, great for roommates', hood: 'Outer Richmond', rent: 4600, beds: 3 },
+  { title: '3BR flat for roommates', hood: 'Outer Richmond', rent: 4600, beds: 3 },
   { title: '1BR close to Muni', hood: 'Excelsior', rent: 2200, beds: 1 },
-  { title: 'Bright 2BR, parking', hood: 'Sunset/Parkside', rent: 3400, beds: 2 },
+  { title: 'Bright 2BR with parking', hood: 'Sunset/Parkside', rent: 3400, beds: 2 },
   { title: '1BR, walk to BART', hood: 'Glen Park', rent: 2750, beds: 1 },
+  { title: 'Room in a 3BR flat', hood: 'Mission', rent: 1450, beds: 'room' },
+  { title: 'Room near USF', hood: 'Lone Mountain/USF', rent: 1350, beds: 'room' },
+  { title: 'Room in a quiet house', hood: 'Excelsior', rent: 1100, beds: 'room' },
+  { title: 'Room, 2 min from N-Judah', hood: 'Inner Sunset', rent: 1300, beds: 'room' },
+  { title: 'Studio in SoMa', hood: 'South of Market', rent: 2400, beds: 0 },
+  { title: 'Modern 1BR', hood: 'Mission Bay', rent: 3500, beds: 1 },
+  { title: '2BR Victorian', hood: 'Haight Ashbury', rent: 4200, beds: 2 },
+  { title: '1BR near Dolores Park', hood: 'Castro/Upper Market', rent: 3100, beds: 1 },
+  { title: '2BR on a family street', hood: 'Outer Mission', rent: 3000, beds: 2 },
+  { title: '1BR with a view', hood: 'Potrero Hill', rent: 3300, beds: 1 },
+  { title: 'Studio in North Beach', hood: 'North Beach', rent: 2300, beds: 0 },
+  { title: '2BR near Stern Grove', hood: 'West of Twin Peaks', rent: 3600, beds: 2 },
+  { title: '1BR in Noe Valley', hood: 'Noe Valley', rent: 3200, beds: 1 },
+  { title: '2BR, quiet block', hood: 'Visitacion Valley', rent: 2600, beds: 2 },
 ];
-const ALIASES = { soma: 'South of Market', fidi: 'Financial District/South Beach', castro: 'Castro/Upper Market', noe: 'Noe Valley', haight: 'Haight Ashbury', richmond: 'Inner Richmond',
-  sunset: 'Sunset/Parkside', marina: 'Marina', dogpatch: 'Potrero Hill', bernal: 'Bernal Heights', 'pac heights': 'Pacific Heights', 'north beach': 'North Beach', mission: 'Mission' };
+const ALIASES = { soma: 'South of Market', fidi: 'Financial District/South Beach', downtown: 'Financial District/South Beach', castro: 'Castro/Upper Market', dolores: 'Castro/Upper Market',
+  noe: 'Noe Valley', haight: 'Haight Ashbury', richmond: 'Inner Richmond', sunset: 'Sunset/Parkside', marina: 'Marina', dogpatch: 'Potrero Hill', potrero: 'Potrero Hill', bernal: 'Bernal Heights',
+  'pac heights': 'Pacific Heights', hayes: 'Hayes Valley', nopa: 'Western Addition', tenderloin: 'Tenderloin', bayview: 'Bayview Hunters Point', usf: 'Lone Mountain/USF', mission: 'Mission' };
 const BEDF = { 0: .8, 1: 1, 2: 1.45, 3: 1.9, 4: 2.3 };
+const ROOMF = 0.6;      // une chambre en colocation ≈ 60 % d'un 1 chambre
+
 function extract(text) {
-  const t = text.toLowerCase(), o = {};
-  const hit = Object.keys(S.rent).sort((a, b) => b.length - a.length).find(n => t.includes(n.toLowerCase())) || Object.entries(ALIASES).find(([k]) => t.includes(k))?.[1];
+  const t = text.toLowerCase().replace(/(\d)[\s ,.](\d{3})\b/g, '$1$2'), o = {};   // "3 000" ou "3,000" -> "3000"
+  const names = (S.hoods ? S.hoods.features.map(f => f.properties.nhood) : Object.keys(S.rent)).sort((a, b) => b.length - a.length);
+  const hit = names.find(n => t.includes(n.toLowerCase())) || Object.entries(ALIASES).find(([k]) => new RegExp(`\\b${k}\\b`).test(t))?.[1];
   if (hit) o.area = hit;
-  if (/anywhere|peu importe|n'importe|partout|no preference/.test(t)) o.area = 'any';
-  const m = t.match(/\$\s?(\d[\d,.]*)\s?(k)?|(\d[\d,.]*)\s?(k|\$|usd|dollars|€)/);
-  if (m) { let v = parseFloat((m[1] || m[3]).replace(/,/g, '')); if ((m[2] || m[4]) === 'k') v *= 1000; if (v >= 300) o.budget = v; }
-  const p = t.match(/(\d+)\s*(personnes?|people|persons|roommates?|colocs?|adults?|adultes?)/); if (p) o.people = +p[1];
-  if (/\b(alone|just me|seul|seule|solo)\b/.test(t)) o.people = 1; if (/\bcouple\b/.test(t)) o.people = 2;
-  const d = t.match(/(\d+)\s*(mois|months?|ans?|years?)\b/); if (d) o.months = /an|year/.test(d[2]) ? +d[1] * 12 : +d[1];
-  if (/studio/.test(t)) o.beds = 0; const b = t.match(/(\d)\s*(br|bed|bedrooms?|chambres?)/); if (b) o.beds = +b[1];
-  const bare = t.match(/^\s*\$?(\d[\d,.]*)\s*(k)?\s*$/);
-  if (bare && S.lastAsked) { let v = parseFloat(bare[1].replace(/,/g, '')); if (bare[2]) v *= 1000; if (['budget', 'people', 'months'].includes(S.lastAsked)) o[S.lastAsked] = v; }
+  if (/anywhere|peu importe|n'importe|n’importe|partout|no preference|pas de préférence/.test(t)) o.area = 'any';
+  // budget : le premier nombre "d'argent" (>= 500, ou avec k / $ / €), qui n'est pas une durée ni un nombre de personnes
+  for (const m of t.matchAll(/\$?\s?(\d+(?:\.\d+)?)\s*(k\b)?/g)) {
+    const after = t.slice(m.index + m[0].length, m.index + m[0].length + 14);
+    if (/^\s*(mois|months?|ans?\b|years?|personnes?|people|persons?|chambres?|bed|br\b|rooms?|colocs?|roommates?|min|minutes?|km|%)/.test(after)) continue;
+    let v = parseFloat(m[1]); if (m[2]) v *= 1000;
+    if (v >= 500 && v <= 30000) { o.budget = v; break; }
+  }
+  const p = t.match(/(\d+)\s*(personnes?|people|persons?|adultes?|adults?)/); if (p) o.people = +p[1];
+  if (/\b(alone|just me|seul|seule|solo)\b/.test(t)) o.people = 1;
+  if (/\bcouple\b|ma copine|mon copain|ma femme|mon mari|my (girlfriend|boyfriend|partner|wife|husband)|partenaire/.test(t)) o.people = 2;
+  const d = t.match(/(\d+)\s*(mois|months?|ans?\b|years?)/); if (d) o.months = /an|year/.test(d[2]) ? +d[1] * 12 : +d[1];
+  if (/studio/.test(t)) o.beds = 0;
+  const b = t.match(/(\d)\s*(chambres?|bedrooms?|br\b|bd\b|beds?\b)/); if (b) o.beds = +b[1];
+  if (/coloc|colocation|roommate|flatshare|shared|une chambre\b|a room\b/.test(t) && !b) o.beds = 'room';
+  if (/s[ûu]r|safe|s[ée]curi|calme|quiet/.test(t)) o.priority = 'safety';
+  if (/pas cher|cheap|abordable|affordable|moins cher/.test(t)) o.priority = 'price';
+  // réponse courte à la dernière question
+  const bare = t.match(/^\s*\$?(\d+(?:\.\d+)?)\s*(k)?\s*\$?\s*$/);
+  if (bare && S.lastAsked && ['budget', 'people', 'months'].includes(S.lastAsked)) { let v = parseFloat(bare[1]); if (bare[2]) v *= 1000; o[S.lastAsked] = v; }
   return o;
 }
 const ASK = {
-  area: () => tr('Which neighborhood are you looking in? (or “anywhere”)', 'Dans quel quartier cherches-tu ? (ou « peu importe »)'),
+  area: () => tr('Any neighborhood in mind? (or “anywhere”)', 'Un quartier en tête ? (ou « peu importe »)'),
   budget: () => tr('What’s your maximum monthly rent?', 'Quel est ton loyer maximum par mois ?'),
   people: () => tr('How many people will live there?', 'Combien de personnes vont y vivre ?'),
   months: () => tr('How long do you plan to stay? (e.g. 6 months, 2 years)', 'Combien de temps comptes-tu rester ? (ex. 6 mois, 2 ans)'),
 };
-function localAgent() {
+const ADDR_RE = /\b\d{1,5}\s+[a-z0-9 .'-]{2,30}?\s(st|street|ave|avenue|blvd|boulevard|way|rd|road|dr|drive|ter|terrace|pl|place|ln|lane)\b\.?/i;
+
+function localAgent(text) {
   const s = S.slots;
-  for (const k of ['area', 'budget', 'people', 'months']) if (s[k] == null) { S.lastAsked = k; return { text: ASK[k]() }; }
+  const addr = text.match(ADDR_RE);
+  if (addr) return { text: tr(`Opening the full report for ${addr[0]}…`, `J’ouvre le rapport complet de ${addr[0]}…`), openAddress: addr[0] };
+  if (s.budget == null) {
+    S.lastAsked = 'budget';
+    const pre = s.area && s.area !== 'any' ? tr(`${s.area}, got it — it’s outlined on the map. `, `${s.area}, c’est noté : je l’entoure sur la carte. `) : '';
+    return { text: pre + ASK.budget(), hoods: s.area && s.area !== 'any' ? [s.area] : [] };
+  }
   S.lastAsked = null;
-  const beds = s.beds ?? Math.max(1, s.people || 1), f = BEDF[Math.min(4, beds)];
-  let rk = ranking(s.budget, f); if (s.area !== 'any') rk = [...rk.filter(h => h.n === s.area), ...rk.filter(h => h.n !== s.area)];
-  const top = rk.filter(h => h.fits).slice(0, 3);
-  const listings = LISTINGS.filter(l => l.rent <= s.budget && (l.beds >= Math.min(beds, 3) || (beds <= 1 && l.beds <= 1))).sort((a, b) => (b.hood === s.area) - (a.hood === s.area) || a.rent - b.rent).slice(0, 3);
-  let text = tr(`Got it: ${s.people} ${s.people > 1 ? 'people' : 'person'}, up to ${fmt$(s.budget)}/month, ${s.months} months${s.area !== 'any' ? ', around ' + s.area : ''}.`,
-    `C’est noté : ${s.people} personne${s.people > 1 ? 's' : ''}, jusqu’à ${fmt$(s.budget)}/mois, ${s.months} mois${s.area !== 'any' ? ', vers ' + s.area : ''}.`);
-  if (s.area !== 'any' && S.rent[s.area] && S.rent[s.area] * f > s.budget) text += '\n' + tr(`Heads-up: ${beds} bedroom(s) in ${s.area} is around ${fmt$(S.rent[s.area] * f)}.`, `Attention : ${beds} chambre(s) à ${s.area}, c’est environ ${fmt$(S.rent[s.area] * f)}.`);
-  if (s.months < 12) text += '\n' + tr('Under 12 months is usually a sublet: get the master tenant’s written consent.', 'Moins de 12 mois, c’est souvent une sous-location : demande l’accord écrit du locataire principal.');
-  text += '\n\n' + (top.length ? tr('Neighborhoods that fit, safest first:', 'Quartiers qui collent, les plus sûrs d’abord :') : tr('Nothing fits this budget for that size. Try more budget or fewer bedrooms.', 'Rien ne colle à ce budget pour cette taille. Essaie plus de budget ou moins de chambres.'));
-  return { text, hoods: top.map(h => h.n), listings };
+  const room = s.beds === 'room', beds = room ? 1 : (s.beds ?? Math.max(1, s.people || 1)), f = room ? ROOMF : BEDF[Math.min(4, beds)];
+  const want = l => room ? l.beds === 'room' : l.beds !== 'room' && (beds === 0 ? l.beds === 0 : beds === 1 ? l.beds <= 1 : l.beds >= Math.min(beds, 3));
+  // les quartiers où on a des logements à montrer passent devant
+  const withPlaces = new Set(LISTINGS.filter(l => want(l) && l.rent <= s.budget * 1.05).map(l => l.hood));
+  const rk = ranking(s.budget, f, s.priority).sort((a, b) => (b.fits - a.fits) || (withPlaces.has(b.n) - withPlaces.has(a.n)) || (b.score - a.score));
+  const inArea = s.area && s.area !== 'any' ? rk.find(h => h.n === s.area) : null;
+  let top = rk.filter(h => h.fits && h !== inArea).slice(0, inArea ? 2 : 3);
+  if (inArea) top = [inArea, ...top];
+  const over = !rk.some(h => h.fits);
+  if (over) top = [...rk].sort((a, b) => a.rent - b.rent).slice(0, 3);
+  const near = l => (l.hood === s.area ? 2 : 0) + (top.some(h => h.n === l.hood) ? 1 : 0);
+  let listings = LISTINGS.filter(l => want(l) && l.rent <= s.budget * 1.05).sort((a, b) => near(b) - near(a) || a.rent - b.rent);
+  if (!listings.length) listings = LISTINGS.filter(want).sort((a, b) => a.rent - b.rent);
+  listings = listings.slice(0, 4);
+
+  const what = room ? tr('a room in a shared flat', 'une chambre en colocation') : beds === 0 ? 'studio' : tr(`${beds} bedroom${beds > 1 ? 's' : ''}`, `${beds} chambre${beds > 1 ? 's' : ''}`);
+  let out = tr(`Here’s what I found for ${what} up to ${fmt$(s.budget)}/month${s.area && s.area !== 'any' ? ` around ${s.area}` : ''}:`,
+    `Voilà ce que j’ai trouvé pour ${what} jusqu’à ${fmt$(s.budget)}/mois${s.area && s.area !== 'any' ? ` vers ${s.area}` : ''} :`);
+  if (inArea && !inArea.fits) out += '\n' + tr(`${s.area} runs about ${fmt$(inArea.rent)}, above your budget, so I added cheaper neighborhoods.`, `${s.area} tourne autour de ${fmt$(inArea.rent)}, au-dessus de ton budget : j’ai ajouté des quartiers moins chers.`);
+  if (over) out += '\n' + tr(`Nothing fits exactly, so these are the closest. A room in a shared flat would be around ${fmt$(Math.min(...Object.values(S.rent)) * ROOMF)}.`, `Rien ne colle exactement, voici les plus proches. Une chambre en colocation coûterait environ ${fmt$(Math.min(...Object.values(S.rent)) * ROOMF)}.`);
+  if (s.months && s.months < 12) out += '\n' + tr('Under 12 months is usually a sublet: get the master tenant’s written consent.', 'Moins de 12 mois, c’est souvent une sous-location : demande l’accord écrit du locataire principal.');
+  out += '\n' + tr('Neighborhoods are outlined on the map and places are pinned.', 'Les quartiers sont entourés sur la carte et les logements épinglés.');
+  const next = ['area', 'people', 'months'].find(k => s[k] == null && !(k === 'people' && room));
+  if (next) { S.lastAsked = next; out += '\n\n' + ASK[next](); }
+  return { text: out, hoods: top.map(h => h.n), listings };
 }
+
+// Carte : quartiers entourés et numérotés, logements épinglés avec leur prix
+function listingLatLng(l) {
+  if (l.lat) return [l.lat, l.lon];
+  let c = null; if (hoodLayer) hoodLayer.eachLayer(x => { if (x.feature.properties.nhood === l.hood) c = x.getBounds().getCenter(); });
+  if (!c) return null;
+  const h = [...l.title].reduce((a, ch) => a + ch.charCodeAt(0), 0);     // petit décalage stable pour ne pas superposer
+  return [c.lat + ((h % 7) - 3) * 0.0015, c.lng + ((h % 5) - 2) * 0.002];
+}
+function showOnMap(hoods = [], listings = [], fly = true) {
+  chatLayer.clearLayers(); if (!hoodLayer) return;
+  const g = L.featureGroup();
+  hoods.forEach((n, i) => hoodLayer.eachLayer(l => {
+    if (l.feature.properties.nhood !== n) return;
+    const poly = L.geoJSON(l.feature, { interactive: false, style: { color: '#0077CC', weight: 3, fillColor: '#1BA9F5', fillOpacity: .16 } }).addTo(chatLayer); g.addLayer(poly);
+    L.marker(l.getBounds().getCenter(), { icon: L.divIcon({ className: '', html: `<div class="mapbadge">${i + 1}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] }) }).bindPopup(hoodPopup(n)).addTo(chatLayer);
+  }));
+  listings.forEach(l => {
+    const ll = listingLatLng(l); if (!ll) return;
+    const m = L.marker(ll, { icon: L.divIcon({ className: '', html: `<div class="pricepin">${fmt$(l.rent)}</div>`, iconSize: [0, 0], iconAnchor: [0, 0] }) })
+      .bindPopup(`<b>${esc(l.title)}</b><br>${esc(l.hood)} · ${l.beds === 'room' ? tr('room', 'chambre') : l.beds ? l.beds + ' ' + tr('bed', 'ch.') : 'studio'} · ${fmt$(l.rent)}${l.address ? `<br><a href="#" data-pop-addr="${esc(l.address)}">${tr('Check this building →', 'Vérifier l’immeuble →')}</a>` : ''}`)
+      .addTo(chatLayer);
+    g.addLayer(m);
+  });
+  if (fly && g.getLayers().length) flyBounds(g.getBounds(), { maxZoom: 14, duration: 1 });
+}
+map.on('popupopen', e => e.popup.getElement().querySelectorAll('[data-pop-addr]').forEach(a => a.onclick = ev => { ev.preventDefault(); map.closePopup(); $('address').value = a.dataset.popAddr; search(); }));
+
 function vChat() {
   return `${pixline()}<h1>${tr('Find your place', 'Trouve ton logement')}</h1>
-  <p class="small muted">${tr('Tell me what you need. I’ll ask what’s missing, then suggest neighborhoods and places.', 'Dis-moi ce que tu cherches. Je te demande ce qui manque, puis je te propose des quartiers et des logements.')}</p>
-  <div class="msgs">${S.chat.map(renderMsg).join('')}</div>
-  ${S.chat.length ? '' : `<div class="chips">${[tr('2 people in the Mission, $4k max, 1 year', '2 personnes à Mission, 4000$ max, 1 an'), tr('Safe studio, $2,200', 'Studio dans un quartier sûr, 2200$'), tr('A room for 6 months, anywhere', 'Une chambre pour 6 mois, peu importe où')].map(q => `<button class="chip" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`}
+  <p class="small muted">${tr('Say what you need, in your own words. I’ll show options on the map and ask what’s missing.', 'Dis ce que tu cherches, avec tes mots. Je te montre des options sur la carte et je te demande ce qui manque.')}</p>
+  <div class="msgs">${S.chat.map((m, i) => renderMsg(m, i)).join('')}</div>
+  ${S.chat.length ? '' : `<div class="chips">${[tr('2 people in the Mission, $4k max, 1 year', '2 personnes à Mission, 4000 max, 1 an'), tr('Safe studio around $2,200', 'Studio dans un quartier sûr, 2200'), tr('A room in a shared flat for 6 months', 'Une chambre en coloc pour 6 mois'), tr('Tell me about 907 Valencia St', 'Parle-moi du 907 Valencia St')].map(q => `<button class="chip" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`}
   <form class="chatbar" id="chatForm"><label for="chatIn" class="sr">Message</label><input id="chatIn" autocomplete="off" placeholder="${tr('Message…', 'Message…')}"><button class="round" aria-label="Send">→</button></form>`;
 }
-function renderMsg(m) {
+function renderMsg(m, mi) {
   if (m.typing) return `<div class="msg bot typing"><i></i><i></i><i></i></div>`;
   let h = `<div class="msg ${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content)}</div>`;
-  (m.hoods || []).forEach(n => { h += `<div class="card"><div class="row"><b>${esc(n)}</b><button class="btn sm ghost" data-hood="${esc(n)}">${tr('Map', 'Carte')}</button></div>
-    <div class="tiny muted">${tr('Median 1BR', 'Médiane 1 ch.')} ${fmt$(S.rent[n])} · ${tr('crime', 'criminalité')} ${crimeWord(rankOf(S.crime)(S.crime[n]))}</div></div>`; });
-  (m.listings || []).forEach(l => { h += `<div class="card"><div class="row"><b>${esc(l.title)}</b><span class="num" style="color:var(--blue)">${fmt$(l.rent)}</span></div>
-    <div class="tiny muted">${esc(l.hood)} · ${l.beds ? l.beds + ' ' + tr('bed', 'ch.') : 'studio'}</div>
-    ${l.address ? `<div style="margin-top:8px"><button class="btn sm" data-addr="${esc(l.address)}">${tr('Check this building', 'Vérifier l’immeuble')}</button></div>` : ''}</div>`; });
+  (m.hoods || []).forEach((n, i) => { h += `<div class="card click" data-hood="${esc(n)}"><div class="row"><span style="display:flex;gap:9px;align-items:center"><span class="mapbadge sm">${i + 1}</span><b>${esc(n)}</b></span><span class="tiny muted">${tr('Map', 'Carte')} →</span></div>
+    <div class="tiny muted" style="margin-top:3px">${tr('Median 1BR', 'Médiane 1 ch.')} ${fmt$(S.rent[n])} · ${tr('crime', 'criminalité')} ${crimeWord(rankOf(S.crime)(S.crime[n]))}</div></div>`; });
+  (m.listings || []).forEach((l, i) => { h += `<div class="card"><div class="row"><b class="small">${esc(l.title)}</b><span class="num" style="color:var(--blue)">${fmt$(l.rent)}</span></div>
+    <div class="tiny muted">${esc(l.hood)} · ${l.beds === 'room' ? tr('room', 'chambre') : l.beds ? l.beds + ' ' + tr('bed', 'ch.') : 'studio'}</div>
+    <div class="actions"><button class="btn sm ghost" data-pin="${mi}:${i}">${tr('See on map', 'Voir sur la carte')}</button>${l.address ? `<button class="btn sm" data-addr="${esc(l.address)}">${tr('Check building', 'Vérifier l’immeuble')}</button>` : ''}</div></div>`; });
   return h;
 }
 async function sendChat(text) {
@@ -880,15 +977,21 @@ async function sendChat(text) {
     try { const r = await getJSON(`${API}/api/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: S.chat.filter(m => !m.typing).map(m => ({ role: m.role, content: m.content })), lang, slots: S.slots }) });
       S.chatBackend = true; if (r.slots) Object.assign(S.slots, r.slots); reply = { text: r.reply, hoods: r.neighborhoods || [], listings: r.listings || [] }; } catch { S.chatBackend = false; }
   }
-  if (!reply) { await sleep(600); reply = localAgent(); }
+  if (!reply) { await sleep(500); reply = localAgent(text); }
   S.chat = S.chat.filter(m => !m.typing); S.chat.push({ role: 'assistant', content: reply.text, hoods: reply.hoods, listings: reply.listings }); render();
-  if (reply.hoods?.length && hoodLayer) { const g = L.featureGroup(); hoodLayer.eachLayer(l => { if (reply.hoods.includes(l.feature.properties.nhood)) g.addLayer(L.geoJSON(l.feature)); }); if (g.getLayers().length) map.flyToBounds(g.getBounds(), { ...PAD(), duration: 1 }); }
+  if (reply.hoods?.length || reply.listings?.length) showOnMap(reply.hoods, reply.listings);
+  if (reply.openAddress) { $('address').value = reply.openAddress; setTimeout(search, 700); }
 }
 function bChat() {
   $('body').scrollTop = $('body').scrollHeight;
   $('chatForm').onsubmit = e => { e.preventDefault(); const v = $('chatIn').value; $('chatIn').value = ''; sendChat(v); };
   document.querySelectorAll('[data-q]').forEach(b => b.onclick = () => sendChat(b.dataset.q));
-  document.querySelectorAll('.msgs [data-hood], .card [data-hood]').forEach(b => b.onclick = () => focusHood(b.dataset.hood));
+  document.querySelectorAll('.msgs [data-hood]').forEach(b => b.onclick = () => focusHood(b.dataset.hood));
+  document.querySelectorAll('[data-pin]').forEach(b => b.onclick = () => {
+    const [mi, li] = b.dataset.pin.split(':').map(Number), m = S.chat[mi], l = m.listings[li];
+    showOnMap(m.hoods, m.listings, false); const ll = listingLatLng(l); if (!ll) return;
+    map.flyTo(ll, 16, { duration: .9 }); setTimeout(() => chatLayer.eachLayer(x => { if (x.getLatLng && x.getLatLng().lat === ll[0] && x.getLatLng().lng === ll[1]) x.openPopup(); }), 950); collapseMobile();
+  });
   bindAddr(); setTimeout(() => $('chatIn') && $('chatIn').focus(), 50);
 }
 
