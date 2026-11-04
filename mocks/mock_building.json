@@ -1,0 +1,76 @@
+{
+  "query_address": "777 Bay St",
+  "matched_address": "777 BAY ST",
+  "lat": 37.804676058917046,
+  "lon": -122.41965295599888,
+  "block": "0045",
+  "lot": "010B",
+  "blklot": "0045010B",
+  "neighborhood": "Russian Hill",
+  "supervisor_district": "3",
+  "profile": {
+    "year_built": 1926,
+    "units": 24,
+    "stories": 6,
+    "last_sale_date": "2016-08-12",
+    "likely_rent_controlled": true
+  },
+  "dbi_complaints": [
+    {"date": "2026-08-19", "description": "No heat in unit reported by occupant", "status": "open", "closed_date": null},
+    {"date": "2025-12-02", "description": "Water leak from ceiling into unit below", "status": "open", "closed_date": null},
+    {"date": "2024-11-14", "description": "Mold in bathroom and bedroom walls", "status": "closed", "closed_date": "2025-02-03"},
+    {"date": "2023-03-27", "description": "Elevator out of service for more than two weeks", "status": "closed", "closed_date": "2023-05-11"},
+    {"date": "2021-09-08", "description": "Work without permit in basement", "status": "closed", "closed_date": "2022-01-20"},
+    {"date": "2019-06-30", "description": "Rear stairway handrail loose", "status": "closed", "closed_date": "2019-08-02"}
+  ],
+  "violations": [
+    {"date": "2025-01-10", "category": "Housing conditions", "description": "Abate mold and repair source of moisture", "status": "complied", "unsafe_building": false},
+    {"date": "2021-10-04", "category": "Building section", "description": "Obtain permit for basement alterations", "status": "complied", "unsafe_building": false},
+    {"date": "2018-05-22", "category": "Fire safety", "description": "Repair self-closing doors at exit stairway", "status": "complied", "unsafe_building": true}
+  ],
+  "permits": [
+    {"date": "2025-03-18", "type": "Otc alterations permit", "description": "Replace water-damaged drywall, units 3B and 4B", "status": "issued", "estimated_cost": 18000},
+    {"date": "2023-06-01", "type": "Additions alterations or repairs", "description": "Elevator modernization", "status": "complete", "estimated_cost": 240000},
+    {"date": "2021-12-09", "type": "Otc alterations permit", "description": "Legalize basement storage partition walls", "status": "complete", "estimated_cost": 9500},
+    {"date": "2017-04-21", "type": "Otc alterations permit", "description": "Re-roof, like for like", "status": "complete", "estimated_cost": 62000}
+  ],
+  "block_evictions": [
+    {"date": "2025-07-15", "reasons": ["owner_move_in"]},
+    {"date": "2024-02-08", "reasons": ["non_payment"]},
+    {"date": "2022-10-30", "reasons": ["ellis_act_withdrawal"]},
+    {"date": "2022-10-30", "reasons": ["ellis_act_withdrawal"]},
+    {"date": "2019-04-11", "reasons": ["breach", "nuisance"]}
+  ],
+  "block_rents": [
+    {"bedrooms": "Studio", "rent_range": "$2,001-$2,250"},
+    {"bedrooms": "1", "rent_range": "$2,751-$3,000"},
+    {"bedrooms": "2", "rent_range": "$3,751-$4,000"}
+  ],
+  "neighborhood_311": {
+    "total_last_12m": 142,
+    "top_categories": [
+      {"name": "Street and sidewalk cleaning", "count": 58},
+      {"name": "Parking enforcement", "count": 31},
+      {"name": "Graffiti", "count": 22},
+      {"name": "Noise report", "count": 14},
+      {"name": "Tree maintenance", "count": 9}
+    ]
+  },
+  "stats": {
+    "open_complaints": 2,
+    "complaints_10y": 6,
+    "violations_10y": 3,
+    "evictions_block_10y": 5
+  },
+  "sources": {
+    "addresses": "https://data.sf.gov/d/ramy-di5m",
+    "parcels": "https://data.sf.gov/d/acdm-wktn",
+    "tax_rolls": "https://data.sf.gov/d/wv5m-vpq2",
+    "dbi_complaints": "https://data.sf.gov/d/gm2e-bten",
+    "violations": "https://data.sf.gov/d/nbtm-fbw5",
+    "permits": "https://data.sf.gov/d/i98e-djp9",
+    "evictions": "https://data.sf.gov/d/5cei-gny5",
+    "rents": "https://data.sf.gov/d/gdc7-dmcn",
+    "cases_311": "https://data.sf.gov/d/vw6y-z8j6"
+  }
+}
