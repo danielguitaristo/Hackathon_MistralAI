@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <style>
 :root{
   /* Golden Gate Bridge International Orange: C0 M69 Y100 K6 (goldengate.org) */
@@ -74,7 +74,7 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
 .chip-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;min-height:34px}
 .chip-btn:hover{border-color:var(--muted)}
-.features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px;margin-bottom:64px}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px;margin-bottom:56px}
 .feature{padding:18px;border-radius:var(--radius);background:var(--tint)}
 .feature .fi{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:#fff;color:var(--c)}
 .feature h2{font-size:17px;letter-spacing:-.01em;margin-top:12px}
@@ -83,6 +83,7 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 .t-city{--c:var(--city);--tint:var(--city-tint)}
 .t-voices{--c:var(--voice);--tint:var(--voice-tint)}
 .t-people{--c:var(--people);--tint:var(--people-tint)}
+.t-map{--c:var(--ink)}
 
 /* states */
 .state{min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:56px 0}
@@ -110,7 +111,6 @@ svg.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wid
 .panel{padding-top:24px;padding-bottom:48px}
 
 /* report: AI text on the left, official data on the right */
-.report{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(290px,1fr);gap:24px;align-items:start}
 .ai-card{padding:20px 22px 8px;border:1px solid var(--line);border-radius:var(--radius)}
 .verdict-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
 .verdict{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px 4px 10px;font-size:14px;font-weight:500}
@@ -145,12 +145,8 @@ button.tag{cursor:pointer}
 .fold-body ol{margin:0 0 10px;padding-left:20px;font-size:15px}
 .fold-body li{margin:5px 0}
 .legal{margin-top:12px;font-size:13px;line-height:1.4;color:var(--muted)}
-.side{display:flex;flex-direction:column;gap:14px}
-#map{height:240px;border-radius:var(--radius);border:1px solid var(--line);background:var(--fog);z-index:1}
-.map-fallback{display:grid;place-items:center;height:100%;padding:16px;font-size:13px;color:var(--muted);text-align:center}
-.pin{width:18px;height:18px;background:var(--bridge);border:3px solid #fff;border-radius:50%;box-shadow:0 1px 5px rgba(28,62,87,.45)}
-.official{padding:16px;background:var(--city-tint);border-radius:var(--radius)}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.official{margin-top:16px;padding:16px;background:var(--city-tint);border-radius:var(--radius)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-top:12px}
 .stat{display:block;text-align:left;background:#fff;border:1px solid transparent;border-radius:11px;padding:11px 12px;cursor:pointer}
 .stat:hover{border-color:var(--city)}
 .stat b{display:block;font-size:25px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
@@ -159,7 +155,7 @@ button.tag{cursor:pointer}
 .stat.alert:hover{border-color:var(--red)}
 .stat.alert b{color:var(--red)}
 .stat.alert span{color:var(--red)}
-.facts{margin:14px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.facts{margin:14px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:10px}
 .facts dt{font-size:13px;color:var(--muted)}
 .facts dd{margin:0;font-weight:500}
 .rentnote{margin-top:12px;font-size:13.5px;color:var(--city);line-height:1.35}
@@ -198,7 +194,8 @@ button.tag{cursor:pointer}
 
 /* reviews and people */
 .panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
-.voice-grid{display:grid;grid-template-columns:minmax(220px,.7fr) minmax(0,2fr);gap:36px}
+.avg{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:start;margin-bottom:18px}
+.avg .bars{margin:0;gap:8px}
 .avg .big{font-size:46px;font-weight:600;line-height:1;letter-spacing:-.03em;color:var(--voice)}
 .avg .big small{font-size:18px;font-weight:400;color:var(--muted);letter-spacing:0}
 .bars.voiced .track{background:var(--voice-tint)}
@@ -211,7 +208,7 @@ button.tag{cursor:pointer}
 .review blockquote{margin:7px 0}
 .stars{color:var(--amber-fill);letter-spacing:1px;font-size:15px}
 .stars .off{color:var(--line)}
-.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.people-grid{display:grid;gap:16px}
 .card{padding:20px;border:1px solid var(--line);border-radius:var(--radius)}
 .card h3{display:flex;align-items:center;gap:9px;font-size:18px}
 .card h3 svg{color:var(--people)}
@@ -229,7 +226,6 @@ button.tag{cursor:pointer}
 .me{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:14px;margin-bottom:14px}
 
 footer{padding-top:18px;padding-bottom:30px;font-size:13px;color:var(--muted);border-top:1px solid var(--line)}
-.leaflet-tile-pane{filter:saturate(.75) brightness(1.03)}
 
 /* dialog */
 dialog{width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);border:0;border-radius:16px;padding:0;background:#fff;color:var(--ink);box-shadow:0 20px 60px rgba(28,62,87,.25)}
@@ -263,7 +259,6 @@ fieldset{border:0;padding:0;margin:0}
 
 @media (max-width:860px){
   .features{grid-template-columns:1fr 1fr}
-  .report,.voice-grid,.people-grid{grid-template-columns:minmax(0,1fr);gap:20px}
   .hero-copy{max-width:470px}
 }
 @media (max-width:700px){
@@ -272,13 +267,6 @@ fieldset{border:0;padding:0;margin:0}
   .hero-copy{max-width:none}
   .hero-art{height:212px;right:calc(50% - 215px);
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 88%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 88%,transparent 100%)}
-  .mainnav{position:fixed;left:0;right:0;bottom:0;top:auto;background:#fff;border-top:1px solid var(--line);border-bottom:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 18px rgba(28,62,87,.08)}
-  .mainnav .wrap{gap:0;padding:0}
-  .mainnav button{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:8px 2px 8px;margin:0;border-bottom:0;border-top:3px solid transparent;font-size:12.5px;white-space:normal;line-height:1.15;text-align:center}
-  .mainnav button[aria-current=page]{border-top-color:var(--c)}
-  .panel{padding-top:18px;padding-bottom:28px}
-  .has-tabs footer{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
-  .has-tabs .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
 }
 @media (max-width:620px){
   .wrap{padding-left:16px;padding-right:16px}
@@ -296,6 +284,72 @@ fieldset{border:0;padding:0;margin:0}
   .dlg{padding:20px 16px}
   .person .btn{width:100%}
 }
+
+/* map */
+.map-section{margin-top:4px}
+.map-head{padding-bottom:12px}
+.map-head h2{font-size:clamp(22px,2.6vw,28px)}
+.map-slot{height:clamp(440px,72vh,780px);border-block:1px solid var(--line)}
+#mapstage{position:relative;width:100%;height:100%;background:var(--fog);overflow:hidden}
+#bigmap{position:absolute;inset:0}
+.map-top{position:absolute;left:12px;top:12px;right:58px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:8px;pointer-events:none}
+.metrics{display:flex;gap:2px;max-width:100%;padding:4px;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(28,62,87,.18);overflow-x:auto;scrollbar-width:none;pointer-events:auto}
+.metrics button{flex:none;min-height:36px;padding:6px 12px;border:0;border-radius:9px;background:none;color:var(--muted);font-size:14px;font-weight:500;cursor:pointer}
+.metrics button:hover{color:var(--ink)}
+.metrics button[aria-pressed=true]{background:var(--bridge-tint);color:var(--bridge-strong)}
+.map-hint{max-width:100%;padding:4px 10px;background:rgba(255,255,255,.94);border-radius:8px;box-shadow:0 1px 6px rgba(28,62,87,.14);color:var(--ink);font-size:13px;line-height:1.35}
+.map-hint:empty{display:none}
+.map-hint.err{background:var(--red-tint);color:var(--red);pointer-events:auto}
+.map-hint .link{color:inherit;margin-left:4px}
+.map-legend{position:absolute;left:12px;bottom:12px;z-index:2;max-width:calc(100% - 24px);padding:9px 12px 8px;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(28,62,87,.18);font-size:12.5px;line-height:1.3}
+.map-legend:empty{display:none}
+.lg-title{font-weight:500;margin-bottom:6px}
+.lg-scale{display:flex;gap:2px}
+.lg-item{flex:1 1 0;min-width:42px}
+.lg-item i{display:block;height:8px;border-radius:2px}
+.lg-item small{display:block;margin-top:3px;color:var(--muted);font-size:11.5px;white-space:nowrap}
+.map-tip{position:absolute;left:0;top:0;z-index:3;max-width:300px;padding:5px 9px;background:var(--ink);border-radius:8px;color:#fff;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.map-tip[hidden]{display:none}
+.map-tip b{font-weight:600}
+.map-off{position:absolute;inset:0;z-index:4;display:grid;place-items:center;padding:24px;background:var(--fog);color:var(--muted);text-align:center}
+.pin{width:20px;height:20px;background:var(--bridge);border:3px solid #fff;border-radius:50%;box-shadow:0 1px 6px rgba(28,62,87,.5)}
+.maplibregl-map{font-family:var(--sans)}
+.maplibregl-popup-content{padding:14px 16px;border-radius:14px;box-shadow:0 8px 28px rgba(28,62,87,.24);color:var(--ink)}
+.maplibregl-popup-close-button{width:30px;height:30px;font-size:20px;color:var(--muted);border-radius:0 14px 0 8px}
+.map-pop h3{padding-right:20px;font-size:16px}
+.pop-note{margin-top:2px;color:var(--muted);font-size:12.5px}
+.pop-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px}
+.pop-stats b{display:block;font-size:20px;font-weight:600;line-height:1.1}
+.pop-stats span{display:block;margin-top:2px;color:var(--muted);font-size:12px;line-height:1.2}
+.map-pop .btn{width:100%;min-height:40px}
+.mainnav .nav-map{display:none}
+
+/* results: the report beside the map */
+@media (min-width:901px){
+  body.has-split{height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+  body.has-split #app{flex:1;min-height:0}
+  .has-split .bar .wrap{max-width:none}
+  .split{display:grid;grid-template-columns:max(440px,min(46vw,720px)) minmax(0,1fr);height:100%}
+  .split-left{height:100%;overflow-y:auto;border-right:1px solid var(--line)}
+  .split-left .wrap{max-width:none}
+  .split-right{height:100%}
+}
+@media (max-width:900px){
+  .split-right{display:none}
+  body.map-open .split-right{display:block;position:fixed;top:0;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:850}
+  .mainnav .nav-map{display:flex}
+  .mainnav{position:fixed;left:0;right:0;bottom:0;top:auto;background:#fff;border-top:1px solid var(--line);border-bottom:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 18px rgba(28,62,87,.08)}
+  .mainnav .wrap{gap:0;padding:0}
+  .mainnav button{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:8px 2px 8px;margin:0;border-bottom:0;border-top:3px solid transparent;font-size:12.5px;white-space:normal;line-height:1.15;text-align:center}
+  .mainnav button[aria-current=page]{border-top-color:var(--c)}
+  .panel{padding-top:18px;padding-bottom:28px}
+  .has-tabs footer{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+  .has-tabs .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+}
+@media (max-width:440px){
+  .avg{grid-template-columns:minmax(0,1fr);gap:12px}
+  .map-top{right:50px}
+}
 @media (prefers-reduced-motion:reduce){.steps li.on::before{animation:none}.chev{transition:none}}
 </style>
 </head>
@@ -305,7 +359,7 @@ fieldset{border:0;padding:0;margin:0}
 <main id="app"></main>
 <dialog id="dlg"></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
 "use strict";
 /* =========================== i18n =========================== */
@@ -321,7 +375,7 @@ ppl_sub:"Pseudonyms only. No email or phone shown.",ppl_tenants:"Ask a tenant",p
 role_current_tenant:"Current tenant",role_former_tenant:"Former tenant",role_seeking_roommate:"Looking for a room",role_has_room:"Has a room",budget:"Budget",move_in:"Move-in",sch_early:"early riser",sch_late:"night owl",sch_flexible:"flexible schedule",clean:"tidiness",g_rarely:"guests rarely",g_sometimes:"guests sometimes",g_often:"guests often",smoker:"smoker",nonsmoker:"non-smoker",pets:"has pets",nopets:"no pets",
 f_review_title:"Write a review",f_pseudo:"Pseudonym",f_pseudo_h:"Don't use your real name.",f_start:"Moved in",f_end:"Moved out",f_still:"I still live here",f_ratings:"Rate from 1 (poor) to 5 (great)",f_text:"Your review",f_text_h:"Names and contact details are removed. Harassment and discrimination are rejected.",f_proof:"Proof you lived here (optional)",f_proof_h:"A lease or utility bill earns the Verified badge.",f_privacy:"Your document is read in memory, never stored.",f_cancel:"Cancel",f_publish:"Submit review",f_checking:"Checking…",f_rate_err:"Please rate all five categories.",pub_ok:"Your review is published.",pub_ver:"Your review is published with the Verified badge.",rejected:"Your review wasn't published:",
 f_profile_title:"Create your profile",f_role:"I am…",f_nhood:"Neighborhood",f_bmin:"Budget min ($/month)",f_bmax:"Budget max ($/month)",f_bio:"Short bio",f_bio_h:"Don't include your email, phone number or full name.",f_sched:"Schedule",f_cleanl:"Tidiness (1–5)",f_guests:"Guests",f_smoke:"I smoke",f_pets:"I have pets",f_open:"Other users can send me contact requests",f_create:"Create profile",f_sched_early:"Early",f_sched_late:"Late",f_sched_flexible:"Flexible",f_g_rarely:"Rarely",f_g_sometimes:"Sometimes",f_g_often:"Often",prof_ok:"Profile created.",
-f_contact_title:"Send a request to {p}",f_msg:"Message",f_msg_h:"Don't share your email or phone number here.",f_send:"Send request",contact_first:"Create a profile first so they know who's asking.",contact_ok:"Your request was sent.",generic_err:"Something went wrong. Please try again.",l0t:"Risks at a glance",tab_e:"Block evictions",tab_r:"Block rents",tab_n:"311",not_official:"Independent project. Not a City and County of San Francisco service.",mock_bar:"MOCK MODE: sample data, not real city records"},
+f_contact_title:"Send a request to {p}",f_msg:"Message",f_msg_h:"Don't share your email or phone number here.",f_send:"Send request",contact_first:"Create a profile first so they know who's asking.",contact_ok:"Your request was sent.",generic_err:"Something went wrong. Please try again.",l0t:"Risks at a glance",tab_e:"Block evictions",tab_r:"Block rents",tab_n:"311",not_official:"Independent project. Not a City and County of San Francisco service.",map_title:"Explore the map",nav_map:"Map",map_by_nh:"by neighborhood",map_by_blk:"by block",map_by_par:"by building",map_by_face:"by street block",map_hint_nh:"Click a neighborhood to zoom in",map_hint_blk:"Click a block to see its buildings",map_hint_par:"Click a building to see its report",map_zoom_in:"Zoom in to pick a building",map_loading:"Loading city data…",map_error:"City data isn't responding.",map_off:"The map can't be shown on this device. You can still search by address.",see_report:"See full report",no_address:"No street address on this parcel.",map_on_block:"on this block",coop_win:"Use Ctrl + scroll to zoom the map",coop_mac:"Use ⌘ + scroll to zoom the map",coop_mobile:"Use two fingers to move the map",mock_bar:"MOCK MODE: sample data, not real city records"},
 es:{search_ph:"Escribe una dirección de San Francisco",search:"Buscar",try:"Prueba:",hero_title:"Conoce el edificio antes de firmar.",l1t:"Quejas, infracciones, permisos",l2t:"Lo que dicen los inquilinos",l3t:"Pregunta a inquilinos, busca compañero",
 loading:"Buscando",step1:"Localizando la parcela",step2:"Obteniendo registros de la ciudad",step3:"Reuniendo opiniones de inquilinos",step4:"Mistral está escribiendo tu informe",err_title:"No pudimos cargar esta dirección",err_nf:"Revisa el número y la calle, por ejemplo 777 Bay St.",err_net:"El servicio no responde. Inténtalo de nuevo en un momento.",retry:"Reintentar",
 nav_report:"Informe",nav_city:"Registros",nav_voices:"Opiniones",nav_people:"Personas",district:"Distrito",parcel:"Parcela",green:"Pocas señales de alerta",orange:"Mira con atención",red:"Alertas serias",ai_note:"Resumen de IA por Mistral",no_report:"El informe de IA no está disponible ahora. Los registros de la ciudad siguen disponibles.",sig_tenant:"Opinión de inquilinos",sig_city:"Registro de la ciudad",questions:"Preguntas para el propietario",copy:"Copiar",copied:"Preguntas copiadas",disclaimer:"Esto no es asesoramiento legal. Verifica los datos importantes con la ciudad o un asesor de inquilinos.",
@@ -333,7 +387,7 @@ ppl_sub:"Solo seudónimos. Sin correo ni teléfono.",ppl_tenants:"Pregunta a un 
 role_current_tenant:"Inquilino actual",role_former_tenant:"Antiguo inquilino",role_seeking_roommate:"Busca habitación",role_has_room:"Tiene habitación",budget:"Presupuesto",move_in:"Mudanza",sch_early:"madrugador",sch_late:"noctámbulo",sch_flexible:"horario flexible",clean:"orden",g_rarely:"pocas visitas",g_sometimes:"algunas visitas",g_often:"muchas visitas",smoker:"fumador",nonsmoker:"no fumador",pets:"con mascotas",nopets:"sin mascotas",
 f_review_title:"Escribir una opinión",f_pseudo:"Seudónimo",f_pseudo_h:"No uses tu nombre real.",f_start:"Entrada",f_end:"Salida",f_still:"Sigo viviendo aquí",f_ratings:"Valora de 1 (mal) a 5 (excelente)",f_text:"Tu opinión",f_text_h:"Se eliminan nombres y datos de contacto. Se rechazan el acoso y la discriminación.",f_proof:"Prueba de residencia (opcional)",f_proof_h:"Un contrato o factura da la insignia de verificado.",f_privacy:"Tu documento se lee en memoria y nunca se guarda.",f_cancel:"Cancelar",f_publish:"Enviar opinión",f_checking:"Comprobando…",f_rate_err:"Valora las cinco categorías.",pub_ok:"Tu opinión está publicada.",pub_ver:"Tu opinión está publicada con la insignia de verificado.",rejected:"Tu opinión no se publicó:",
 f_profile_title:"Crea tu perfil",f_role:"Soy…",f_nhood:"Barrio",f_bmin:"Presupuesto mín. ($/mes)",f_bmax:"Presupuesto máx. ($/mes)",f_bio:"Breve descripción",f_bio_h:"No incluyas correo, teléfono ni nombre completo.",f_sched:"Horario",f_cleanl:"Orden (1–5)",f_guests:"Visitas",f_smoke:"Fumo",f_pets:"Tengo mascotas",f_open:"Otros usuarios pueden enviarme solicitudes",f_create:"Crear perfil",f_sched_early:"Temprano",f_sched_late:"Tarde",f_sched_flexible:"Flexible",f_g_rarely:"Pocas",f_g_sometimes:"Algunas",f_g_often:"Muchas",prof_ok:"Perfil creado.",
-f_contact_title:"Enviar solicitud a {p}",f_msg:"Mensaje",f_msg_h:"No compartas aquí tu correo ni teléfono.",f_send:"Enviar solicitud",contact_first:"Primero crea un perfil para que sepan quién pregunta.",contact_ok:"Tu solicitud se envió.",generic_err:"Algo salió mal. Inténtalo de nuevo.",l0t:"Los riesgos de un vistazo",tab_e:"Desalojos en la cuadra",tab_r:"Alquileres en la cuadra",tab_n:"311",not_official:"Proyecto independiente. No es un servicio de la Ciudad y el Condado de San Francisco.",mock_bar:"MODO DE PRUEBA: datos de ejemplo, no registros reales"},
+f_contact_title:"Enviar solicitud a {p}",f_msg:"Mensaje",f_msg_h:"No compartas aquí tu correo ni teléfono.",f_send:"Enviar solicitud",contact_first:"Primero crea un perfil para que sepan quién pregunta.",contact_ok:"Tu solicitud se envió.",generic_err:"Algo salió mal. Inténtalo de nuevo.",l0t:"Los riesgos de un vistazo",tab_e:"Desalojos en la cuadra",tab_r:"Alquileres en la cuadra",tab_n:"311",not_official:"Proyecto independiente. No es un servicio de la Ciudad y el Condado de San Francisco.",map_title:"Explora el mapa",nav_map:"Mapa",map_by_nh:"por barrio",map_by_blk:"por cuadra",map_by_par:"por edificio",map_by_face:"por cuadra",map_hint_nh:"Haz clic en un barrio para acercarte",map_hint_blk:"Haz clic en una cuadra para ver sus edificios",map_hint_par:"Haz clic en un edificio para ver su informe",map_zoom_in:"Acércate para elegir un edificio",map_loading:"Cargando datos…",map_error:"Los datos de la ciudad no responden.",map_off:"El mapa no se puede mostrar en este dispositivo. Aún puedes buscar por dirección.",see_report:"Ver el informe completo",no_address:"Esta parcela no tiene dirección.",map_on_block:"en esta cuadra",coop_win:"Usa Ctrl + rueda para hacer zoom",coop_mac:"Usa ⌘ + rueda para hacer zoom",coop_mobile:"Usa dos dedos para mover el mapa",mock_bar:"MODO DE PRUEBA: datos de ejemplo, no registros reales"},
 zh:{search_ph:"输入旧金山地址",search:"查询",try:"试试：",hero_title:"签约之前，先读懂这栋楼。",l1t:"投诉、违规、许可",l2t:"租客的真实评价",l3t:"联系租客，寻找室友",
 loading:"正在查询",step1:"定位地块",step2:"获取市政记录",step3:"收集租客评价",step4:"Mistral 正在撰写报告",err_title:"无法加载此地址",err_nf:"请检查门牌号和街道名称，例如 777 Bay St。",err_net:"服务暂无响应，请稍后再试。",retry:"重试",
 nav_report:"报告",nav_city:"市政记录",nav_voices:"租客评价",nav_people:"联系人",district:"选区",parcel:"地块",green:"警示信号较少",orange:"需要仔细查看",red:"存在严重警示",ai_note:"由 Mistral 生成的 AI 摘要",no_report:"AI 报告暂不可用，市政记录仍可查看。",sig_tenant:"租客意见",sig_city:"市政记录",questions:"可以问房东的问题",copy:"复制",copied:"问题已复制",disclaimer:"本内容不构成法律建议。重要信息请向市政部门或租客顾问核实。",
@@ -345,7 +399,7 @@ ppl_sub:"仅显示化名，不显示邮箱或电话。",ppl_tenants:"询问租�
 role_current_tenant:"现任租客",role_former_tenant:"前任租客",role_seeking_roommate:"正在找房间",role_has_room:"有空房间",budget:"预算",move_in:"入住",sch_early:"早起",sch_late:"晚睡",sch_flexible:"作息灵活",clean:"整洁度",g_rarely:"很少访客",g_sometimes:"偶尔访客",g_often:"常有访客",smoker:"吸烟",nonsmoker:"不吸烟",pets:"有宠物",nopets:"无宠物",
 f_review_title:"写评价",f_pseudo:"化名",f_pseudo_h:"请勿使用真实姓名。",f_start:"入住时间",f_end:"搬出时间",f_still:"我仍住在这里",f_ratings:"评分：1（差）到 5（很好）",f_text:"你的评价",f_text_h:"姓名和联系方式会被删除；骚扰和歧视内容将被拒绝。",f_proof:"居住证明（可选）",f_proof_h:"租约或水电账单可获认证标记。",f_privacy:"文件仅在内存中读取，绝不存储。",f_cancel:"取消",f_publish:"提交评价",f_checking:"正在检查…",f_rate_err:"请为五个类别全部评分。",pub_ok:"你的评价已发布。",pub_ver:"你的评价已发布并带有认证标记。",rejected:"你的评价未发布：",
 f_profile_title:"创建资料",f_role:"我是…",f_nhood:"社区",f_bmin:"最低预算（美元/月）",f_bmax:"最高预算（美元/月）",f_bio:"简介",f_bio_h:"请勿填写邮箱、电话或全名。",f_sched:"作息",f_cleanl:"整洁度（1–5）",f_guests:"访客",f_smoke:"我吸烟",f_pets:"我有宠物",f_open:"其他用户可以向我发送联系请求",f_create:"创建资料",f_sched_early:"早",f_sched_late:"晚",f_sched_flexible:"灵活",f_g_rarely:"很少",f_g_sometimes:"偶尔",f_g_often:"经常",prof_ok:"资料已创建。",
-f_contact_title:"向 {p} 发送请求",f_msg:"留言",f_msg_h:"请勿在此分享邮箱或电话。",f_send:"发送请求",contact_first:"请先创建资料，让对方知道是谁在询问。",contact_ok:"请求已发送。",generic_err:"出错了，请重试。",l0t:"一眼看清风险",tab_e:"街区驱逐",tab_r:"街区租金",tab_n:"311",not_official:"独立项目，并非旧金山市县政府的服务。",mock_bar:"模拟模式：示例数据，并非真实记录"},
+f_contact_title:"向 {p} 发送请求",f_msg:"留言",f_msg_h:"请勿在此分享邮箱或电话。",f_send:"发送请求",contact_first:"请先创建资料，让对方知道是谁在询问。",contact_ok:"请求已发送。",generic_err:"出错了，请重试。",l0t:"一眼看清风险",tab_e:"街区驱逐",tab_r:"街区租金",tab_n:"311",not_official:"独立项目，并非旧金山市县政府的服务。",map_title:"浏览地图",nav_map:"地图",map_by_nh:"按社区",map_by_blk:"按街区",map_by_par:"按建筑",map_by_face:"按街区",map_hint_nh:"点击社区放大",map_hint_blk:"点击街区查看建筑",map_hint_par:"点击建筑查看报告",map_zoom_in:"放大以选择建筑",map_loading:"正在加载数据…",map_error:"市政数据暂无响应。",map_off:"此设备无法显示地图，仍可按地址搜索。",see_report:"查看完整报告",no_address:"此地块没有门牌地址。",map_on_block:"在此街区",coop_win:"按住 Ctrl 并滚动以缩放地图",coop_mac:"按住 ⌘ 并滚动以缩放地图",coop_mobile:"用两根手指移动地图",mock_bar:"模拟模式：示例数据，并非真实记录"},
 fr:{search_ph:"Entrez une adresse à San Francisco",search:"Rechercher",try:"Essayez :",hero_title:"Connaissez l'immeuble avant de signer.",l1t:"Plaintes, infractions, permis",l2t:"Ce que disent les locataires",l3t:"Contacter un locataire, trouver un coloc",
 loading:"Recherche de",step1:"Localisation de la parcelle",step2:"Récupération des registres de la ville",step3:"Collecte des avis de locataires",step4:"Mistral rédige votre rapport",err_title:"Impossible de charger cette adresse",err_nf:"Vérifiez le numéro et la rue, par exemple 777 Bay St.",err_net:"Le service ne répond pas. Réessayez dans un instant.",retry:"Réessayer",
 nav_report:"Rapport",nav_city:"Registres",nav_voices:"Avis",nav_people:"Personnes",district:"District",parcel:"Parcelle",green:"Peu de signaux d'alerte",orange:"À regarder de près",red:"Alertes sérieuses",ai_note:"Résumé IA par Mistral",no_report:"Le rapport IA est indisponible pour le moment. Les registres de la ville restent consultables.",sig_tenant:"Avis de locataires",sig_city:"Registre de la ville",questions:"Questions à poser au propriétaire",copy:"Copier",copied:"Questions copiées",disclaimer:"Ceci n'est pas un conseil juridique. Vérifiez les points importants auprès de la ville ou d'un conseiller pour locataires.",
@@ -357,7 +411,7 @@ ppl_sub:"Pseudonymes uniquement. Ni e-mail ni téléphone.",ppl_tenants:"Demande
 role_current_tenant:"Locataire actuel",role_former_tenant:"Ancien locataire",role_seeking_roommate:"Cherche une chambre",role_has_room:"A une chambre",budget:"Budget",move_in:"Emménagement",sch_early:"lève-tôt",sch_late:"couche-tard",sch_flexible:"horaires flexibles",clean:"rangement",g_rarely:"rarement des invités",g_sometimes:"parfois des invités",g_often:"souvent des invités",smoker:"fumeur",nonsmoker:"non-fumeur",pets:"animaux",nopets:"pas d'animaux",
 f_review_title:"Écrire un avis",f_pseudo:"Pseudonyme",f_pseudo_h:"N'utilisez pas votre vrai nom.",f_start:"Arrivée",f_end:"Départ",f_still:"J'habite encore ici",f_ratings:"Notez de 1 (mauvais) à 5 (excellent)",f_text:"Votre avis",f_text_h:"Les noms et coordonnées sont retirés. Le harcèlement et les propos discriminatoires sont rejetés.",f_proof:"Preuve d'occupation (facultatif)",f_proof_h:"Un bail ou une facture donne le badge Vérifié.",f_privacy:"Votre document est lu en mémoire, jamais stocké.",f_cancel:"Annuler",f_publish:"Envoyer l'avis",f_checking:"Vérification…",f_rate_err:"Notez les cinq catégories.",pub_ok:"Votre avis est publié.",pub_ver:"Votre avis est publié avec le badge Vérifié.",rejected:"Votre avis n'a pas été publié :",
 f_profile_title:"Créer votre profil",f_role:"Je suis…",f_nhood:"Quartier",f_bmin:"Budget min ($/mois)",f_bmax:"Budget max ($/mois)",f_bio:"Courte présentation",f_bio_h:"N'indiquez ni e-mail, ni téléphone, ni nom complet.",f_sched:"Rythme",f_cleanl:"Rangement (1–5)",f_guests:"Invités",f_smoke:"Je fume",f_pets:"J'ai des animaux",f_open:"Les autres utilisateurs peuvent m'envoyer des demandes",f_create:"Créer le profil",f_sched_early:"Tôt",f_sched_late:"Tard",f_sched_flexible:"Flexible",f_g_rarely:"Rarement",f_g_sometimes:"Parfois",f_g_often:"Souvent",prof_ok:"Profil créé.",
-f_contact_title:"Envoyer une demande à {p}",f_msg:"Message",f_msg_h:"Ne partagez ici ni e-mail ni téléphone.",f_send:"Envoyer la demande",contact_first:"Créez d'abord un profil pour qu'on sache qui demande.",contact_ok:"Votre demande a été envoyée.",generic_err:"Une erreur s'est produite. Réessayez.",l0t:"Les risques en un coup d'œil",tab_e:"Évictions du bloc",tab_r:"Loyers du bloc",tab_n:"311",not_official:"Projet indépendant. Ce n'est pas un service de la Ville et du Comté de San Francisco.",mock_bar:"MODE MOCK : données d'exemple, pas de vrais registres"}
+f_contact_title:"Envoyer une demande à {p}",f_msg:"Message",f_msg_h:"Ne partagez ici ni e-mail ni téléphone.",f_send:"Envoyer la demande",contact_first:"Créez d'abord un profil pour qu'on sache qui demande.",contact_ok:"Votre demande a été envoyée.",generic_err:"Une erreur s'est produite. Réessayez.",l0t:"Les risques en un coup d'œil",tab_e:"Évictions du bloc",tab_r:"Loyers du bloc",tab_n:"311",not_official:"Projet indépendant. Ce n'est pas un service de la Ville et du Comté de San Francisco.",map_title:"Explorer la carte",nav_map:"Carte",map_by_nh:"par quartier",map_by_blk:"par bloc",map_by_par:"par immeuble",map_by_face:"par bloc de rue",map_hint_nh:"Cliquez sur un quartier pour zoomer",map_hint_blk:"Cliquez sur un bloc pour voir ses immeubles",map_hint_par:"Cliquez sur un immeuble pour voir son rapport",map_zoom_in:"Zoomez pour choisir un immeuble",map_loading:"Chargement des données…",map_error:"Les données de la ville ne répondent pas.",map_off:"La carte ne peut pas s'afficher sur cet appareil. La recherche par adresse reste possible.",see_report:"Voir le rapport complet",no_address:"Pas d'adresse sur cette parcelle.",map_on_block:"sur ce bloc",coop_win:"Ctrl + molette pour zoomer sur la carte",coop_mac:"⌘ + molette pour zoomer sur la carte",coop_mobile:"Utilisez deux doigts pour déplacer la carte",mock_bar:"MODE MOCK : données d'exemple, pas de vrais registres"}
 };
 const LANGS = {en:"English",es:"Español",zh:"中文",fr:"Français"};
 const LOCALE = {en:"en-US",es:"es-US",zh:"zh-CN",fr:"fr-FR"};
@@ -376,7 +430,7 @@ const store = {
 };
 const state = {
   lang: LANGS[qs.get("lang")] ? qs.get("lang") : (LANGS[store.get("kyb_lang")] ? store.get("kyb_lang") : "en"),
-  view:"landing", address:"", data:null, error:null, section:validSection(qs.get("tab")), tab:"c", showAll:{},
+  view:"landing", address:"", data:null, error:null, section:validSection(qs.get("tab")), mapOpen:false, tab:"c", showAll:{},
   profile:store.get("kyb_profile"), matches:null, sent:{}, pendingContact:null, reqId:0
 };
 const $ = (s,el=document)=>el.querySelector(s);
@@ -405,11 +459,13 @@ async function api(path,opts){
   return body;
 }
 const mockJson = f=>fetch(new URL("../mocks/"+f,location.href)).then(r=>{if(!r.ok)throw new Error(f);return r.json()});
-async function getReport(address,lang){
+async function getReport(address,lang,point){
   if(MOCK){
     const [building,report,community]=await Promise.all([mockJson("mock_building.json"),mockJson("mock_report.json"),mockJson("mock_community.json")]);
     await new Promise(r=>setTimeout(r,500));
-    building.query_address=address; return {building,report,community};
+    building.query_address=address;
+    if(point){building.lat=point.lat;building.lon=point.lon;building.blklot=point.blklot||building.blklot;building.matched_address=address.toUpperCase()}
+    return {building,report,community};
   }
   return api(`/api/report?address=${encodeURIComponent(address)}&lang=${encodeURIComponent(lang)}`);
 }
@@ -467,7 +523,8 @@ const ICONS={
   report:icon(`<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>`),
   city:icon(`<path d="M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18"/>`),
   voices:icon(`<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-5A8 8 0 1 1 21 12z"/>`),
-  people:icon(`<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>`)
+  people:icon(`<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>`),
+  map:icon(`<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>`)
 };
 const chev=`<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 const NAV_LABEL={report:"nav_report",city:"nav_city",voices:"nav_voices",people:"nav_people"};
@@ -489,12 +546,16 @@ function pushUrl(replace){
 }
 function render(){
   renderBar();
-  document.body.classList.toggle("has-tabs",state.view==="results");
+  const v=state.view;
+  if(v!=="results") state.mapOpen=false;
+  document.body.classList.toggle("has-split",v!=="landing");
+  document.body.classList.toggle("has-tabs",v==="results");
+  document.body.classList.toggle("map-open",state.mapOpen);
   const app=$("#app");
-  if(state.view==="landing") app.innerHTML=landing();
-  else if(state.view==="loading") app.innerHTML=loadingView();
-  else if(state.view==="error") app.innerHTML=errorView();
-  else { app.innerHTML=resultsView(); renderPanel(); }
+  if(v==="landing") app.innerHTML=landing();
+  else app.innerHTML=`<div class="split"><div class="split-left">${v==="loading"?loadingView():v==="error"?errorView():resultsView()}</div><div class="split-right" id="mapslot"></div></div>`;
+  if(v==="results") renderPanel();
+  MapView.mount($("#mapslot"),{embedded:v==="landing"});
 }
 
 /* =========================== landing, loading, error =========================== */
@@ -515,6 +576,10 @@ function landing(){
         <div class="chips"><span class="muted small">${esc(t("try"))}</span>${EXAMPLES.map(a=>`<button class="chip-btn" data-a="example" data-v="${esc(a)}">${esc(a)}</button>`).join("")}</div>
       </div></div>
     </div>
+    <section class="map-section" aria-labelledby="maptitle">
+      <div class="wrap map-head"><h2 id="maptitle">${esc(t("map_title"))}</h2></div>
+      <div class="map-slot" id="mapslot"></div>
+    </section>
     <div class="wrap"><div class="features">${items.map(([k,d])=>`<div class="feature t-${k}"><span class="fi">${ICONS[k]}</span><h2>${esc(t(NAV_LABEL[k]))}</h2><p>${esc(t(d))}</p></div>`).join("")}</div></div>
     ${siteFooter()}`;
 }
@@ -587,7 +652,7 @@ function officialPanel(b){
 }
 function reportPanel(){
   const b=state.data.building;
-  return `<div class="report"><div>${reportInner()}</div><aside class="side"><div id="map"></div>${officialPanel(b)}</aside></div>`;
+  return `<div class="report">${reportInner()}${officialPanel(b)}</div>`;
 }
 
 /* =========================== city records tab =========================== */
@@ -653,8 +718,8 @@ function voicesPanel(){
   const avg=c.avg_ratings;
   return `<div class="panel-head"><span class="flag voice">${esc(t("voice_flag"))}</span><button class="btn voice" data-a="review">${esc(t("write"))}</button></div>
     <div class="voice-grid">
-      <aside class="avg">${avg?`<div class="big">${(+avg.overall||0).toFixed(1)}<small> / 5</small></div>
-        <p class="small muted" style="margin-top:4px">${esc(t("basedon",{n:c.n_reviews||0,v:c.n_verified||0}))}</p>
+      <aside class="avg">${avg?`<div><div class="big">${(+avg.overall||0).toFixed(1)}<small> / 5</small></div>
+        <p class="small muted" style="margin-top:4px">${esc(t("basedon",{n:c.n_reviews||0,v:c.n_verified||0}))}</p></div>
         <ul class="bars voiced">${RATING_KEYS.filter(k=>k!=="overall").map(k=>`<li><div class="lab"><span>${esc(t("r_"+k))}</span><b>${avg[k]!=null?(+avg[k]).toFixed(1):"—"}</b></div><div class="track"><div class="fill" style="width:${(+avg[k]||0)/5*100}%"></div></div></li>`).join("")}</ul>`:""}
       </aside>
       <div>
@@ -715,6 +780,7 @@ function resultsView(){
     </div></div>
     <nav class="mainnav" aria-label="Sections"><div class="wrap">
       ${SECTIONS.map(k=>`<button class="t-${k}" data-a="nav" data-v="${k}"${k===state.section?` aria-current="page"`:""}>${ICONS[k]}<span>${esc(t(NAV_LABEL[k]))}</span></button>`).join("")}
+      <button class="nav-map t-map" data-a="mapopen">${ICONS.map}<span>${esc(t("nav_map"))}</span></button>
     </div></nav>
     <div id="panel" class="wrap panel"></div>
     ${siteFooter()}`;
@@ -723,59 +789,570 @@ function renderPanel(){
   const el=$("#panel"); if(!el||!state.data) return;
   const k=state.section;
   el.innerHTML=k==="city"?cityPanel():k==="voices"?voicesPanel():k==="people"?`<div id="peopleInner">${peopleInner()}</div>`:reportPanel();
-  if(k==="report") initMap();
   showSelectedSubtab();
 }
 function showSelectedSubtab(){
   const row=$(".subtabs"), sel=row&&$("[aria-selected=true]",row);
   if(sel) row.scrollLeft=sel.offsetLeft-row.offsetLeft-16;
 }
+function syncNav(){
+  document.querySelectorAll(".mainnav button").forEach(b=>{
+    const on=state.mapOpen?b.dataset.a==="mapopen":b.dataset.v===state.section;
+    if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
+  });
+  document.body.classList.toggle("map-open",state.mapOpen);
+  if(state.mapOpen) MapView.resize();
+}
 function showSection(k){
   state.section=validSection(k);
-  document.querySelectorAll(".mainnav button").forEach(b=>{
-    if(b.dataset.v===state.section) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
-  });
+  state.mapOpen=false;
+  syncNav();
   pushUrl(true);
   renderPanel();
-  const nav=$(".mainnav"), panel=$("#panel");
-  if(nav&&panel){
-    const stuck=getComputedStyle(nav).position==="sticky"?nav.offsetHeight:0;
+  const nav=$(".mainnav"), panel=$("#panel"), left=$(".split-left");
+  if(!nav||!panel) return;
+  const stuck=getComputedStyle(nav).position==="sticky"?nav.offsetHeight:0;
+  if(left&&getComputedStyle(left).overflowY==="auto"){
+    const top=panel.getBoundingClientRect().top-left.getBoundingClientRect().top+left.scrollTop-stuck;
+    if(left.scrollTop>top) left.scrollTo(0,top);
+  }else{
     const top=panel.getBoundingClientRect().top+window.scrollY-stuck;
     if(window.scrollY>top) window.scrollTo(0,top);
   }
 }
-function initMap(){
-  const b=state.data.building, el=$("#map"); if(!el) return;
-  if(b.lat==null||b.lon==null){el.style.display="none";return}
-  try{
-    const map=L.map(el,{scrollWheelZoom:false}).setView([b.lat,b.lon],16);
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
-    L.marker([b.lat,b.lon],{icon:L.divIcon({className:"",html:'<div class="pin"></div>',iconSize:[18,18],iconAnchor:[9,9]}),title:b.matched_address||""}).addTo(map);
-  }catch(e){ el.innerHTML=`<div class="map-fallback">${esc(b.lat)}, ${esc(b.lon)}</div>`; }
-}
+
+/* =========================== map ===========================
+   Neighborhoods, then blocks, then building footprints as you zoom in, colored by a
+   count over the same 10 years and with the same parcel matching as backend/data.py.
+   Geometry for neighborhoods and blocks is static (frontend/tools/build_map_data.py);
+   counts and parcels come live from DataSF. */
+const MapView=(()=>{
+  const DATASF="https://data.sf.gov/resource/";
+  const DS={parcels:"acdm-wktn",c:"gm2e-bten",v:"nbtm-fbw5",e:"5cei-gny5"};
+  const STYLE="https://tiles.openfreemap.org/styles/positron";
+  const CITY=[[-122.515,37.705],[-122.355,37.835]];
+  const LIMIT=[[-122.72,37.62],[-122.18,37.92]];
+  const Z_BLOCK=13.2, Z_PARCEL=16.1, Z_LOAD=15.7, MAX_BLOCKS=160, MAX_HULL_KM2=1.6;
+  const SINCE=new Date(Date.now()-3650*864e5).toISOString().slice(0,10);
+  const METRICS=[{k:"c",label:"st_c"},{k:"v",label:"st_v"},{k:"e",label:"tab_e"}];
+  const RAMP=["#FDE3D4","#FBB78F","#F48A4E","#D9500F","#8F2C00"], ZERO="#E7ECEF", INK="#1C3E57";
+  const BINS={
+    c:{nh:[1,1000,2500,5000,7500],blk:[1,10,25,50,100],par:[1,2,4,8,16]},
+    v:{nh:[1,300,800,1200,2000],blk:[1,5,10,20,50],par:[1,2,3,5,10]},
+    e:{nh:[1,100,250,500,1000],face:[1,2,4,8,20]}
+  };
+  let map=null, stage=null, tried=false, ready=false, failed=false, pending=0, metric="c";
+  let selected=null, marker=null, popup=null, hovered=null, shownLevel=null, rebuildTimer=null, hoodBoxes=new Map();
+  let queue=[], nhFC=null, blkFC=null, blockIndex=[], blockById=new Map(), eviFC={type:"FeatureCollection",features:[]}, eviState="idle";
+  const fpsByBlock=new Map(), parcelState=new Map(), lotIndex=new Map(), fpById=new Map();
+  const lotCounts={c:new Map(),v:new Map()}, lotLoading={c:new Map(),v:new Map()}, totals={c:"idle",v:"idle"};
+
+  const q=s=>String(s).replace(/'/g,"''");
+  const inList=ids=>ids.map(i=>`'${q(i)}'`).join(",");
+  const pretty=a=>String(a).replace(/\b0(\d(?:ST|ND|RD|TH))\b/,"$1");
+  const compact=n=>new Intl.NumberFormat(LOCALE[state.lang],{notation:"compact",maximumFractionDigits:1}).format(n);
+  const level=()=>{const z=map.getZoom();return z<Z_BLOCK?"nh":z<Z_PARCEL?"blk":"par"};
+  const step=(key,bins)=>["step",["coalesce",["get",key],0],ZERO,...bins.flatMap((b,i)=>[b,RAMP[i]])];
+  const chunk=(a,n)=>{const o=[];for(let i=0;i<a.length;i+=n)o.push(a.slice(i,i+n));return o};
+  const whenReady=fn=>{ready?fn():queue.push(fn)};
+
+  async function soql(ds,params){
+    const u=new URL(DATASF+ds+".json");
+    Object.entries(params).forEach(([k,v])=>u.searchParams.set("$"+k,v));
+    const r=await fetch(u);
+    if(!r.ok) throw new Error("DataSF "+r.status);
+    return r.json();
+  }
+  async function tracked(fn){
+    pending++; renderHint();
+    try{return await fn()}finally{pending--;renderHint()}
+  }
+  function fail(){failed=true;renderHint()}
+
+  /* ---------- interface ---------- */
+  function stageEl(){
+    if(stage) return stage;
+    stage=document.createElement("div");
+    stage.id="mapstage";
+    stage.innerHTML=`<div id="bigmap"></div><div class="map-top"><div class="metrics" role="group"></div><div class="map-hint" aria-live="polite"></div></div><div class="map-legend"></div><div class="map-tip" hidden></div>`;
+    return stage;
+  }
+  function metricLabel(){return t(METRICS.find(m=>m.k===metric).label)}
+  function legendSpec(){
+    if(metric==="e") return level()==="nh"?{bins:BINS.e.nh,by:"map_by_nh"}:{bins:BINS.e.face,by:"map_by_face"};
+    const lv=level();
+    return {bins:BINS[metric][lv],by:"map_by_"+lv,zero:lv==="par"};
+  }
+  function renderLegend(){
+    const el=stage.querySelector(".map-legend");
+    if(!ready){el.innerHTML="";return}
+    const {bins,by,zero}=legendSpec();
+    const label=(v,i)=>i===bins.length-1?`${compact(v)}+`:(bins[i+1]-1===v?compact(v):`${compact(v)}–${compact(bins[i+1]-1)}`);
+    const title=`${metric==="e"?t("st_e"):metricLabel()} ${t(by)} · ${t("tenyears")}`;
+    el.innerHTML=`<div class="lg-title">${esc(title)}</div><div class="lg-scale">${zero?`<div class="lg-item"><i style="background:${ZERO}"></i><small>0</small></div>`:""}${bins.map((v,i)=>`<div class="lg-item"><i style="background:${RAMP[i]}"></i><small>${esc(label(v,i))}</small></div>`).join("")}</div>`;
+  }
+  function renderHint(){
+    if(!stage) return;
+    const el=stage.querySelector(".map-hint");
+    el.classList.toggle("err",failed);
+    if(failed){el.innerHTML=`${esc(t("map_error"))} <button class="link" data-a="mapretry">${esc(t("retry"))}</button>`;return}
+    if(pending>0||(!ready&&map)){el.textContent=t("map_loading");return}
+    if(!map){el.textContent="";return}
+    const lv=level();
+    el.textContent=lv==="nh"?t("map_hint_nh"):lv==="par"?t("map_hint_par"):metric==="e"?t("map_zoom_in"):t("map_hint_blk");
+  }
+  function renderUi(){
+    if(!stage) return;
+    const box=stage.querySelector(".metrics");
+    box.setAttribute("aria-label",t("map_title"));
+    box.innerHTML=METRICS.map(m=>`<button data-a="metric" data-v="${m.k}" aria-pressed="${m.k===metric}">${esc(t(m.label))}</button>`).join("");
+    renderLegend(); renderHint();
+    if(map) stage.querySelector("#bigmap").setAttribute("aria-label",`${t("map_title")}: ${metric==="e"?t("st_e"):metricLabel()}`);
+  }
+  function unavailable(){
+    const off=document.createElement("div");
+    off.className="map-off";
+    off.textContent=t("map_off");
+    stage.appendChild(off);
+    stage.querySelector(".map-top").hidden=true;
+  }
+
+  /* ---------- set up ---------- */
+  function init(){
+    if(typeof maplibregl==="undefined"){unavailable();return}
+    try{
+      map=new maplibregl.Map({
+        container:stage.querySelector("#bigmap"),style:STYLE,bounds:CITY,fitBoundsOptions:{padding:16},maxBounds:LIMIT,minZoom:10,maxZoom:19,
+        attributionControl:false,dragRotate:false,pitchWithRotate:false,
+        locale:{"CooperativeGesturesHandler.WindowsHelpText":t("coop_win"),"CooperativeGesturesHandler.MacHelpText":t("coop_mac"),"CooperativeGesturesHandler.MobileHelpText":t("coop_mobile")}
+      });
+    }catch(e){map=null;unavailable();return}
+    map.touchZoomRotate.disableRotation();
+    map.keyboard.disableRotation();
+    map.addControl(new maplibregl.NavigationControl({showCompass:false}),"top-right");
+    map.addControl(new maplibregl.AttributionControl({compact:true,customAttribution:'<a href="https://datasf.org/opendata/" target="_blank" rel="noopener">DataSF</a>'}),"bottom-right");
+    map.on("load",onLoad);
+    map.on("error",()=>{if(!ready&&!map.isStyleLoaded()) fail()});
+    map.on("mousemove",onMove);
+    map.on("mouseout",clearHover);
+    map.on("movestart",hideTip);
+    map.on("click",onClick);
+    map.on("moveend",sync);
+    map.on("zoom",()=>{if(ready&&level()!==shownLevel){shownLevel=level();renderLegend();renderHint()}});
+  }
+  async function onLoad(){
+    failed=false;
+    map.setPaintProperty("water","fill-color","#D5E5ED");
+    map.setPaintProperty("background","background-color","#F6F7F5");
+    map.setPaintProperty("park","fill-color","#E8EEE6");
+    try{
+      const [hoods,blocks]=await tracked(()=>Promise.all([
+        fetch("map-data/neighborhoods.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}),
+        fetch("map-data/blocks.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+      ]));
+      buildBase(hoods,blocks);
+      addLayers();
+      ready=true; shownLevel=level();
+      applyMetric();
+      queue.forEach(fn=>fn()); queue=[];
+      sync();
+    }catch(e){fail()}
+  }
+  function hullKm2(ring){
+    const kx=111.32*Math.cos(37.77*Math.PI/180), ky=110.57;
+    let a=0;
+    for(let i=0;i<ring.length-1;i++) a+=ring[i][0]*kx*ring[i+1][1]*ky-ring[i+1][0]*kx*ring[i][1]*ky;
+    return Math.abs(a)/2;
+  }
+  function buildBase(hoods,blocks){
+    const [ox,oy]=blocks.origin, s=blocks.scale, features=[];
+    blocks.blocks.forEach(([id,nh,c,v,flat])=>{
+      const ring=[]; let minX=180,minY=90,maxX=-180,maxY=-90;
+      for(let i=0;i<flat.length;i+=2){
+        const x=ox+flat[i]/s, y=oy+flat[i+1]/s;
+        ring.push([x,y]);
+        minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+      }
+      ring.push(ring[0]);
+      const entry={id,hood:blocks.neighborhoods[nh],minX,minY,maxX,maxY,c,v};
+      blockIndex.push(entry); blockById.set(id,entry);
+      if(hullKm2(ring)<=MAX_HULL_KM2) features.push({type:"Feature",properties:{id,c,v},geometry:{type:"Polygon",coordinates:[ring]}});
+    });
+    blkFC={type:"FeatureCollection",features};
+    nhFC=hoods;
+    nhFC.features.forEach(f=>{
+      f.properties.c=0;f.properties.v=0;f.properties.e=0;
+      let minX=180,minY=90,maxX=-180,maxY=-90;
+      const walk=n=>{if(typeof n[0]==="number"){minX=Math.min(minX,n[0]);maxX=Math.max(maxX,n[0]);minY=Math.min(minY,n[1]);maxY=Math.max(maxY,n[1])}else n.forEach(walk)};
+      walk(f.geometry.coordinates);
+      hoodBoxes.set(f.properties.name,[[minX,minY],[maxX,maxY]]);
+    });
+    sumHoods("c"); sumHoods("v");
+  }
+  function sumHoods(key){
+    const sums=new Map();
+    blockIndex.forEach(b=>{if(b.hood) sums.set(b.hood,(sums.get(b.hood)||0)+(b[key]||0))});
+    nhFC.features.forEach(f=>{f.properties[key]=sums.get(f.properties.name)||0});
+  }
+  function addLayers(){
+    const before=map.getStyle().layers.find(l=>l.type==="symbol").id;
+    const hover=["boolean",["feature-state","hover"],false];
+    map.addSource("nh",{type:"geojson",data:nhFC,promoteId:"name"});
+    map.addSource("blk",{type:"geojson",data:blkFC,promoteId:"id"});
+    map.addSource("par",{type:"geojson",data:{type:"FeatureCollection",features:[]},promoteId:"id"});
+    map.addSource("evi",{type:"geojson",data:eviFC,promoteId:"id"});
+    map.addSource("nh-names",{type:"geojson",data:{type:"FeatureCollection",features:nhFC.features.map(f=>({type:"Feature",properties:{name:f.properties.name},geometry:{type:"Point",coordinates:[f.properties.lx,f.properties.ly]}}))}});
+
+    map.addLayer({id:"nh-fill",type:"fill",source:"nh",maxzoom:Z_BLOCK+.15,paint:{"fill-color":ZERO,"fill-opacity":["interpolate",["linear"],["zoom"],Z_BLOCK-.4,.84,Z_BLOCK+.1,0]}},before);
+    map.addLayer({id:"nh-line",type:"line",source:"nh",maxzoom:Z_BLOCK+.15,paint:{"line-color":["case",hover,INK,"#fff"],"line-width":["case",hover,2.2,1]}},before);
+    map.addLayer({id:"blk-fill",type:"fill",source:"blk",minzoom:Z_BLOCK-.45,maxzoom:Z_PARCEL+.15,paint:{"fill-color":ZERO,"fill-opacity":["interpolate",["linear"],["zoom"],Z_BLOCK-.4,0,Z_BLOCK,.88,Z_PARCEL-.2,.88,Z_PARCEL+.1,0]}},before);
+    map.addLayer({id:"blk-line",type:"line",source:"blk",minzoom:Z_BLOCK-.2,maxzoom:Z_PARCEL+.15,paint:{"line-color":["case",hover,INK,"#fff"],"line-width":["case",hover,2,.6]}},before);
+    map.addLayer({id:"par-fill",type:"fill",source:"par",minzoom:Z_PARCEL-.45,paint:{"fill-color":ZERO,"fill-opacity":["interpolate",["linear"],["zoom"],Z_PARCEL-.4,0,Z_PARCEL,.94]}},before);
+    map.addLayer({id:"par-line",type:"line",source:"par",minzoom:Z_PARCEL-.2,paint:{"line-color":["case",hover,INK,"#fff"],"line-width":["case",hover,2.2,.7]}},before);
+    map.addLayer({id:"par-sel",type:"line",source:"par",minzoom:Z_PARCEL-.2,filter:["==",["get","id"],""],paint:{"line-color":INK,"line-width":3}},before);
+    map.addLayer({id:"evi-dots",type:"circle",source:"evi",minzoom:Z_BLOCK-.2,layout:{"visibility":"none","circle-sort-key":["get","n"]},paint:{
+      "circle-color":step("n",BINS.e.face),
+      "circle-radius":["interpolate",["linear"],["zoom"],Z_BLOCK,4.5,16,9,18,13],
+      "circle-stroke-color":["case",hover,INK,"#fff"],
+      "circle-stroke-width":["case",hover,2.2,1.2]
+    }});
+    map.addLayer({id:"nh-names",type:"symbol",source:"nh-names",maxzoom:Z_BLOCK,layout:{"text-field":["get","name"],"text-font":["Noto Sans Regular"],"text-size":["interpolate",["linear"],["zoom"],11,10,13,12.5],"text-max-width":7,"text-padding":4},paint:{"text-color":INK,"text-halo-color":"rgba(255,255,255,.9)","text-halo-width":1.4}});
+    map.setLayerZoomRange("label_other",Z_BLOCK,24);
+  }
+  function applyMetric(){
+    if(!ready) return;
+    const isE=metric==="e", show=v=>v?"visible":"none";
+    map.setPaintProperty("nh-fill","fill-color",step(metric,BINS[metric].nh));
+    map.setLayoutProperty("blk-fill","visibility",show(!isE));
+    map.setLayoutProperty("blk-line","visibility",show(!isE));
+    map.setLayoutProperty("evi-dots","visibility",show(isE));
+    if(!isE){
+      map.setPaintProperty("blk-fill","fill-color",step(metric,BINS[metric].blk));
+      map.setPaintProperty("par-fill","fill-color",step(metric,BINS[metric].par));
+    }else{
+      map.setPaintProperty("par-fill","fill-color",ZERO);
+    }
+    clearHover();
+    renderUi();
+    if(isE) loadEvictions(); else refreshTotals(metric);
+    sync();
+  }
+
+  /* ---------- live data ---------- */
+  async function refreshTotals(key){
+    if(totals[key]!=="idle") return;
+    totals[key]="loading";
+    try{
+      const rows=await soql(DS[key],{select:key==="c"?"block,count(*) as n":"block,count(distinct complaint_number) as n",where:`date_filed>='${SINCE}'`,group:"block",limit:50000});
+      const byBlock=new Map(rows.map(r=>[r.block,+r.n]));
+      blockIndex.forEach(b=>{b[key]=byBlock.get(b.id)||0});
+      blkFC.features.forEach(f=>{f.properties[key]=byBlock.get(f.properties.id)||0});
+      sumHoods(key);
+      map.getSource("blk").setData(blkFC);
+      map.getSource("nh").setData(nhFC);
+      totals[key]="done";
+    }catch(e){totals[key]="idle"}   // the snapshot stays on screen
+  }
+  async function loadEvictions(){
+    if(eviState!=="idle") return;
+    eviState="loading";
+    try{
+      const rows=await tracked(()=>soql(DS.e,{select:"address,neighborhood,shape,count(*) as n",where:`file_date>='${SINCE}' AND shape IS NOT NULL`,group:"address,neighborhood,shape",limit:50000}));
+      const sums=new Map();
+      eviFC={type:"FeatureCollection",features:rows.map((r,i)=>{
+        if(r.neighborhood) sums.set(r.neighborhood,(sums.get(r.neighborhood)||0)+(+r.n));
+        return {type:"Feature",properties:{id:"e"+i,n:+r.n,addr:r.address||""},geometry:r.shape};
+      })};
+      nhFC.features.forEach(f=>{f.properties.e=sums.get(f.properties.name)||0});
+      map.getSource("evi").setData(eviFC);
+      map.getSource("nh").setData(nhFC);
+      eviState="done";
+    }catch(e){eviState="idle";fail()}
+  }
+  function blocksInView(){
+    const b=map.getBounds(), c=b.getCenter();
+    const w=b.getWest(), e=b.getEast(), s=b.getSouth(), n=b.getNorth();
+    const dist=x=>Math.hypot((x.minX+x.maxX)/2-c.lng,(x.minY+x.maxY)/2-c.lat);
+    return blockIndex.filter(x=>x.maxX>=w&&x.minX<=e&&x.maxY>=s&&x.minY<=n).sort((a,d)=>dist(a)-dist(d)).slice(0,MAX_BLOCKS).map(x=>x.id);
+  }
+  function sync(){
+    if(!ready) return;
+    renderHint();
+    if(map.getZoom()<Z_LOAD) return;
+    const ids=blocksInView();
+    loadParcels(ids);
+    if(metric!=="e") loadLots(metric,ids);
+  }
+  function bestAddress(rows){
+    const seen=new Map();
+    rows.forEach(r=>{
+      if(!r.from_address_num||r.from_address_num==="0"||!r.street_name) return;
+      const text=[r.from_address_num,r.street_name,r.street_type].filter(Boolean).join(" ");
+      const e=seen.get(text)||{text,number:r.from_address_num,street:r.street_name,count:0};
+      e.count++; seen.set(text,e);
+    });
+    return [...seen.values()].sort((a,b)=>b.count-a.count||(+a.number)-(+b.number))[0]||null;
+  }
+  function makeFootprints(block,rows){
+    const groups=new Map();
+    rows.forEach(r=>{
+      if(!r.shape) return;
+      const key=JSON.stringify(r.shape.coordinates);
+      if(!groups.has(key)) groups.set(key,{shape:r.shape,rows:[]});
+      groups.get(key).rows.push(r);
+    });
+    return [...groups.values()].map(g=>{
+      const a=bestAddress(g.rows);
+      return {id:g.rows[0].blklot,block,lots:new Set(g.rows.map(r=>r.lot_num)),blklots:g.rows.map(r=>r.blklot),
+        number:a?a.number:null,street:a?a.street:"",addr:a?a.text:"",c:null,v:null,geometry:g.shape};
+    });
+  }
+  function assignCounts(block){
+    const fps=fpsByBlock.get(block); if(!fps) return;
+    ["c","v"].forEach(key=>{
+      const rows=lotCounts[key].get(block);
+      fps.forEach(fp=>{fp[key]=rows?0:null});
+      if(!rows) return;
+      rows.forEach(r=>fps.forEach(fp=>{
+        if(fp.lots.has(r.lot)||(r.street_number&&r.street_number===fp.number)) fp[key]+=+r.n;
+      }));
+    });
+  }
+  function scheduleRebuild(){
+    clearTimeout(rebuildTimer);
+    rebuildTimer=setTimeout(rebuildParcels,80);
+  }
+  function rebuildParcels(){
+    if(fpsByBlock.size>500){
+      const keep=new Set(blocksInView());
+      [...fpsByBlock.keys()].forEach(id=>{if(!keep.has(id)&&fpsByBlock.size>350){fpsByBlock.delete(id);parcelState.delete(id)}});
+    }
+    const features=[];
+    lotIndex.clear(); fpById.clear();
+    fpsByBlock.forEach(fps=>fps.forEach(fp=>{
+      fpById.set(fp.id,fp);
+      fp.blklots.forEach(l=>lotIndex.set(l,fp.id));
+      features.push({type:"Feature",properties:{id:fp.id,addr:pretty(fp.addr),c:fp.c,v:fp.v},geometry:fp.geometry});
+    }));
+    map.getSource("par").setData({type:"FeatureCollection",features});
+    applySelection();
+  }
+  function loadParcels(ids){
+    const missing=ids.filter(id=>!parcelState.has(id));
+    chunk(missing,25).forEach(group=>{
+      group.forEach(id=>parcelState.set(id,"loading"));
+      tracked(()=>soql(DS.parcels,{select:"blklot,block_num,lot_num,from_address_num,street_name,street_type,simplify(shape,0.00001) as shape",where:`active=true AND block_num in (${inList(group)})`,limit:20000}))
+        .then(rows=>{
+          const byBlock=new Map();
+          rows.forEach(r=>{if(!byBlock.has(r.block_num))byBlock.set(r.block_num,[]);byBlock.get(r.block_num).push(r)});
+          group.forEach(id=>{fpsByBlock.set(id,makeFootprints(id,byBlock.get(id)||[]));parcelState.set(id,"done");assignCounts(id)});
+          scheduleRebuild();
+        })
+        .catch(()=>{group.forEach(id=>parcelState.delete(id));fail()});
+    });
+  }
+  function loadLots(key,ids){
+    const loading=lotLoading[key], missing=ids.filter(id=>!lotCounts[key].has(id)&&!loading.has(id));
+    chunk(missing,40).forEach(group=>{
+      const p=tracked(()=>soql(DS[key],{select:key==="c"?"block,lot,street_number,count(*) as n":"block,lot,street_number,count(distinct complaint_number) as n",where:`date_filed>='${SINCE}' AND block in (${inList(group)})`,group:"block,lot,street_number",limit:50000}))
+        .then(rows=>{
+          const byBlock=new Map(group.map(id=>[id,[]]));
+          rows.forEach(r=>{if(byBlock.has(r.block))byBlock.get(r.block).push(r)});
+          byBlock.forEach((list,id)=>{lotCounts[key].set(id,list);assignCounts(id)});
+          scheduleRebuild();
+        })
+        .catch(()=>fail())
+        .finally(()=>group.forEach(id=>loading.delete(id)));
+      group.forEach(id=>loading.set(id,p));
+    });
+    return Promise.all(ids.map(id=>loading.get(id)).filter(Boolean));
+  }
+
+  /* ---------- pointer ---------- */
+  function activeLayers(){
+    const lv=level();
+    if(lv==="nh") return ["nh-fill"];
+    if(lv==="blk") return metric==="e"?["evi-dots"]:["blk-fill"];
+    return metric==="e"?["evi-dots","par-fill"]:["par-fill"];
+  }
+  function topFeature(point){return map.queryRenderedFeatures(point,{layers:activeLayers()})[0]||null}
+  function hideTip(){const tip=stage.querySelector(".map-tip");tip.hidden=true}
+  function clearHover(){
+    if(hovered&&map.getSource(hovered.source)) map.removeFeatureState(hovered,"hover");
+    hovered=null;
+    if(map) map.getCanvas().style.cursor="";
+    if(stage) hideTip();
+  }
+  function tipHtml(f){
+    const p=f.properties, name=metric==="e"?"":metricLabel().toLowerCase();
+    const row=(n,label,where)=>`<b>${esc(n)}</b> ${esc(label)}${where?` · ${esc(where)}`:""}`;
+    if(f.source==="nh") return row(p[metric]??0,metric==="e"?t("st_e").toLowerCase():name,p.name);
+    if(f.source==="blk") return row(p[metric]??0,`${name} ${t("map_on_block")}`);
+    if(f.source==="evi") return row(p.n,`${t("st_e")} ${t("st_e_scope")}`.toLowerCase(),p.addr);
+    if(metric==="e") return esc(p.addr||t("no_address"));
+    return row(p[metric]===undefined||p[metric]===null?"…":p[metric],name,p.addr);
+  }
+  function onMove(e){
+    if(!ready) return;
+    const f=topFeature(e.point);
+    if(!f){clearHover();return}
+    if(!hovered||hovered.source!==f.source||hovered.id!==f.id){
+      if(hovered&&map.getSource(hovered.source)) map.removeFeatureState(hovered,"hover");
+      hovered={source:f.source,id:f.id};
+      map.setFeatureState(hovered,{hover:true});
+    }
+    map.getCanvas().style.cursor="pointer";
+    const tip=stage.querySelector(".map-tip");
+    tip.innerHTML=tipHtml(f);
+    tip.hidden=false;
+    const w=stage.clientWidth, h=stage.clientHeight, tw=tip.offsetWidth, th=tip.offsetHeight;
+    const x=Math.min(e.point.x+14,w-tw-6), y=e.point.y-th-12<6?e.point.y+16:e.point.y-th-12;
+    tip.style.transform=`translate(${Math.max(6,x)}px,${Math.min(y,h-th-6)}px)`;
+  }
+  function closePopup(){if(popup){popup.remove();popup=null}}
+  function showPopup(lngLat,node){
+    closePopup();
+    popup=new maplibregl.Popup({maxWidth:"290px",offset:10}).setLngLat(lngLat).setDOMContent(node).addTo(map);
+  }
+  function zoomInto(box,minZoom){
+    const cam=map.cameraForBounds(box,{padding:50});
+    if(cam) map.flyTo({center:cam.center,zoom:Math.max(cam.zoom,minZoom),speed:1.5});
+  }
+  function onClick(e){
+    if(!ready) return;
+    const f=topFeature(e.point);
+    if(!f){closePopup();return}
+    hideTip();
+    if(f.source==="nh"){closePopup();zoomInto(hoodBoxes.get(f.properties.name),Z_BLOCK+.5)}
+    else if(f.source==="blk"){
+      closePopup();
+      const b=blockById.get(f.properties.id);
+      zoomInto([[b.minX,b.minY],[b.maxX,b.maxY]],Z_PARCEL+.5);
+    }
+    else if(f.source==="evi") faceCard(e.lngLat,f.properties);
+    else buildingCard(e.lngLat,f.properties.id);
+  }
+  function faceCard(lngLat,p){
+    const node=document.createElement("div");
+    node.className="map-pop";
+    node.innerHTML=`<h3>${esc(p.addr)}</h3><p class="pop-note"><b>${esc(p.n)}</b> ${esc(`${t("st_e")} ${t("st_e_scope")}`.toLowerCase())} · ${esc(t("tenyears"))}</p>${level()==="par"?"":`<p class="pop-note">${esc(t("map_zoom_in"))}</p>`}`;
+    showPopup(lngLat,node);
+  }
+  function faceCount(fp){
+    const n=parseInt(fp.number,10);
+    if(!fp.street||isNaN(n)) return Promise.resolve(null);
+    const street=fp.street.toUpperCase().replace(/^0(\d)/,"$1"), hundred=Math.floor(n/100)*100;
+    return soql(DS.e,{select:"count(*) as n",where:`upper(address) like '${q(hundred+" BLOCK OF "+street)} %' AND file_date>='${SINCE}'`}).then(r=>+((r[0]||{}).n||0)).catch(()=>null);
+  }
+  function buildingCard(lngLat,id){
+    const fp=fpById.get(id); if(!fp) return;
+    const node=document.createElement("div");
+    node.className="map-pop";
+    const stat=(cls,label)=>`<div><b class="${cls}">…</b><span>${esc(label)}</span></div>`;
+    if(!fp.addr){node.innerHTML=`<p>${esc(t("no_address"))}</p>`;showPopup(lngLat,node);return}
+    node.innerHTML=`<h3>${esc(pretty(fp.addr))}</h3><p class="pop-note">${esc(t("city_flag"))} · ${esc(t("tenyears"))}</p>
+      <div class="pop-stats">${stat("pc",t("st_c"))}${stat("pv",t("st_v"))}${stat("pe",`${t("st_e")} ${t("st_e_scope")}`)}</div>
+      <button class="btn" data-a="pick" data-v="${esc(fp.addr)}" data-lat="${esc(lngLat.lat)}" data-lon="${esc(lngLat.lng)}" data-b="${esc(fp.id)}">${esc(t("see_report"))}</button>`;
+    showPopup(lngLat,node);
+    const put=(cls,v)=>{const el=node.querySelector("."+cls);if(el)el.textContent=v===null||v===undefined?"—":v};
+    Promise.all([loadLots("c",[fp.block]),loadLots("v",[fp.block])]).then(()=>{
+      assignCounts(fp.block);
+      const now=(fpsByBlock.get(fp.block)||[]).find(x=>x.id===fp.id)||fp;
+      put("pc",now.c); put("pv",now.v);
+    });
+    faceCount(fp).then(v=>put("pe",v));
+  }
+
+  /* ---------- selection ---------- */
+  function setMarker(lat,lon){
+    if(!map) return;
+    if(!marker){
+      const el=document.createElement("div");
+      el.className="pin";
+      marker=new maplibregl.Marker({element:el});
+    }
+    marker.setLngLat([lon,lat]).addTo(map);
+  }
+  function applySelection(){
+    if(!ready) return;
+    const id=selected&&(lotIndex.get(selected.blklot)||"");
+    map.setFilter("par-sel",["==",["get","id"],id||""]);
+  }
+
+  return {
+    mount(slot,{embedded}){
+      if(!slot) return;
+      const el=stageEl();
+      if(el.parentNode!==slot) slot.appendChild(el);
+      if(!tried){tried=true;init()}
+      renderUi();
+      if(!map) return;
+      if(embedded) map.cooperativeGestures.enable(); else map.cooperativeGestures.disable();
+      requestAnimationFrame(()=>map.resize());
+    },
+    resize(){if(map) requestAnimationFrame(()=>{map.resize();sync()})},
+    setMetric(k){
+      if(!METRICS.some(m=>m.k===k)||k===metric) return;
+      metric=k;
+      closePopup();
+      applyMetric();
+      const b=stage.querySelector(`.metrics [data-v="${k}"]`); if(b) b.focus();
+    },
+    mark(p){
+      closePopup();
+      selected={blklot:p.blklot};
+      whenReady(()=>{setMarker(p.lat,p.lon);applySelection()});
+    },
+    focus(b){
+      if(b.lat==null||b.lon==null) return;
+      selected={blklot:b.blklot};
+      whenReady(()=>{
+        setMarker(b.lat,b.lon);
+        map.flyTo({center:[b.lon,b.lat],zoom:Math.max(map.getZoom(),Z_PARCEL+.9),speed:1.5});
+        applySelection();
+      });
+    },
+    reset(){
+      selected=null;
+      if(marker) marker.remove();
+      closePopup();
+      whenReady(()=>{applySelection();map.fitBounds(CITY,{padding:16})});
+    },
+    retry(){
+      if(!ready){location.reload();return}
+      failed=false;
+      if(metric==="e") loadEvictions();
+      sync();
+      renderHint();
+    }
+  };
+})();
 
 /* =========================== loading flow =========================== */
-async function load(address,{silent=false,push=true}={}){
+async function load(address,{silent=false,push=true,point=null}={}){
   const id=++state.reqId;
   if(state.address&&state.address!==address) state.section="report";
   state.address=address;
   if(push&&!silent) pushUrl();
   let timer;
   if(!silent){
+    state.mapOpen=false;
     state.view="loading"; render(); window.scrollTo(0,0);
+    if(point) MapView.mark(point);
     let i=0; timer=setInterval(()=>{
       const li=document.querySelectorAll("#steps li"); if(!li.length||i>=li.length-1){clearInterval(timer);return}
       li[i].className="done"; li[++i].className="on";
     },1700);
   }
   try{
-    const data=await getReport(address,state.lang);
+    const data=await getReport(address,state.lang,point);
     if(id!==state.reqId) return;
     clearInterval(timer);
     state.data=data;
     if(silent){renderPanel();return}
     state.tab="c"; state.showAll={};
     state.view="results"; render();
+    MapView.focus(data.building);
     loadMatches();
   }catch(e){
     if(id!==state.reqId) return;
@@ -921,10 +1498,14 @@ document.addEventListener("submit",e=>{
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-a]"); if(!el) return;
   const a=el.dataset.a, v=el.dataset.v;
-  if(a==="home"){state.reqId++;state.view="landing";state.address="";state.data=null;state.section="report";pushUrl();render();window.scrollTo(0,0)}
+  if(a==="home"){state.reqId++;state.view="landing";state.address="";state.data=null;state.section="report";pushUrl();render();MapView.reset();window.scrollTo(0,0)}
   else if(a==="example") load(v);
   else if(a==="retry") load(state.address);
   else if(a==="nav") showSection(v);
+  else if(a==="mapopen"){state.mapOpen=true;syncNav()}
+  else if(a==="metric") MapView.setMetric(v);
+  else if(a==="mapretry") MapView.retry();
+  else if(a==="pick") load(v,{point:{lat:+el.dataset.lat,lon:+el.dataset.lon,blklot:el.dataset.b}});
   else if(a==="goto"){state.tab=v;showSection("city")}
   else if(a==="tab"){state.tab=v;$("#records").innerHTML=recordsInner();showSelectedSubtab();$(`#records [data-v="${v}"]`).focus({preventScroll:true})}
   else if(a==="toggleall"){state.showAll[state.tab]=!state.showAll[state.tab];$("#records").innerHTML=recordsInner()}
@@ -954,7 +1535,7 @@ dlg.addEventListener("click",e=>{ if(e.target===dlg){state.pendingContact=null;d
 window.addEventListener("popstate",()=>{
   const q=new URLSearchParams(location.search), a=q.get("address");
   state.address=a||""; state.section=validSection(q.get("tab"));
-  if(a) load(a,{push:false}); else {state.reqId++;state.view="landing";state.data=null;render()}
+  if(a) load(a,{push:false}); else {state.reqId++;state.view="landing";state.data=null;render();MapView.reset()}
 });
 
 /* =========================== start =========================== */
