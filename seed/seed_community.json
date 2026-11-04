@@ -1,60 +1,260 @@
 {
-  "_note": "ALL ENTRIES ARE FICTIONAL demo data. Load them with demo=true so the UI labels them as fictional examples. blklot 0045010B is the mock building's key; change it to the real blklot of your demo address.",
+  "_note": "Données de démo FICTIVES (chargées avec demo=true). Fusion du seed de Fleurine (adresses de la démo : 907 Valencia, 2288 Broadway) et de celui de Colomban.",
   "reviews": [
     {
-      "id": "demo-r1", "blklot": "0045010B", "pseudo": "FoggyWindow", "period_start": "2023-02", "period_end": null,
-      "ratings": {"overall": 3, "landlord_responsiveness": 3, "maintenance": 2, "noise": 4, "safety": 4},
+      "blklot": "3609042",
+      "pseudo": "mission_renter",
+      "period_start": "2022-01",
+      "period_end": "2025-06",
+      "ratings": {
+        "overall": 2,
+        "landlord_responsiveness": 1,
+        "maintenance": 2,
+        "noise": 3,
+        "safety": 2
+      },
+      "text": "Fire alarm kept beeping for weeks and repair requests went unanswered. Great location though.",
+      "verified": true
+    },
+    {
+      "blklot": "3609042",
+      "pseudo": "valencia_2019",
+      "period_start": "2019-03",
+      "period_end": "2021-08",
+      "ratings": {
+        "overall": 3,
+        "landlord_responsiveness": 2,
+        "maintenance": 3,
+        "noise": 2,
+        "safety": 3
+      },
+      "text": "Hallway often blocked by construction materials. Rent was fair for the area.",
+      "verified": false
+    },
+    {
+      "blklot": "0564C104",
+      "pseudo": "pacific_heights_tenant",
+      "period_start": "2020-09",
+      "period_end": null,
+      "ratings": {
+        "overall": 5,
+        "landlord_responsiveness": 5,
+        "maintenance": 5,
+        "noise": 4,
+        "safety": 5
+      },
+      "text": "Management fixes things within days. Quiet building, well maintained.",
+      "verified": true
+    },
+    {
+      "id": "demo-r1",
+      "blklot": "0045010B",
+      "pseudo": "FoggyWindow",
+      "period_start": "2023-02",
+      "period_end": null,
+      "ratings": {
+        "overall": 3,
+        "landlord_responsiveness": 3,
+        "maintenance": 2,
+        "noise": 4,
+        "safety": 4
+      },
       "text": "Great light and a quiet back side. The manager answers quickly, but the actual repair took six weeks when water came through my ceiling.",
-      "verified": true, "status": "published", "created_at": "2026-09-14T18:20:00Z", "demo": true
+      "verified": true,
+      "status": "published",
+      "created_at": "2026-09-14T18:20:00Z",
+      "demo": true
     },
     {
-      "id": "demo-r2", "blklot": "0045010B", "pseudo": "CableCarCommuter", "period_start": "2021-06", "period_end": "2024-08",
-      "ratings": {"overall": 4, "landlord_responsiveness": 4, "maintenance": 3, "noise": 3, "safety": 5},
+      "id": "demo-r2",
+      "blklot": "0045010B",
+      "pseudo": "CableCarCommuter",
+      "period_start": "2021-06",
+      "period_end": "2024-08",
+      "ratings": {
+        "overall": 4,
+        "landlord_responsiveness": 4,
+        "maintenance": 3,
+        "noise": 3,
+        "safety": 5
+      },
       "text": "Solid building and a good location. Street noise is real on the Bay St side in summer. The elevator was out for a while, but it was fixed properly.",
-      "verified": true, "status": "published", "created_at": "2026-05-03T09:02:00Z", "demo": true
+      "verified": true,
+      "status": "published",
+      "created_at": "2026-05-03T09:02:00Z",
+      "demo": true
     },
     {
-      "id": "demo-r3", "blklot": "0045010B", "pseudo": "NorthPointNeighbor", "period_start": "2019-01", "period_end": "2022-03",
-      "ratings": {"overall": 2, "landlord_responsiveness": 2, "maintenance": 2, "noise": 3, "safety": 3},
+      "id": "demo-r3",
+      "blklot": "0045010B",
+      "pseudo": "NorthPointNeighbor",
+      "period_start": "2019-01",
+      "period_end": "2022-03",
+      "ratings": {
+        "overall": 2,
+        "landlord_responsiveness": 2,
+        "maintenance": 2,
+        "noise": 3,
+        "safety": 3
+      },
       "text": "The heat was unreliable for two winters in a row. I would ask about it before signing.",
-      "verified": false, "status": "published", "created_at": "2025-11-21T22:47:00Z", "demo": true
+      "verified": false,
+      "status": "published",
+      "created_at": "2025-11-21T22:47:00Z",
+      "demo": true
     }
   ],
   "profiles": [
     {
-      "id": "demo-p1", "pseudo": "FoggyWindow", "role": "current_tenant", "blklot": "0045010B", "neighborhood": "Russian Hill",
-      "budget_min": null, "budget_max": null, "move_in": null,
+      "pseudo": "valencia_now",
+      "role": "current_tenant",
+      "blklot": "3609042",
+      "neighborhood": "Mission",
+      "bio": "Happy to answer questions about the building.",
+      "lifestyle": {},
+      "open_to_contact": true,
+      "verified": true
+    },
+    {
+      "pseudo": "grad_student_sf",
+      "role": "seeking_roommate",
+      "blklot": null,
+      "neighborhood": "Mission",
+      "budget_min": 1200,
+      "budget_max": 1700,
+      "move_in": "2027-01",
+      "bio": "Grad student, quiet weekdays, loves cooking.",
+      "lifestyle": {
+        "schedule": "early",
+        "cleanliness": 4,
+        "guests": "sometimes",
+        "smoking": false,
+        "pets": false
+      },
+      "open_to_contact": true
+    },
+    {
+      "pseudo": "room_in_mission",
+      "role": "has_room",
+      "blklot": null,
+      "neighborhood": "Mission",
+      "budget_min": 1400,
+      "budget_max": 1600,
+      "move_in": "2026-12",
+      "bio": "Bright room in a 3BR, we cook together sometimes.",
+      "lifestyle": {
+        "schedule": "flexible",
+        "cleanliness": 4,
+        "guests": "sometimes",
+        "smoking": false,
+        "pets": true
+      },
+      "open_to_contact": true
+    },
+    {
+      "id": "demo-p1",
+      "pseudo": "FoggyWindow",
+      "role": "current_tenant",
+      "blklot": "0045010B",
+      "neighborhood": "Russian Hill",
+      "budget_min": null,
+      "budget_max": null,
+      "move_in": null,
       "bio": "Third-floor tenant since 2023. Happy to answer questions about the building.",
-      "lifestyle": {"schedule": "flexible", "cleanliness": 4, "guests": "sometimes", "smoking": false, "pets": false},
-      "open_to_contact": true, "verified": true, "demo": true
+      "lifestyle": {
+        "schedule": "flexible",
+        "cleanliness": 4,
+        "guests": "sometimes",
+        "smoking": false,
+        "pets": false
+      },
+      "open_to_contact": true,
+      "verified": true,
+      "demo": true
     },
     {
-      "id": "demo-p2", "pseudo": "CableCarCommuter", "role": "former_tenant", "blklot": "0045010B", "neighborhood": "Russian Hill",
-      "budget_min": null, "budget_max": null, "move_in": null,
+      "id": "demo-p2",
+      "pseudo": "CableCarCommuter",
+      "role": "former_tenant",
+      "blklot": "0045010B",
+      "neighborhood": "Russian Hill",
+      "budget_min": null,
+      "budget_max": null,
+      "move_in": null,
       "bio": "Lived here for three years and moved out in 2024. Ask me about noise and the elevator.",
-      "lifestyle": {"schedule": "early", "cleanliness": 3, "guests": "rarely", "smoking": false, "pets": true},
-      "open_to_contact": true, "verified": true, "demo": true
+      "lifestyle": {
+        "schedule": "early",
+        "cleanliness": 3,
+        "guests": "rarely",
+        "smoking": false,
+        "pets": true
+      },
+      "open_to_contact": true,
+      "verified": true,
+      "demo": true
     },
     {
-      "id": "demo-p3", "pseudo": "SunsetSourdough", "role": "has_room", "blklot": null, "neighborhood": "Russian Hill",
-      "budget_min": 1500, "budget_max": 1900, "move_in": "2027-01",
+      "id": "demo-p3",
+      "pseudo": "SunsetSourdough",
+      "role": "has_room",
+      "blklot": null,
+      "neighborhood": "Russian Hill",
+      "budget_min": 1500,
+      "budget_max": 1900,
+      "move_in": "2027-01",
       "bio": "Room free in a two-bedroom. I work days and cook a lot.",
-      "lifestyle": {"schedule": "early", "cleanliness": 4, "guests": "sometimes", "smoking": false, "pets": false},
-      "open_to_contact": true, "verified": true, "demo": true
+      "lifestyle": {
+        "schedule": "early",
+        "cleanliness": 4,
+        "guests": "sometimes",
+        "smoking": false,
+        "pets": false
+      },
+      "open_to_contact": true,
+      "verified": true,
+      "demo": true
     },
     {
-      "id": "demo-p4", "pseudo": "NoeValleyNightOwl", "role": "has_room", "blklot": null, "neighborhood": "Nob Hill",
-      "budget_min": 1700, "budget_max": 2100, "move_in": "2027-02",
+      "id": "demo-p4",
+      "pseudo": "NoeValleyNightOwl",
+      "role": "has_room",
+      "blklot": null,
+      "neighborhood": "Nob Hill",
+      "budget_min": 1700,
+      "budget_max": 2100,
+      "move_in": "2027-02",
       "bio": "Quiet flat, one cat, and I work late shifts.",
-      "lifestyle": {"schedule": "late", "cleanliness": 3, "guests": "rarely", "smoking": false, "pets": true},
-      "open_to_contact": true, "verified": false, "demo": true
+      "lifestyle": {
+        "schedule": "late",
+        "cleanliness": 3,
+        "guests": "rarely",
+        "smoking": false,
+        "pets": true
+      },
+      "open_to_contact": true,
+      "verified": false,
+      "demo": true
     },
     {
-      "id": "demo-p5", "pseudo": "MuniMorningPerson", "role": "seeking_roommate", "blklot": null, "neighborhood": "Russian Hill",
-      "budget_min": 1400, "budget_max": 1800, "move_in": "2027-01",
+      "id": "demo-p5",
+      "pseudo": "MuniMorningPerson",
+      "role": "seeking_roommate",
+      "blklot": null,
+      "neighborhood": "Russian Hill",
+      "budget_min": 1400,
+      "budget_max": 1800,
+      "move_in": "2027-01",
       "bio": "Looking for a calm shared flat close to transit.",
-      "lifestyle": {"schedule": "early", "cleanliness": 4, "guests": "rarely", "smoking": false, "pets": false},
-      "open_to_contact": true, "verified": false, "demo": true
+      "lifestyle": {
+        "schedule": "early",
+        "cleanliness": 4,
+        "guests": "rarely",
+        "smoking": false,
+        "pets": false
+      },
+      "open_to_contact": true,
+      "verified": false,
+      "demo": true
     }
   ]
 }
