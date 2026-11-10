@@ -2,7 +2,7 @@
 
 **Know the building before you sign.** Type any San Francisco address and get a plain-language report on the building, written by Mistral from the city's own open data: complaints and violations, permits and works, evictions on the block, fire calls, police incidents nearby and 311 reports. Then hear from tenants, check your lease, and find a neighborhood that fits your budget.
 
-🔗 **Live demo: https://know-your-building.onrender.com** (free hosting: the first load can take up to a minute while the server wakes up)
+🔗 **Live demo: https://know-your-building-lm5f.onrender.com** (free hosting: the first load can take up to a minute while the server wakes up)
 
 Built in one evening at the **Mistral AI × Elastic hackathon**, San Francisco, November 2026.
 
