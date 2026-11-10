@@ -24,9 +24,11 @@ Nearly two thirds of San Francisco households rent. You get a fifteen-minute sho
 | **Trust network** | Inspired by Paris' "Gens de confiance": recommendations from friends, former landlords and roommates, contactable tenants of the building, and roommate matching that never uses gender, religion or origin. |
 | **More** | Follow a building and see what changed, compare two buildings side by side, commute times, four languages (EN, ES, 中文, FR). |
 
-| Report, by theme | Assistant + map | Trust network |
-|---|---|---|
-| ![Report](docs/screenshots/report.jpg) | ![Assistant](docs/screenshots/assistant.jpg) | ![Trust](docs/screenshots/trust.jpg) |
+| Mistral verdict | Official records, by theme |
+|---|---|
+| ![Mistral verdict for 907 Valencia St](docs/screenshots/verdict.jpg) | ![Report themes](docs/screenshots/report.jpg) |
+| **Assistant + map** | **Trust network** |
+| ![Assistant](docs/screenshots/assistant.jpg) | ![Trust](docs/screenshots/trust.jpg) |
 
 ## Data
 
