@@ -1,83 +1,145 @@
-# Know Your Building (SF)
+# Know Your Building
 
-Entre une adresse de San Francisco, obtiens un rapport généré par Mistral (évictions, plaintes/infractions DBI, permis, rôle fiscal, pompiers, 311). Option : import du bail, analyse OCR des clauses vs. règles de contrôle des loyers de SF.
+**Know the building before you sign.** Type any San Francisco address and get a plain-language report on the building, written by Mistral from the city's own open data: complaints and violations, permits and works, evictions on the block, fire calls, police incidents nearby and 311 reports. Then hear from tenants, check your lease, and find a neighborhood that fits your budget.
 
-## Organisation
-- `backend/`  : données (geocoding, DataSF, agrégation) -> `GET /api/building`
-- `llm/`      : synthèse Mistral + OCR/analyse du bail -> `POST /api/summary`, `POST /api/lease`
-- `frontend/` : UI
-- `mocks/`    : exemples JSON du contrat, pour travailler en parallèle
-- `contract.md` : le contrat d'interface (à modifier à plusieurs, en prévenant)
+🔗 **Live demo: https://know-your-building.onrender.com** (free hosting: the first load can take up to a minute while the server wakes up)
 
-## Règles
-- Chacun reste dans son dossier, une branche par feature, PR vers `main`.
-- Ne jamais commiter `.env` (copier `.env.example`).
-- Données : https://data.sf.gov (Socrata, ex data.sfgov.org)
+Built in one evening at the **Mistral AI × Elastic hackathon**, San Francisco, November 2026.
 
-## Lancer
-    python3 -m venv .venv && source .venv/bin/activate
-    pip install -r requirements.txt
-    cp .env.example .env          # mettre MISTRAL_API_KEY
-    uvicorn backend.main:app --reload --port 8000     # depuis la racine du repo
+![Explore San Francisco by rent and safety](docs/screenshots/explore.jpg)
 
-Docs API interactives : http://localhost:8000/docs · état des branchements : `curl localhost:8000/api/health`
-Le front est servi sur http://localhost:8000/ dès que `frontend/index.html` existe.
+## Why
 
-## Backend (Personne 1) — routes de contract.md
-    GET  /api/building?address=907%20Valencia%20St   -> format mocks/building.json
-    POST /api/summary   body = sortie de /api/building -> format mocks/summary.json
-    POST /api/lease     multipart, champ "file"         -> format mocks/lease.json
-Exemple réel de /api/building (avec `neighborhood_benchmark` Elastic) : `mocks/building_907_valencia.json`.
-Champs en plus du mock (ignorables) : `address.blklot`, `address.neighborhood`,
-`property.likely_rent_controlled`, `evictions.scope = "street_block"`.
+Nearly two thirds of San Francisco households rent. You get a fifteen-minute showing, a few photos, and a lease to sign by tomorrow. Meanwhile the city already publishes a lot about that building, scattered across datasets no renter reads. Know Your Building turns them into an answer in seconds.
 
-**Pour `llm/` (Personne 2)** : le backend appelle `summarize(building: dict) -> dict` et
-`analyze_lease(file_bytes: bytes, mime: str) -> dict`, cherchées dans `llm/__init__.py`,
-`llm/llm.py`, `llm/summary.py`, `llm/lease.py` ou `llm/main.py`. Tant qu'elles n'existent pas :
-résumé calculé par règles, et `mocks/lease.json` pour le bail.
-SDK : l'équipe utilise `mistralai` 3.7 → importer avec `from mistralai.client import Mistral`
-(l'ancien `from mistralai import Mistral` plante en 3.x).
+## What it does
 
-## Elastic (sponsor) — `backend/search.py`
-Elasticsearch indexe ~3 ans de plaintes et d'infractions DBI de toute la ville (~72 000 documents
-géolocalisés) et ajoute au backend :
-- **Comparaison avec les voisins** (agrégations géo) : `/api/building` renvoie en plus
-  `neighborhood_benchmark` — ex. 907 Valencia St a plus de plaintes que 99 % des 319 immeubles
-  à 500 m (27 contre une médiane de 2). Le résumé l'utilise comme signal « Pire que ses voisins ».
-- `GET /api/benchmark?address=...&radius_m=500`
-- `GET /api/search?q=no heat&address=...&radius_m=800&open_only=true` : recherche plein texte
-  dans toute la ville, résultats groupés par immeuble.
-- `semantic=true` : recherche sémantique multilingue (embeddings `mistral-embed` en
-  `dense_vector` + kNN hybride) — « moisissure » en français retrouve « mold ».
+| | |
+|---|---|
+| **Building report** | A verdict (green / orange / red, set by fixed rules, not by the model) and a Mistral summary, separated from the official records. The records are grouped by theme: building & works, safety, tenant stability (evictions *on the street block*, no-fault evictions flagged), and building profile. Elastic compares the building with its neighbors. |
+| **Tenant reviews** | Ratings and reviews, labeled as opinions, not facts. A "Verified tenant" badge when the reviewer uploads a lease or bill: Mistral OCR checks the address and the file is never stored. Every review is moderated by Mistral. |
+| **Lease check** | Upload a lease: Mistral OCR reads it and flags clauses that may break SF rent rules, with the rule reference, then drafts a letter to the landlord. |
+| **Map** | Vector map of the 41 neighborhoods, colored by median rent or by police incidents, plus layers for recent permits (works) and shops. |
+| **Assistant** | Describe what you need in your own words ("2 people in the Mission, $4k max, 1 year"). It asks for what's missing, outlines matching neighborhoods on the map and pins places. |
+| **Trust network** | Inspired by Paris' "Gens de confiance": recommendations from friends, former landlords and roommates, contactable tenants of the building, and roommate matching that never uses gender, religion or origin. |
+| **More** | Follow a building and see what changed, compare two buildings side by side, commute times, four languages (EN, ES, 中文, FR). |
 
-Mise en place (5 min) :
-1. Un cluster : Elastic Cloud (essai gratuit / crédits du hackathon → copier l'URL du
-   endpoint Elasticsearch et créer une API key), ou en local :
+| Report, by theme | Assistant + map | Trust network |
+|---|---|---|
+| ![Report](docs/screenshots/report.jpg) | ![Assistant](docs/screenshots/assistant.jpg) | ![Trust](docs/screenshots/trust.jpg) |
+
+## Data
+
+All building data comes live from [DataSF](https://data.sf.gov) (Socrata):
+
+| Dataset | ID |
+|---|---|
+| Eviction notices | `5cei-gny5` |
+| DBI complaints | `gm2e-bten` |
+| DBI notices of violation | `nbtm-fbw5` |
+| Building permits | `i98e-djp9` |
+| Assessor tax rolls | `wv5m-vpq2` |
+| 311 cases | `vw6y-z8j6` |
+| Fire incidents | `wr8u-xric` |
+| Police incidents | `wg3w-h783` |
+| Rent Board housing inventory | `gdc7-dmcn` |
+| Addresses, parcels, neighborhoods | `ramy-di5m`, `acdm-wktn`, `j2bu-swwd` |
+
+Map tiles: [OpenFreeMap](https://openfreemap.org) / OpenStreetMap. Shops: OpenStreetMap (Overpass). Commute estimates: OSRM and Nominatim.
+
+**Good to know**
+- The city anonymizes evictions and rents at the **street block** level ("900 Block Of Valencia Street"): the app always says "on this block", never "this building".
+- Rent-control status is indicative (built before 1979 with 2+ units).
+- Map rents come from the Rent Board inventory (self-reported, including long-time tenants), so they run below current asking rents.
+- Reviews, the trust network and listings shipped with the demo are fictional sample data. Reviews from the seed are labeled "fictional example".
+- Informational only, not legal advice.
+
+## Stack
+
+- **Front end:** a single `frontend/index.html` (HTML, CSS, vanilla JS), Leaflet with a MapLibre vector basemap. The design mixes Apple-style "liquid glass", Mistral-style pixel art and the Elastic palette.
+- **Back end:** Python, FastAPI, SQLite for the community features (`backend/`).
+- **AI:** Mistral Large (reports, moderation, roommate matching), Mistral OCR (lease analysis, proof of tenancy), Mistral Embed (multilingual semantic search) (`llm/`).
+- **Search:** Elasticsearch, about 72,000 geolocated DBI complaints and violations, used for neighbor benchmarks and full-text search (`backend/search.py`).
+- **Hosting:** Render (one web service serves both the API and the front end).
+
+## Run it locally
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env            # then set MISTRAL_API_KEY
+uvicorn backend.main:app --reload --port 8000      # from the repo root
+```
+
+Open http://localhost:8000/ (or http://localhost:8000/?address=907%20Valencia%20St to jump to a report).
+Interactive API docs: http://localhost:8000/docs · what's plugged in: `curl localhost:8000/api/health`.
+
+Without `MISTRAL_API_KEY` the app still runs, with rule-based summaries; new reviews are refused because moderation is required. Without Elastic, everything else works.
+
+Demo reviews and profiles are loaded from `seed/seed_community.json` on first start (delete `community.db` to reload them).
+
+## Deploy (Render)
+
+`render.yaml` describes one free web service:
+- build: `pip install -r requirements.txt`
+- start: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+- health check: `/api/health`
+
+Create it from the Render dashboard (**New → Blueprint**, pick this repo) and paste `MISTRAL_API_KEY` when asked. The key is never stored in the repo. Optional: `ELASTIC_URL` and `ELASTIC_API_KEY` for the Elastic features.
+
+On the free plan the disk is temporary: new reviews disappear when the service restarts, and the demo data reloads.
+
+## API
+
+```
+GET  /api/report?address=&lang=en|es|zh|fr   -> {building, report, community}
+GET  /api/building?address=                   -> aggregated city data
+POST /api/summary      body = /api/building output
+POST /api/lease        multipart, field "file"   -> {clauses: [{text, issue, severity, rule_ref}]}
+GET  /api/community?blklot=
+POST /api/reviews      multipart: review=<JSON>, proof=<optional file, never stored>
+POST /api/profiles  ·  GET /api/roommates?profile_id=  ·  POST /api/contact
+GET  /api/benchmark?address=&radius_m=500      (Elastic)
+GET  /api/search?q=no heat&address=&radius_m=800&open_only=true&semantic=true   (Elastic)
+GET  /api/health
+```
+
+See `contract.md` and `FRONT.md` for the full formats.
+
+### Elastic setup (optional, 5 min)
+
+1. A cluster: Elastic Cloud (copy the Elasticsearch endpoint URL and create an API key), or locally:
    `docker run -d -p 9200:9200 -e discovery.type=single-node -e xpack.security.enabled=false docker.elastic.co/elasticsearch/elasticsearch:8.15.3`
-2. `.env` : `ELASTIC_URL=...` (+ `ELASTIC_API_KEY=...` pour le cloud)
-3. `python backend/search.py ingest --years 3` (~40 s) — ajouter `--embed` pour la recherche
-   sémantique (appels Mistral, plus long).
-4. `curl localhost:8000/api/health` → `"elastic": {"docs": 71763, ...}`
+2. In `.env`: `ELASTIC_URL=...` (and `ELASTIC_API_KEY=...` for the cloud).
+3. `python backend/search.py ingest --years 3` (about 40 s). Add `--embed` for semantic search (calls Mistral, slower).
+4. `curl localhost:8000/api/health` should show `"elastic": {"docs": 71763, ...}`.
 
-Cluster Elastic Cloud en 9.x : remplacer la ligne du requirements par `elasticsearch>=9,<10`.
-Sans Elastic configuré, tout le reste du backend fonctionne normalement.
+For an Elastic Cloud 9.x cluster, use `elasticsearch>=9,<10` in `requirements.txt`.
 
-## Extension « gens de confiance » (avis, locataires, colocation)
-    GET  /api/report?address=&lang=en|es|zh|fr   -> {building, report, community}
-    GET  /api/community?blklot=3609042
-    POST /api/reviews   multipart : review=<JSON>, proof=<fichier optionnel, jamais stocké>
-    POST /api/profiles  ·  GET /api/roommates?profile_id=  ·  POST /api/contact
-Données de démo chargées depuis `seed/seed_community.json` au premier lancement
-(supprimer `community.db` pour recharger).
+## Demo addresses (real data)
 
-## Adresses de démo (données réelles, trouvées par `python backend/find_demo_addresses.py`)
-| Rôle          | Adresse              | blklot   | Points clés |
-|---------------|----------------------|----------|-------------|
-| Problématique | 907 Valencia St      | 3609042  | 17 plaintes DBI ouvertes, 25 dossiers d'infraction, 33 avis d'éviction sur le bloc |
-| Bien tenu     | 2288 Broadway        | 0564C104 | 30 logements, 0 plainte en 10 ans |
-| Évictions     | 3033 Cesar Chavez St | 5505019  | 9 évictions Ellis Act / owner move-in sur le bloc en 5 ans |
+| Role | Address | Highlights |
+|---|---|---|
+| Problematic | 907 Valencia St | 17 open DBI complaints, 25 notices of violation, 33 eviction notices on the block |
+| Well kept | 2288 Broadway | 30 units, zero complaints in 10 years |
+| Evictions | 3033 Cesar Chavez St | 9 Ellis Act or owner move-in evictions on the block in 5 years |
 
-## À savoir sur les données
-- Évictions et loyers sont anonymisés par la ville au **bloc de rue** ("900 Block Of Valencia Street") : ne jamais dire « cet immeuble ».
-- Une adresse absente de la base de la ville est rattachée au numéro le plus proche de la même rue (`address.normalized` l'indique).
-- Cache mémoire par adresse : ouvrir les adresses de démo une fois avant de passer devant le jury.
+## Project structure
+
+```
+backend/    FastAPI app, DataSF aggregation, community (SQLite), Elastic search
+llm/        Mistral: reports, lease analysis, moderation, proof check, matching
+frontend/   the web app (single index.html)
+seed/       demo reviews and profiles
+mocks/      sample API responses and demo lease PDFs
+docs/       screenshots
+```
+
+## Team
+
+| | Role |
+|---|---|
+| **Fleurine Jaegler** ([@fleurinejaegler](https://github.com/fleurinejaegler)) | Back end & data: DataSF pipeline, API, Elastic |
+| **Thomas Revol** ([@ThomasREVOL](https://github.com/ThomasREVOL)) | AI: Mistral reports, OCR lease analysis, moderation, matching |
+| **Colomban Dubreuil** ([@C0lomban](https://github.com/C0lomban)) | Front-end prototype & demo data |
+| **Daniel Duong** ([@danielguitaristo](https://github.com/danielguitaristo)) | Front end: interface, map, assistant, design |
