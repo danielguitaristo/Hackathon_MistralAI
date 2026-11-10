@@ -246,7 +246,10 @@ table.cmp td:first-child { text-align: left; color: var(--muted); }
    - page servie par le backend (port 8000) -> même origine
    - page servie à part (python3 -m http.server 5500 --directory frontend) -> http://localhost:8000
    ===================================================================== */
-const API = location.port === '8000' ? '' : 'http://localhost:8000';
+// En ligne (Render) et via le backend local (port 8000) : même origine que la page.
+// Seul cas à part : la page ouverte en local sur un autre port (ex. python3 -m http.server 5500).
+const LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+const API = LOCAL && location.port !== '8000' ? 'http://localhost:8000' : '';
 const SODA = 'https://data.sf.gov/resource/';
 const OVERPASS = 'https://overpass-api.de/api/interpreter';
 const SF = [37.7599, -122.4370];
